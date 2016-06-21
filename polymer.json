@@ -1,0 +1,9 @@
+{
+  "entrypoint": "index.html",
+  "shell": "src/bloombox-dashboard.html",
+  "fragments": [
+    "src/bloombox-page-home.html",
+    "src/bloombox-page-analytics.html",
+    "src/bloombox-page-menu.html"
+  ]
+}
