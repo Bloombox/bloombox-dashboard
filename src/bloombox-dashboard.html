@@ -42,8 +42,9 @@
         display: block;
         padding: 0 16px;
         line-height: 40px;
+        cursor: pointer;
+        color: #777;
         text-decoration: none;
-        color: var(--app-secondary-color);
         -webkit-tap-highlight-color: rgba(0,0,0,0);
       }
       .drawer-list a.iron-selected {
@@ -68,10 +69,14 @@
     <!-- App State -->
     <app-location route="{{route}}"></app-location>
     <app-route
-        route="{{route}}"
-        pattern="/:page"
-        data="{{routeData}}"
-        tail="{{subroute}}"></app-route>
+      route="{{route}}"
+      pattern="/:partner"
+      data="{{routeData}}"
+      tail="{{subroute}}"></app-route>
+    <app-route
+      route="{{subroute}}"
+      pattern="/:page"
+      data="{{subrouteData}}"></app-route>
 
     <!-- Persistence -->
 
@@ -82,9 +87,13 @@
       <app-drawer>
         <app-toolbar>Bloombox</app-toolbar>
         <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
-          <a name="home" href="/home">Home</a>
-          <a name="analytics" href="/analytics">Analytics</a>
-          <a name="menu" href="/menu">Menu</a>
+          <a name="home" on-tap="navigate">Home</a>
+          <a name="analytics" on-tap="navigate">Analytics</a>
+          <a name="menu" on-tap="navigate">Menu</a>
+          <a name="profile" on-tap="navigate">Profile</a>
+          <a name="account" on-tap="navigate">Account</a>
+          <a name="settings" on-tap="navigate">Settings</a>
+          <a name="admin" on-tap="navigate">Admin</a>
         </iron-selector>
       </app-drawer>
 
@@ -101,6 +110,10 @@
           <bloombox-page-home name="home"></bloombox-page-home>
           <bloombox-page-analytics name="analytics"></bloombox-page-analytics>
           <bloombox-page-menu name="menu"></bloombox-page-menu>
+          <bloombox-page-profile name="profile"></bloombox-page-profile>
+          <bloombox-page-account name="account"></bloombox-page-account>
+          <bloombox-page-settings name="settings"></bloombox-page-settings>
+          <bloombox-page-admin name="admin"></bloombox-page-admin>
         </iron-pages>
 
       </app-header-layout>
@@ -116,6 +129,16 @@
       is: 'bloombox-dashboard',
 
       properties: {
+        route: {
+          type: Object,
+          reflectToAttribute: true,
+          default: 'home'
+        },
+
+        subroute: {
+          type: Object,
+          reflectToAttribute: true
+        },
 
         page: {
           type: String,
@@ -123,22 +146,61 @@
           observer: '_pageChanged'
         },
 
+        partner: {
+          type: String,
+          reflectToAttribute: true,
+          observer: '_partnerChanged'
+        }
       },
 
       observers: [
-        '_routePageChanged(routeData.page)'
+        '_routePageChanged(subrouteData.page)',
+        '_routePartnerChanged(routeData.partner)',
+        '_routeChanged(partner, page)'
       ],
 
       _routePageChanged: function(page) {
         this.page = page || 'home';
       },
 
+      _routePartnerChanged: function(partner) {
+        this.partner = partner;
+      },
+
       _pageChanged: function(page) {
         // load page import on demand.
+        console.info("Navigating to page '" + page + "'...");
         this.importHref(
           this.resolveUrl('bloombox-page-' + page + '.html'), null, null, true);
-      }
+      },
 
+      _partnerChanged: function(partner) {
+        if (partner != null && partner != undefined && partner.length > 1) {
+          console.info("Loading for partner '" + partner + "'...");
+          this._routeChanged(partner, this.page || 'home');
+        }
+      },
+
+      _routeChanged: function(partner, page) {
+        var existingRoute = this.get("route") || {};
+        if (partner != null && partner != undefined && partner != "" && page != null && page != undefined) {
+          if (existingRoute.path == "/" + partner + "/" + page) {
+            // skip: we are already there
+          } else {
+            this.route = {"prefix": "", "path": "/" + partner + "/" + page, "__queryParams": {}};
+            if (window.location.pathname.length < 3) {
+              window.location.pathname = "/" + partner + "/" + page;
+            }
+          }
+        }
+      },
+
+      navigate: function(event) {
+        var partner = this.partner,
+            page = event.target.getAttribute("name");
+        this.partner = partner;
+        this.page = page;
+      }
     });
 
   </script>
