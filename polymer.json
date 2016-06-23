@@ -4,6 +4,9 @@
   "fragments": [
     "src/bloombox-page-home.html",
     "src/bloombox-page-analytics.html",
-    "src/bloombox-page-menu.html"
+    "src/bloombox-page-menu.html",
+    "src/bloombox-page-profile.html",
+    "src/bloombox-page-account.html",
+    "src/bloombox-page-settings.html"
   ]
 }
