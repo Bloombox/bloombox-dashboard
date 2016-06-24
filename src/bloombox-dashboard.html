@@ -1,5 +1,11 @@
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
+
 <link rel="import" href="../bower_components/app-route/app-location.html">
 <link rel="import" href="../bower_components/app-route/app-route.html">
 <link rel="import" href="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
@@ -8,12 +14,17 @@
 <link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
 <link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
 <link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
-<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
-<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+
+<link rel="import" href="../bower_components/bloombox-logo/bloombox-logo.html">
+<link rel="import" href="../bower_components/bloombox-user/bloombox-user.html">
 <link rel="import" href="../bower_components/bloombox-styles/bloombox-styles.html">
 
+<link rel="import" href="bloombox-loader.html">
 <link rel="import" href="bloombox-dashboard-icons.html">
 
 
@@ -23,15 +34,48 @@
       :host {
         display: block;
         --app-primary-color: #68b345;
-        --app-secondary-color: black;
+        --app-secondary-color: #d5d5d5;
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        background: #eee;
       }
 
       app-header {
-        background-color: var(--app-primary-color);
-        color: #fff;
+        background-color: #4c9d2f;
+        color: #fefefe;
+        border-bottom: none;
       }
       app-header paper-icon-button {
         --paper-icon-button-ink-color: white;
+      }
+      app-drawer app-toolbar {
+        background-color: #4c9d2f;
+        border-bottom: none;
+        color: #fefefe;
+      }
+      app-drawer app-toolbar bloombox-logo {
+        font-size: 16pt;
+        width: 150px;
+        margin-top: 5px;
+        margin-left: -10px;
+      }
+      app-header-layout app-toolbar bloombox-logo {
+        margin-left: 10px;
+        width: 40px;
+        display: inline-block;
+        float: left;
+      }
+
+      app-header-layout app-toolbar div.toggle-container {
+        display: inline-block;
+        height: 64px;
+      }
+
+      app-header-layout app-toolbar div.toggle-container paper-icon-button {
+        margin-top: 10px;
       }
 
       .drawer-list {
@@ -56,6 +100,55 @@
         padding-left: 32px;
       }
 
+      div.loading-overlay {
+        cursor: default;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(104, 179, 69, 0.9);
+        opacity: 1;
+        transition-property: opacity;
+        transition-duration: 0.3s;
+      }
+
+      div.loading-overlay.spinner-inactive {
+        opacity: 0 !important;
+      }
+
+      div.loading-overlay.spinner-removed {
+        display: none;
+      }
+
+      div.toolbar-utils {
+        display: flex;
+        position: absolute;
+        top: 0;
+        right: 0;
+      }
+
+      div.toolbar-utils paper-dropdown-menu {
+        margin-top: -13px;
+        --paper-input-container-label: {
+          color: #d5d5d5 !important;
+        }
+
+        --paper-dropdown-menu-input: {
+          color: #d5d5d5 !important;
+        }
+      }
+
+      div.toolbar-utils paper-dropdown-menu /deep/ input#input {
+        color: #fefefe !important;
+      }
+
+      div.toolbar-utils bloombox-user {
+        margin-top: 8px;
+        color: #fefefe;
+        margin-left: 20px;
+      }
+
       a:focus,
       input:focus,
       select:focus,
@@ -70,94 +163,301 @@
     <app-location route="{{route}}"></app-location>
     <app-route
       route="{{route}}"
-      pattern="/:partner"
-      data="{{routeData}}"
+      pattern="/:partner/:page"
+      data="{{_routeData}}"
       tail="{{subroute}}"></app-route>
-    <app-route
-      route="{{subroute}}"
-      pattern="/:page"
-      data="{{subrouteData}}"></app-route>
-
-    <!-- Persistence -->
 
     <!-- Layout / UI -->
-    <app-drawer-layout fullbleed responsive-width="850px">
-
-      <!-- Drawer content -->
-      <app-drawer>
-        <app-toolbar>Bloombox</app-toolbar>
-        <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
-          <a name="home" on-tap="navigate">Home</a>
-          <a name="analytics" on-tap="navigate">Analytics</a>
-          <a name="menu" on-tap="navigate">Menu</a>
-          <a name="profile" on-tap="navigate">Profile</a>
-          <a name="account" on-tap="navigate">Account</a>
-          <a name="settings" on-tap="navigate">Settings</a>
-          <a name="admin" on-tap="navigate">Admin</a>
-        </iron-selector>
-      </app-drawer>
-
-      <!-- Main content -->
-      <app-header-layout has-scrolling-region>
-
-        <app-header condenses reveals effects="waterfall">
+    <main>
+      <app-drawer-layout fullbleed responsive-width="850px" narrow="{{_narrow}}">
+        <!-- Drawer content -->
+        <app-drawer>
           <app-toolbar>
-            <paper-icon-button icon="menu" drawer-toggle></paper-icon-button>
+            <div title>
+              <bloombox-logo mode="icon" logotext></bloombox-logo>
+            </div><!-- end div[title] -->
           </app-toolbar>
-        </app-header>
+          <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
+            <a name="home" on-tap="navigate">Home</a>
+            <a name="analytics" on-tap="navigate">Analytics</a>
+            <a name="menu" on-tap="navigate">Menu</a>
+            <a name="profile" on-tap="navigate">Profile</a>
+            <a name="account" on-tap="navigate">Account</a>
+            <a name="settings" on-tap="navigate">Settings</a>
+            <a name="admin" on-tap="navigate">Admin</a>
+          </iron-selector>
+        </app-drawer>
 
-        <iron-pages role="main" selected="[[page]]" attr-for-selected="name">
-          <bloombox-page-home name="home"></bloombox-page-home>
-          <bloombox-page-analytics name="analytics"></bloombox-page-analytics>
-          <bloombox-page-menu name="menu"></bloombox-page-menu>
-          <bloombox-page-profile name="profile"></bloombox-page-profile>
-          <bloombox-page-account name="account"></bloombox-page-account>
-          <bloombox-page-settings name="settings"></bloombox-page-settings>
-          <bloombox-page-admin name="admin"></bloombox-page-admin>
-        </iron-pages>
+        <!-- Main content -->
+        <app-header-layout has-scrolling-region>
+          <app-header condenses reveals effects="waterfall">
+            <app-toolbar>
+              <div drawer-toggle top-item>
+                <bloombox-logo mode="icon"></bloombox-logo>
+                <div class="toggle-container">
+                  <paper-icon-button icon="menu" drawer-toggle></paper-icon-button>
+                </div><!-- end div.toggle-container -->
+              </div>
+              <div class="toolbar-utils">
+                <paper-dropdown-menu id="partnerSelection" noink disabled$="[[loading]]">
+                  <paper-listbox id="dispensaryMenuItems" class="dropdown-content" selected="{{partner}}" attr-for-selected="key">
+                    <template is="dom-repeat" items="[[partners]]">
+                      <paper-item key="[[item.key]]">[[item.label]]</paper-item>
+                    </template>
+                  </paper-listbox>
+                </paper-dropdown-menu><!-- end paper-dropdown-menu#partnerSelection -->
 
-      </app-header-layout>
+                <bloombox-user
+                  name="[[user.fullname]]"
+                  email="[[user.email]]"
+                  image="[[user.image]]"
+                  display-mode="[[displayMode]]"></bloombox-user><!-- end bloombox-user -->
+              </div>
+            </app-toolbar>
+          </app-header>
 
-    </app-drawer-layout>
+          <iron-pages role="main" selected="[[page]]" attr-for-selected="name">
+            <bloombox-page-home
+              name="home"
+              endpoint="[[endpoint]]"
+              partner="[[partner]]"
+              environment="[[environment]]"></bloombox-page-home>
+            <bloombox-page-analytics
+              name="analytics"
+              endpoint="[[endpoint]]"
+              partner="[[partner]]"
+              environment="[[environment]]"></bloombox-page-analytics>
+            <bloombox-page-menu
+              name="menu"
+              endpoint="[[endpoint]]"
+              partner="[[partner]]"
+              environment="[[environment]]"></bloombox-page-menu>
+            <bloombox-page-profile
+              name="profile"
+              endpoint="[[endpoint]]"
+              partner="[[partner]]"
+              environment="[[environment]]"></bloombox-page-profile>
+            <bloombox-page-account
+              name="account"
+              endpoint="[[endpoint]]"
+              partner="[[partner]]"
+              environment="[[environment]]"></bloombox-page-account>
+            <bloombox-page-settings
+              name="settings"
+              endpoint="[[endpoint]]"
+              partner="[[partner]]"
+              environment="[[environment]]"></bloombox-page-settings>
+            <bloombox-page-admin
+              name="admin"
+              endpoint="[[endpoint]]"
+              partner="[[partner]]"
+              environment="[[environment]]"></bloombox-page-admin>
+          </iron-pages>
+        </app-header-layout>
+      </app-drawer-layout>
+    </main>
 
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay spinner-container">
+      <bloombox-loader></bloombox-loader>
+    </div><!-- end div.loading-overlay -->
   </template>
 
   <script>
+    var BloomboxDashboardConfig = {
+      spinner: {
+        thrash: 100,  // shortest value for simple UI reflow pause
+        delay: 1000,  // i'll buy it at a HIGH PRICE
+        interval: 316,  // must be animation delay (300ms) plus at least on render window (16ms)
+        navigationDelay: 1500  // shorter delay to let the UI catch up with major changes
+      }      
+    };
 
-    Polymer({
-
+    Polymer.BloomboxDashboard = Polymer({
       is: 'bloombox-dashboard',
-
       properties: {
+        /**
+         * Private property that holds onto a reference to the main
+         * loading overlay.
+         */
+        _overlay: {
+          type: Object,
+          readOnly: true
+        },
+
+        /**
+         * Private property indicating our current `narrow` UI-mode
+         * state. `true` when the window width is less than the
+         * `responsiveWidth`.
+         */
+        _narrow: {
+          type: Boolean,
+          notify: true
+        },
+
+        /**
+         * Object containing result of parsed data from URL. This stops
+         * after finding the required properties `partner` and `home`.
+         */
+        _routeData: {
+          type: Object,
+          notify: true
+        },
+
+        /**
+         * Computes and returns the current display mode for widgets,
+         * based on the current `narrow` state of the main UI.
+         */
+        displayMode: {
+          type: String,
+          notify: true,
+          computed: '_computeDisplayMode(_narrow)'
+        },
+
+        /**
+         * Boolean flag indicating the dashboard is currently loading up.
+         */
+        loading: {
+          type: Boolean,
+          notify: true,
+          reflectToAttribute: true,
+          default: true,
+          observer: '_loadingStateChanged'
+        },
+
+        /**
+         * Active page route. Holds parsed route info including the current
+         * `page` and `partner`.
+         */
         route: {
           type: Object,
-          reflectToAttribute: true,
-          default: 'home'
+          notify: true,
+          reflectToAttribute: false
         },
 
+        /**
+         * Active page subroute. Holds parsed route info that was found in
+         * addition to the standard/required `route` data.
+         */
         subroute: {
           type: Object,
-          reflectToAttribute: true
+          notify: true,
+          reflectToAttribute: false
         },
 
+        /**
+         * Active page name, such as `home` or `menu`.
+         */
         page: {
           type: String,
+          notify: true,
           reflectToAttribute: true,
           observer: '_pageChanged'
         },
 
+        /**
+         * Currently logged-in user.
+         */
+        user: {
+          type: Object,
+          notify: true,
+          reflectToAttribute: false,
+          readOnly: true
+        },
+
+        /**
+         * Transport settings provided by the server.
+         */
+        transport: {
+          type: Object,
+          notify: true,
+          reflectToAttribute: false,
+          readOnly: true,
+          observer: '_transportConfigLoaded'
+        },
+
+        /**
+         * API configuration and manifest provided by the server.
+         */
+        api: {
+          type: Object,
+          notify: true,
+          reflectToAttribute: false,
+          readOnly: true,
+          observer: '_apiConfigLoaded'
+        },
+
+        /**
+         * Credential and authorization information for the current user,
+         * provided by the server.
+         */
+        credentials: {
+          type: Object,
+          notify: true,
+          reflectToAttribute: false,
+          readOnly: true,
+          observer: '_credentialsLoaded'
+        },
+
+        /**
+         * List of `partner` objects that the current user has access to,
+         * and may switch to in the UI.
+         */
+        partners: {
+          type: Array,
+          notify: true,
+          readOnly: true,
+          reflectToAttribute: false,
+          observer: '_partnersLoaded'
+        },
+
+        /**
+         * Active partner name, such as `mm` or `abatin`.
+         */
         partner: {
           type: String,
+          notify: true,
           reflectToAttribute: true,
           observer: '_partnerChanged'
+        },
+
+        /**
+         * Active database environment. Defaults to `sandbox`.
+         */
+        environment: {
+          type: String,
+          reflectToAttribute: true,
+          default: 'sandbox'
+        },
+
+        /**
+         * Computed property that generates a Firebase endpoint prefix for
+         * subcomponents that are backed by persisted data.
+         */
+        endpoint: {
+          type: String,
+          notify: true,
+          computed: '_computeEndpoint(environment, partner)'
         }
       },
 
       observers: [
-        '_routePageChanged(subrouteData.page)',
-        '_routePartnerChanged(routeData.partner)',
+        '_routePageChanged(_routeData.page)',
+        '_routePartnerChanged(_routeData.partner)',
         '_routeChanged(partner, page)'
       ],
+
+      _computeEndpoint: function(environment, partner) {
+        return "/" + environment + "/" + partner;
+      },
+
+      _computeDisplayMode: function() {
+        var narrow = this.get("_narrow");
+        if (narrow === true) {
+          return "slim";
+        }
+        return "normal";
+      },
 
       _routePageChanged: function(page) {
         this.page = page || 'home';
@@ -167,6 +467,28 @@
         this.partner = partner;
       },
 
+      _loadingStateChanged: function(loading) {
+        var overlay = this._overlay;
+
+        if (overlay !== null && overlay !== undefined) {
+          if (loading === false && !overlay.classList.contains("spinner-inactive")) {
+            // hide the loading spinner
+            overlay.classList.add("spinner-inactive");
+            setTimeout(function() {
+              overlay.classList.add("spinner-removed");
+            }, BloomboxDashboardConfig.spinner.interval);
+          } else {
+            if (overlay.classList.contains("spinner-inactive")) {
+              // show the loading spinner
+              overlay.classList.remove("spinner-removed");
+              setTimeout(function() {
+                overlay.classList.remove("spinner-inactive");
+              }, BloomboxDashboardConfig.spinner.thrash);
+            }
+          }
+        }
+      },
+
       _pageChanged: function(page) {
         // load page import on demand.
         console.info("Navigating to page '" + page + "'...");
@@ -174,10 +496,19 @@
           this.resolveUrl('bloombox-page-' + page + '.html'), null, null, true);
       },
 
-      _partnerChanged: function(partner) {
+      _partnerChanged: function(partner, oldPartner) {
+        var that = this;
         if (partner != null && partner != undefined && partner.length > 1) {
           console.info("Loading for partner '" + partner + "'...");
           this._routeChanged(partner, this.page || 'home');
+        }
+
+        if (oldPartner !== null && oldPartner !== undefined && oldPartner.length > 1) {
+          // show loading spinner for short period
+          this.loading = true;
+          setTimeout(function() {
+            that.loading = false;
+          }, BloomboxDashboardConfig.spinner.navigationDelay);
         }
       },
 
@@ -195,14 +526,67 @@
         }
       },
 
+      _transportConfigLoaded: function(transport) {
+        console.info("Loaded transport configuration.", transport);
+      },
+
+      _apiConfigLoaded: function(api) {
+        console.info("Loaded API configuration.", api);
+      },
+
+      _credentialsLoaded: function(credentials) {
+        console.info("Loaded user credentials.", credentials);
+      },
+
+      _partnersLoaded: function(partners) {
+        console.info("Loaded user partner access.", partners);
+
+        if (window.location.pathname == "" || window.location.pathname.length < 2) {
+          // start us off with the first partner the user has access to
+          this.partner = partners[0].key;
+        }
+      },
+
       navigate: function(event) {
         var partner = this.partner,
             page = event.target.getAttribute("name");
         this.partner = partner;
         this.page = page;
+      },
+
+      ready: function() {
+        var overlay = this.$.loadingOverlay,
+            that = this;
+        this._set_overlay(overlay);
+        console.info("Dashboard is ready to boot.");
+
+        // this would be the loading order...
+        this._setUser({"email": "sam@momentum.io",
+                     "id": "116744996931216702695",
+                     "image": "https://lh5.googleusercontent.com/-hdqCivz5y4I/AAAAAAAAAAI/AAAAAAAAAZ8/orvrIMNGHmU/photo.jpg",
+                     "domain": "momentum.io",
+                     "admin": true,
+                     "fullname": "Sam Gammon",
+                     "firstname": "Sam",
+                     "lastname": "Gammon"});
+        this._setTransport({"base": "bloombox-io",
+                          "environment": "sandbox",
+                          "token": "eyJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJodHRwczovL2lkZW50aXR5dG9vbGtpdC5nb29nbGVhcGlzLmNvbS9nb29nbGUuaWRlbnRpdHkuaWRlbnRpdHl0b29sa2l0LnYxLklkZW50aXR5VG9vbGtpdCIsImNsYWltcyI6eyJlbnZpcm9ubWVudCI6InNhbmRib3giLCJwYXJ0bmVycyI6eyJhYmF0aW4iOnRydWV9LCJlbWFpbCI6InNhbUBtb21lbnR1bS5pbyIsImFkbWluIjp0cnVlLCJrZXkiOiJhZzF6Zm1Kc2IyOXRZbTk0TFdsdmNrMExFZ2RCWTJOdmRXNTBJa0E0TUdRMlltWTBaVGc0TURjNE9HRmpPV0kwTlRGbFptSm1ZMlptTnpobE5qZ3lOR00zWkRSaU0yVm1ZV1kyTURZNFl6WXpNREptWm1KaE4yRmlOMlZsREtJQkIzWXpZbVYwWVRFIn0sImV4cCI6MTQ2NjcyMzQxMSwiaWF0IjoxNDY2NzE5ODExLCJpc3MiOiJwbGF0Zm9ybUBibG9vbWJveC1pby5pYW0uZ3NlcnZpY2VhY2NvdW50LmNvbSIsInN1YiI6InBsYXRmb3JtQGJsb29tYm94LWlvLmlhbS5nc2VydmljZWFjY291bnQuY29tIiwidWlkIjoiMThjZGUwMzFiMjNmMDE3N2E0Y2QxY2UxMGRhYWUzOTMxNzk5NTQ2YjIyNDQ0NWVmYWQ1Y2YwYzAzOTdhOWE0NiJ9.cx0IwkxG1vf3LrfZoZu5wGGzTxL6NPKYs0Tjixhf1RZpfP_kTgXsdSK41cH2nuKWWVBo0PdKXjkWCxCe2_f3GvXW0hHKQSq0h2FMUxLmFRVsjM-x4TULs_5EAI81WyorljuWDwrq-q81cVNYBrouVO9W86SGiSsw6AqJmrZxfE_hLp1DI1tJZFKuk9agry0euS5TUptSjIXuOnAe8PvznwAo69sHNlBDhSFmtYQ1eiq99tYVvAqQwMONySgQrcuTT2SDcsosNWu12AgDpwNMjEQdA-U4oxgmWAj3tWtt9X82AFoiT1b4ofs4YNhMfjGLd0EciltCXHv56C8sRckY3Q",
+                          "key": "AIzaSyCQx80_10nt75jjovZqb1n8EJJb6bJu6hc"});
+        this._setApi({load: [["accounts","v1"],["analytics","v1"],["partner","v1"],["device","v1"]],
+                    key: "AIzaSyCQx80_10nt75jjovZqb1n8EJJb6bJu6hc",
+                    endpoint: "https://bloombox-io.appspot.com/_ah/api"});
+        this._setCredentials({"id": "690823427095-h9n5cdoa6jnlittcpi7j8i2cq4isugob.apps.googleusercontent.com",
+                            "access": "ya29.CjAKA5eAX-79Rdi6nTkvX6AaYGZfEzm7MJY1hopy2CVuTB1TCZEd2LjnXAgGPGD9A3E",
+                            "expiration": 1466723357162,
+                            "scope": "https://www.googleapis.com/auth/user.birthday.read,https://www.googleapis.com/auth/userinfo.email,https://www.googleapis.com/auth/plus.me"});
+        this._setPartners([{"label": "Abatin Wellness", "key": "abatin"},
+                            {"label": "Bloom Sandbox", "key": "mm"}]);
+
+        setTimeout(function() {
+          that.loading = false;
+        }, BloomboxDashboardConfig.spinner.delay);
       }
     });
-
   </script>
-
 </dom-module>

@@ -1,5 +1,6 @@
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-document.html">
 
 <dom-module id="bloombox-page-menu">
 
@@ -36,23 +37,110 @@
       }
     </style>
 
+    <!-- Firebase Collections -->
+    <firebase-document
+      id="strainsCollection"
+      app-name="Bloombox"
+      log$="[[debug]]"
+      path="[[endpoint]]/menu/flowers"
+      data="{{strains}}"></firebase-document>
+    <firebase-document
+      id="ediblesCollection"
+      app-name="Bloombox"
+      log$="[[debug]]"
+      path="[[endpoint]]/menu/edibles"
+      data="{{edibles}}"></firebase-document>
+    <firebase-document
+      id="concentratesCollection"
+      app-name="Bloombox"
+      log$="[[debug]]"
+      path="[[endpoint]]/menu/edibles"
+      data="{{concentrates}}"></firebase-document>
+    <firebase-document
+      id="cartridgesCollection"
+      app-name="Bloombox"
+      log$="[[debug]]"
+      path="[[endpoint]]/menu/cartridges"
+      data="{{cartridges}}"></firebase-document>
+    <firebase-document
+      id="apothecaryCollection"
+      app-name="Bloombox"
+      log$="[[debug]]"
+      path="[[endpoint]]/menu/apothecary"
+      data="{{apothecary}}"></firebase-document>
+    <firebase-document
+      id="prerollsCollection"
+      app-name="Bloombox"
+      log$="[[debug]]"
+      path="[[endpoint]]/menu/prerolls"
+      data="{{prerolls}}"></firebase-document>
+
+    <!-- Card UI -->
     <div class="card">
       <div class="circle">3</div>
       <h1>Menu</h1>
       <p>Modus commodo minimum eum te, vero utinam assueverit per eu.</p>
       <p>Ea duis bonorum nec, falli paulo aliquid ei eum.Has at minim mucius aliquam, est id tempor laoreet.Pro saepe pertinax ei, ad pri animal labores suscipiantur.</p>
     </div>
-
   </template>
 
   <script>
+    Polymer.BloomboxPageMenu = Polymer({
+      is: 'bloombox-page-menu',
+      properties: {
+        endpoint: {
+          type: String,
+          notify: true
+        },
 
-    Polymer({
+        strains: {
+          type: Object,
+          notify: true,
+          default: function() {
+            return {};
+          }
+        },
 
-      is: 'bloombox-page-menu'
+        edibles: {
+          type: Object,
+          notify: true,
+          default: function() {
+            return {};
+          }
+        },
 
+        concentrates: {
+          type: Object,
+          notify: true,
+          default: function() {
+            return {};
+          }
+        },
+
+        cartridges: {
+          type: Object,
+          notify: true,
+          default: function() {
+            return {};
+          }
+        },
+
+        apothecary: {
+          type: Object,
+          notify: true,
+          default: function() {
+            return {};
+          }
+        },
+
+        prerolls: {
+          type: Object,
+          notify: true,
+          default: function() {
+            return {};
+          }
+        }
+      }
     });
-
   </script>
-
 </dom-module>

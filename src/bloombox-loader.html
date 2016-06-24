@@ -1,0 +1,44 @@
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-spinner/paper-spinner-lite.html">
+
+
+<dom-module id="bloombox-loader">
+  <template>
+    <style is="custom-style" include="bloombox-styles">
+      :host {
+        display: flex;
+        width: 100px;
+        height: 100px;
+      }
+
+      div.spinner-container {
+        display: flex;
+        justify-content: center;
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 200px;
+        text-align: center;
+      }
+
+      div.spinner-container paper-spinner-lite {
+        --paper-spinner-color: #BADA55;
+      }
+    </style>
+
+    <div class="spinner-container">
+      <paper-spinner-lite
+        id="mainSpinner"
+        active
+        alt="Loading dashboard..."></paper-spinner-lite>
+    </div><!-- end div.spinner-container -->
+  </template>
+
+  <script>
+    Polymer.BloomboxLoader = Polymer({
+      is: 'bloombox-loader'
+    });
+  </script>
+</dom-module>
