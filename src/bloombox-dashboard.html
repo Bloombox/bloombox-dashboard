@@ -539,6 +539,7 @@
       _routeChanged: function(partner, page) {
         var existingRoute = this.get("route") || {};
         if (partner != null && partner != undefined && partner != "" && page != null && page != undefined) {
+          document.title = page.charAt(0).toUpperCase() + page.substr(1) + " - " + partner.charAt(0).toUpperCase() + partner.substr(1) + " - " + "Bloombox Dashboard";
           if (existingRoute.path == "/" + partner + "/" + page) {
             // skip: we are already there
           } else {
