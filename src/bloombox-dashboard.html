@@ -450,8 +450,7 @@
          */
         environment: {
           type: String,
-          reflectToAttribute: true,
-          default: 'sandbox'
+          reflectToAttribute: true
         },
 
         /**
@@ -468,7 +467,8 @@
       observers: [
         '_routePageChanged(_routeData.page)',
         '_routePartnerChanged(_routeData.partner)',
-        '_routeChanged(partner, page)'
+        '_routeChanged(partner, page)',
+        '_bootDashboard(user, transport, api, partners, credentials, firebase, environment)'
       ],
 
       _computeEndpoint: function(environment, partner) {
@@ -552,6 +552,8 @@
 
       _transportConfigLoaded: function(transport) {
         console.info("Loaded transport configuration.", transport);
+        console.log("Selecting environment '" + transport.environment + "'.");
+        this.environment = transport.environment;
       },
 
       _apiConfigLoaded: function(api) {
@@ -582,6 +584,14 @@
         this.page = page;
       },
 
+      _bootDashboard: function() {
+        var that = this;
+        console.log("Dashboard is ready for use.");
+        setTimeout(function() {
+          that.loading = false;
+        }, BloomboxDashboardConfig.spinner.delay);
+      },
+
       ready: function() {
         var overlay = this.$.loadingOverlay,
             that = this;
@@ -610,10 +620,6 @@
                             "scope": "https://www.googleapis.com/auth/user.birthday.read,https://www.googleapis.com/auth/userinfo.email,https://www.googleapis.com/auth/plus.me"});
         this._setPartners([{"label": "Abatin Wellness", "key": "abatin"},
                             {"label": "Bloom Sandbox", "key": "mm"}]);
-
-        setTimeout(function() {
-          that.loading = false;
-        }, BloomboxDashboardConfig.spinner.delay);
       }
     });
   </script>
