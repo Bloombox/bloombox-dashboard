@@ -34,7 +34,7 @@
       :host {
         display: block;
         --app-primary-color: #68b345;
-        --app-secondary-color: #d5d5d5;
+        --app-secondary-color: #333;
         position: fixed;
         top: 0;
         left: 0;
@@ -62,6 +62,11 @@
         margin-top: 5px;
         margin-left: -10px;
       }
+
+      app-header-layout app-toolbar {
+        background-color: var(--app-secondary-color);
+      }
+
       app-header-layout app-toolbar bloombox-logo {
         margin-left: 10px;
         width: 40px;
@@ -131,16 +136,17 @@
       div.toolbar-utils paper-dropdown-menu {
         margin-top: -13px;
         --paper-input-container-label: {
-          color: #d5d5d5 !important;
+          color: #fefefe !important;
         }
 
         --paper-dropdown-menu-input: {
-          color: #d5d5d5 !important;
+          color: #fefefe !important;
         }
       }
 
       div.toolbar-utils paper-dropdown-menu /deep/ input#input {
         color: #fefefe !important;
+        margin-left: 5px;
       }
 
       div.toolbar-utils bloombox-user {
@@ -193,7 +199,7 @@
           <app-header condenses reveals effects="waterfall">
             <app-toolbar>
               <div drawer-toggle top-item>
-                <bloombox-logo mode="icon"></bloombox-logo>
+                <bloombox-logo hidden mode="icon"></bloombox-logo>
                 <div class="toggle-container">
                   <paper-icon-button icon="menu" drawer-toggle></paper-icon-button>
                 </div><!-- end div.toggle-container -->
