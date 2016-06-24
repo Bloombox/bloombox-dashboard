@@ -1,145 +1,247 @@
 
+<!-- Polymer / Firebase -->
 <link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../bower_components/polymerfire/firebase-document.html">
 
+<!-- Bloombox Commons -->
+<link rel="import" href="../bower_components/bloombox-styles/bloombox-styles.html">
+<link rel="import" href="../bower_components/bloombox-menutools/bloombox-menutools.html">
+
+<!-- Product Cards -->
+<link rel="import" href="../bower_components/bloombox-strain/bloombox-strain.html">
+<link rel="import" href="../bower_components/bloombox-edible/bloombox-edible.html">
+<link rel="import" href="../bower_components/bloombox-preroll/bloombox-preroll.html">
+<link rel="import" href="../bower_components/bloombox-cartridge/bloombox-cartridge.html">
+<link rel="import" href="../bower_components/bloombox-apothecary/bloombox-apothecary.html">
+<link rel="import" href="../bower_components/bloombox-concentrate/bloombox-concentrate.html">
+
+
 <dom-module id="bloombox-page-menu">
-
   <template>
-
-    <style>
+    <style is="custom-style" include="bloombox-styles">
       :host {
         display: block;
-        padding: 10px;
+        padding: 40px;
       }
-      .card {
-        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
-        padding: 16px;
-        margin: 24px;
-        border-radius: 5px;
-        background-color: #fff;
-        color: #757575;
-      }
-      .circle {
-        display: inline-block;
-        height: 64px;
-        width: 64px;
-        border-radius: 50%;
-        background: #ddd;
-        line-height: 64px;
-        font-size: 30px;
-        color: #555;
-        text-align: center;
-      }
+
       h1 {
-        font-size: 22px;
+        font-size: 28px;
         margin: 16px 0;
         color: #212121;
+      }
+
+      :host paper-card.menutools-container,
+      :host paper-card.menutools-container .card-content {
+        background-color: white;
+        min-width: 575px;
+      }
+
+      :host bloombox-strain,
+      :host bloombox-apothecary {
+        margin-bottom: 20px;
+        width: 100%;
+      }
+
+      :host .menu-content {
+        margin-top: 40px;
       }
     </style>
 
     <!-- Firebase Collections -->
     <firebase-document
       id="strainsCollection"
-      app-name="Bloombox"
       log$="[[debug]]"
-      path="[[endpoint]]/menu/flowers"
-      data="{{strains}}"></firebase-document>
-    <firebase-document
-      id="ediblesCollection"
-      app-name="Bloombox"
-      log$="[[debug]]"
-      path="[[endpoint]]/menu/edibles"
-      data="{{edibles}}"></firebase-document>
-    <firebase-document
-      id="concentratesCollection"
-      app-name="Bloombox"
-      log$="[[debug]]"
-      path="[[endpoint]]/menu/edibles"
-      data="{{concentrates}}"></firebase-document>
-    <firebase-document
-      id="cartridgesCollection"
-      app-name="Bloombox"
-      log$="[[debug]]"
-      path="[[endpoint]]/menu/cartridges"
-      data="{{cartridges}}"></firebase-document>
-    <firebase-document
-      id="apothecaryCollection"
-      app-name="Bloombox"
-      log$="[[debug]]"
-      path="[[endpoint]]/menu/apothecary"
-      data="{{apothecary}}"></firebase-document>
-    <firebase-document
-      id="prerollsCollection"
-      app-name="Bloombox"
-      log$="[[debug]]"
-      path="[[endpoint]]/menu/prerolls"
-      data="{{prerolls}}"></firebase-document>
+      path="[[_menuEndpoint]]"
+      data="{{data}}"></firebase-document>
 
     <!-- Card UI -->
-    <div class="card">
-      <div class="circle">3</div>
-      <h1>Menu</h1>
-      <p>Modus commodo minimum eum te, vero utinam assueverit per eu.</p>
-      <p>Ea duis bonorum nec, falli paulo aliquid ei eum.Has at minim mucius aliquam, est id tempor laoreet.Pro saepe pertinax ei, ad pri animal labores suscipiantur.</p>
-    </div>
+    <h1>Menu Manager</h1>
+
+    <paper-card class="fullwidth menutools-container">
+      <div class="menu-tools toolbar-content card-content">
+        <bloombox-menutools
+          instock="{{instock}}"
+          display-mode="{{_menuDisplayMode}}"
+          locations="[[locations]]"
+          location="{{location}}"></bloombox-menutools>
+      </div><!-- end div.toolbar-content.card-content -->
+
+      <!-- Menu Navigation (categories) -->
+      <div class="menu-nav">
+        <paper-tabs selected="{{section}}" attr-for-selected="key" noink>
+          <paper-tab key="flowers">Flowers</paper-tab>
+          <paper-tab key="edibles">Edibles</paper-tab>
+          <paper-tab key="concentrates">Concentrates</paper-tab>
+          <paper-tab key="prerolls">Pre-Rolls</paper-tab>
+          <paper-tab key="apothecary">Apothecary</paper-tab>
+          <paper-tab key="cartridges">Cartridges</paper-tab>
+        </paper-tabs>
+      </div><!-- end div.menu-nav -->
+    </paper-card><!-- end .paper-card.menutools-container -->
+
+    <div id="menuWrap" class="menu-content">
+      <iron-pages id="menuPages" selected="{{section}}" attr-for-selected="section">
+        <div class="menu-page flowers-menu-page" section="flowers">
+          <!-- Zero-State: Entry Creation -->
+          <div class="newEntryContainer">
+            <bloombox-strain
+              class="newEntry"
+              hidden
+              partner="[[partner.key]]"
+              zerostate></bloombox-strain>
+          </div>
+
+          <!-- Sample State: Current Entries -->
+          <div class="menu-items-container">
+            <!-- No Strains/Not Loaded -->
+            <template is="dom-if" if="[[!data]]">
+              <b>Loading / No Content</b>
+            </template>
+
+            <template is="dom-if" if="[[data]]">
+              <template is="dom-repeat" items="[[_toArray(data)]]" as="strain">
+                <bloombox-strain
+                  key="[[strain.key]]"
+                  partner="[[partner.key]]"
+                  name="[[strain.value.name]]"
+                  pricing="[[formatPricelist(strain.value.pricelist)]]"
+                  grow="[[strain.value.grow]]"
+                  species="[[strain.value.species]]"
+                  visible="[[strain.value.flags.visible]]"
+                  description$="[[strain.value.description]]"
+                  tests$="[[strain.value.tests]]"
+                  ancestry$="[[strain.value.ancestry]]"
+                  sale$="[[strain.value.flags.sale]]"
+                  bogo$="[[strain.value.flags.bogo]]"
+                  premium$="[[strain.value.flags.premium]]"
+                  pictures$="[[strain.value.pictures]]"
+                  hidden$="[[_shouldHideProduct(instock, strain)]]"
+                  display-mode="[[_menuDisplayMode]]"></bloombox-strain><!-- end bloombox-strain -->
+              </template>
+            </template>
+          </div><!-- end div.menu-items-container -->
+        </div><!-- end div.menu-page.flowers-menu-page -->
+
+        <div class="menu-page edibles-menu-page" section="edibles">
+          <b>EDIBLES</b>
+        </div><!-- end div.menu-page.edibles-menu-page -->
+
+        <div class="menu-page concentrates-menu-page" section="concentrates">
+          <b>CONCENTRATES</b>
+        </div><!-- end div.menu-page.concentrates-menu-page -->
+
+        <div class="menu-page prerolls-menu-page" section="prerolls">
+          <b>PRE-ROLLS</b>
+        </div><!-- end div.menu-page.prerolls-menu-page -->
+
+        <div class="menu-page apothecary-menu-page" section="apothecary">
+          <b>APOTHECARY</b>
+        </div><!-- end div.menu-page.apothecary-menu-page -->
+
+        <div class="menu-page cartridges-menu-page" section="cartridges">
+          <b>CARTRIDGES</b>
+        </div><!-- end div.menu-page.cartridges-menu-page -->
+      </iron-pages><!-- end iron-pages#menuPages -->
+    </div><!-- end div#menuWrap.menu-content -->
   </template>
 
   <script>
+    var BloomboxLocationCache = {};
+
     Polymer.BloomboxPageMenu = Polymer({
       is: 'bloombox-page-menu',
       properties: {
+        _menuEndpoint: {
+          type: String,
+          notify: true,
+          computed: '_computeMenuEndpoint(endpoint, location, section)'
+        },
+
+        debug: {
+          type: Boolean,
+          notify: true,
+          value: function() {
+            return window && window["__debug"] || false;
+          }
+        },
+
+        section: {
+          type: String,
+          notify: true,
+          value: 'flowers'
+        },
+
+        locations: {
+          type: Array,
+          notify: true,
+          readOnly: true,
+          observer: '_locationsLoaded'
+        },
+
+        location: {
+          type: String,
+          notify: true,
+          observer: '_locationChanged'
+        },
+
         endpoint: {
           type: String,
           notify: true
         },
 
-        strains: {
+        data: {
           type: Object,
-          notify: true,
-          default: function() {
-            return {};
-          }
-        },
-
-        edibles: {
-          type: Object,
-          notify: true,
-          default: function() {
-            return {};
-          }
-        },
-
-        concentrates: {
-          type: Object,
-          notify: true,
-          default: function() {
-            return {};
-          }
-        },
-
-        cartridges: {
-          type: Object,
-          notify: true,
-          default: function() {
-            return {};
-          }
-        },
-
-        apothecary: {
-          type: Object,
-          notify: true,
-          default: function() {
-            return {};
-          }
-        },
-
-        prerolls: {
-          type: Object,
-          notify: true,
-          default: function() {
-            return {};
-          }
+          notify: true
         }
+      },
+
+      _toArray: function(obj) {
+        return Object.keys(obj).map(function(key) {
+          return {
+            key: key,
+            value: obj[key]
+          };
+        });
+      },
+
+      _computeMenuEndpoint: function(endpoint, location, section) {
+        return endpoint + "/locations/" + location + "/menu/" + section;
+      },
+
+      _locationsLoaded: function(locations) {
+        var location = this.location;
+
+        BloomboxLocationCache = {};
+        for (l in locations) {
+          BloomboxLocationCache[locations[l].key] = locations[l];
+        }
+
+        if (location == null || location == undefined) {
+          this.location = locations[0].key;
+        }
+      },
+
+      _locationChanged: function(location) {
+        console.info("Loading menu for location '" + location + "'...");
+      },
+
+      _shouldHideProduct: function(instock, strain) {
+        if (!instock && strain && strain.value && strain.value.flags && !strain.value.flags.visible)
+          return true;
+        return false;
+      },
+
+      formatPricelist: function(pricelist) {
+        return [
+          {"label": "1g", "available": pricelist["gram"]["available"], "price": pricelist["gram"]["price"]},
+          {"label": "3.5g", "available": pricelist["eighth"]["available"], "price": pricelist["eighth"]["price"]},
+          {"label": "7g", "available": pricelist["quarter"]["available"], "price": pricelist["quarter"]["price"]},
+          {"label": "14g", "available": pricelist["half"]["available"], "price": pricelist["half"]["price"]},
+          {"label": "28g", "available": pricelist["ounce"]["available"], "price": pricelist["ounce"]["price"]}
+        ];
       }
     });
   </script>

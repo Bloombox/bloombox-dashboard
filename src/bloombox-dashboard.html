@@ -242,16 +242,19 @@
               name="analytics"
               endpoint="[[endpoint]]"
               partner="[[partner]]"
+              locations="[[locations]]"
               environment="[[environment]]"></bloombox-page-analytics>
             <bloombox-page-menu
               name="menu"
               endpoint="[[endpoint]]"
               partner="[[partner]]"
+              locations="[[locations]]"
               environment="[[environment]]"></bloombox-page-menu>
             <bloombox-page-profile
               name="profile"
               endpoint="[[endpoint]]"
               partner="[[partner]]"
+              locations="[[locations]]"
               environment="[[environment]]"></bloombox-page-profile>
             <bloombox-page-account
               name="account"
@@ -288,6 +291,8 @@
         navigationDelay: 1500  // shorter delay to let the UI catch up with major changes
       }      
     };
+
+    var BloomboxPartnerCache = {};
 
     Polymer.BloomboxDashboard = Polymer({
       is: 'bloombox-dashboard',
@@ -388,8 +393,7 @@
           type: Object,
           notify: true,
           reflectToAttribute: false,
-          readOnly: true,
-          observer: '_transportConfigLoaded'
+          readOnly: true
         },
 
         /**
@@ -438,12 +442,19 @@
         },
 
         /**
+         * Available locations for the currently-active partner.
+         */
+        locations: {
+          type: Array,
+          notify: true
+        },
+
+        /**
          * Reference to the currently-active Firebase application.
          */
         firebase: {
           type: Object,
           notify: true,
-          observer: '_firebaseLoaded'
         },
 
         /**
@@ -469,11 +480,53 @@
         '_routePageChanged(_routeData.page)',
         '_routePartnerChanged(_routeData.partner)',
         '_routeChanged(partner, page)',
+        '_transportLoaded(transport, firebase)',
         '_bootDashboard(user, transport, api, partners, credentials, firebase, environment)'
       ],
 
+      _transportLoaded: function(transport, app) {
+        var firebase = window["firebase"],
+            that = this;
+        console.info("Loaded transport layer.", transport);
+        console.log("Selecting environment '" + transport.environment + "'.");
+
+        firebase.auth().signInWithCustomToken(transport.token).then(function() {
+          // set environment now that we're logged in
+          that.environment = transport.environment;
+        }).catch(function(error) {
+          // error occurred, report it
+          console.error("An error occurred authenticating with storage:", error);
+        });
+      },
+
+      _apiConfigLoaded: function(api) {
+        console.info("Loaded API configuration.", api);
+      },
+
+      _credentialsLoaded: function(credentials) {
+        console.info("Loaded user credentials.", credentials);
+      },
+
+      _partnersLoaded: function(partners, oldValue) {
+        var existingPartner = this.partner;
+        console.info("Loaded user partner access.", partners);
+
+        BloomboxPartnerCache = {};
+        for (partner in partners) {
+          BloomboxPartnerCache[partners[partner].key] = partners[partner];
+        }
+
+        if (window.location.pathname == "" || window.location.pathname.length < 2) {
+          // start us off with the first partner the user has access to
+          this.partner = partners[0].key;
+        } else if (oldValue == null || oldValue == undefined) {
+          // we loaded the partner via a URL reference, so re-run our `_partnerChanged` observer
+          this._partnerChanged(existingPartner, existingPartner);
+        }
+      },
+
       _computeEndpoint: function(environment, partner) {
-        return "/" + environment + "/" + partner;
+        return "/" + environment + "/partners/" + partner;
       },
 
       _computeDisplayMode: function() {
@@ -522,18 +575,26 @@
       },
 
       _partnerChanged: function(partner, oldPartner) {
-        var that = this;
-        if (partner != null && partner != undefined && partner.length > 1) {
-          console.info("Loading for partner '" + partner + "'...");
-          this._routeChanged(partner, this.page || 'home');
-        }
+        var that = this,
+            newLocations = [],
+            partners = this.partners,
+            partnerSpec = BloomboxPartnerCache[partner];
 
-        if (oldPartner !== null && oldPartner !== undefined && oldPartner.length > 1) {
-          // show loading spinner for short period
-          this.loading = true;
-          setTimeout(function() {
-            that.loading = false;
-          }, BloomboxDashboardConfig.spinner.navigationDelay);
+        if (partners !== null && partners !== undefined) {
+          console.info("Loading for partner '" + partner + "'...", partnerSpec);
+          this.locations = partnerSpec.locations;
+
+          if (partner != null && partner != undefined && partner.length > 1) {
+            this._routeChanged(partner, this.page || 'home');
+          }
+
+          if (oldPartner !== null && oldPartner !== undefined && oldPartner.length > 1) {
+            // show loading spinner for short period
+            this.loading = true;
+            setTimeout(function() {
+              that.loading = false;
+            }, BloomboxDashboardConfig.spinner.navigationDelay);
+          }
         }
       },
 
@@ -552,31 +613,12 @@
         }
       },
 
-      _transportConfigLoaded: function(transport) {
-        console.info("Loaded transport configuration.", transport);
-        console.log("Selecting environment '" + transport.environment + "'.");
-        this.environment = transport.environment;
-      },
-
-      _apiConfigLoaded: function(api) {
-        console.info("Loaded API configuration.", api);
-      },
-
-      _credentialsLoaded: function(credentials) {
-        console.info("Loaded user credentials.", credentials);
-      },
-
-      _partnersLoaded: function(partners) {
-        console.info("Loaded user partner access.", partners);
-
-        if (window.location.pathname == "" || window.location.pathname.length < 2) {
-          // start us off with the first partner the user has access to
-          this.partner = partners[0].key;
-        }
-      },
-
-      _firebaseLoaded: function(app) {
-        console.info("Firebase connected.", app);
+      _bootDashboard: function() {
+        var that = this;
+        console.log("Dashboard is ready for use.");
+        setTimeout(function() {
+          that.loading = false;
+        }, BloomboxDashboardConfig.spinner.delay);
       },
 
       navigate: function(event) {
@@ -584,14 +626,6 @@
             page = event.target.getAttribute("name");
         this.partner = partner;
         this.page = page;
-      },
-
-      _bootDashboard: function() {
-        var that = this;
-        console.log("Dashboard is ready for use.");
-        setTimeout(function() {
-          that.loading = false;
-        }, BloomboxDashboardConfig.spinner.delay);
       },
 
       ready: function() {
@@ -611,8 +645,7 @@
                      "lastname": "Gammon"});
         this._setTransport({"base": "bloombox-io",
                           "environment": "sandbox",
-                          "token": "eyJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJodHRwczovL2lkZW50aXR5dG9vbGtpdC5nb29nbGVhcGlzLmNvbS9nb29nbGUuaWRlbnRpdHkuaWRlbnRpdHl0b29sa2l0LnYxLklkZW50aXR5VG9vbGtpdCIsImNsYWltcyI6eyJlbnZpcm9ubWVudCI6InNhbmRib3giLCJwYXJ0bmVycyI6eyJhYmF0aW4iOnRydWV9LCJlbWFpbCI6InNhbUBtb21lbnR1bS5pbyIsImFkbWluIjp0cnVlLCJrZXkiOiJhZzF6Zm1Kc2IyOXRZbTk0TFdsdmNrMExFZ2RCWTJOdmRXNTBJa0E0TUdRMlltWTBaVGc0TURjNE9HRmpPV0kwTlRGbFptSm1ZMlptTnpobE5qZ3lOR00zWkRSaU0yVm1ZV1kyTURZNFl6WXpNREptWm1KaE4yRmlOMlZsREtJQkIzWXpZbVYwWVRFIn0sImV4cCI6MTQ2NjcyMzQxMSwiaWF0IjoxNDY2NzE5ODExLCJpc3MiOiJwbGF0Zm9ybUBibG9vbWJveC1pby5pYW0uZ3NlcnZpY2VhY2NvdW50LmNvbSIsInN1YiI6InBsYXRmb3JtQGJsb29tYm94LWlvLmlhbS5nc2VydmljZWFjY291bnQuY29tIiwidWlkIjoiMThjZGUwMzFiMjNmMDE3N2E0Y2QxY2UxMGRhYWUzOTMxNzk5NTQ2YjIyNDQ0NWVmYWQ1Y2YwYzAzOTdhOWE0NiJ9.cx0IwkxG1vf3LrfZoZu5wGGzTxL6NPKYs0Tjixhf1RZpfP_kTgXsdSK41cH2nuKWWVBo0PdKXjkWCxCe2_f3GvXW0hHKQSq0h2FMUxLmFRVsjM-x4TULs_5EAI81WyorljuWDwrq-q81cVNYBrouVO9W86SGiSsw6AqJmrZxfE_hLp1DI1tJZFKuk9agry0euS5TUptSjIXuOnAe8PvznwAo69sHNlBDhSFmtYQ1eiq99tYVvAqQwMONySgQrcuTT2SDcsosNWu12AgDpwNMjEQdA-U4oxgmWAj3tWtt9X82AFoiT1b4ofs4YNhMfjGLd0EciltCXHv56C8sRckY3Q",
-                          "key": "AIzaSyCQx80_10nt75jjovZqb1n8EJJb6bJu6hc"});
+                          "token": "eyJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJodHRwczovL2lkZW50aXR5dG9vbGtpdC5nb29nbGVhcGlzLmNvbS9nb29nbGUuaWRlbnRpdHkuaWRlbnRpdHl0b29sa2l0LnYxLklkZW50aXR5VG9vbGtpdCIsImNsYWltcyI6eyJlbnZpcm9ubWVudCI6InNhbmRib3giLCJwYXJ0bmVycyI6eyJhYmF0aW4iOnRydWV9LCJlbWFpbCI6InNhbUBtb21lbnR1bS5pbyIsImFkbWluIjp0cnVlLCJrZXkiOiJhZzF6Zm1Kc2IyOXRZbTk0TFdsdmNrMExFZ2RCWTJOdmRXNTBJa0E0TUdRMlltWTBaVGc0TURjNE9HRmpPV0kwTlRGbFptSm1ZMlptTnpobE5qZ3lOR00zWkRSaU0yVm1ZV1kyTURZNFl6WXpNREptWm1KaE4yRmlOMlZsREtJQkIzWXpZbVYwWVRFIn0sImV4cCI6MTQ2NjgxMDQ0OSwiaWF0IjoxNDY2ODA2ODQ5LCJpc3MiOiJwbGF0Zm9ybUBibG9vbWJveC1pby5pYW0uZ3NlcnZpY2VhY2NvdW50LmNvbSIsInN1YiI6InBsYXRmb3JtQGJsb29tYm94LWlvLmlhbS5nc2VydmljZWFjY291bnQuY29tIiwidWlkIjoiMThjZGUwMzFiMjNmMDE3N2E0Y2QxY2UxMGRhYWUzOTMxNzk5NTQ2YjIyNDQ0NWVmYWQ1Y2YwYzAzOTdhOWE0NiJ9.VsUbbRaHDXrbSLBlQDj51aGRpAwv0z6ny6Id29SWrq8Kvbx0KYX2xM5pwgSU0J_zfkt1vlhYktTmFZdd8SCcq2woyo-RwRsTi0sG0MzlBd7__1jDVuAwrHKnrdOoC27slnP3H_MX28AKie67NVeXJs11mfaIFP0CQ3QFCEulyYEr-RBxJ35j2xH2hKsB3JGX48ttDNpUry-XtOYNtYhgEXF4MZZDaPzsywHo5z7CuZtLD9fXEmm-cg_C5eDlrQofceth5Xa9NhLkfyDueeV1cC-rL9GtDvL4y0YvYVgcki9mo8HaMJysdBiU8Bjyb4ygYIAtIacE9c7IOSxKFa3CZA"});
         this._setApi({load: [["accounts","v1"],["analytics","v1"],["partner","v1"],["device","v1"]],
                     key: "AIzaSyCQx80_10nt75jjovZqb1n8EJJb6bJu6hc",
                     endpoint: "https://bloombox-io.appspot.com/_ah/api"});
@@ -620,8 +653,7 @@
                             "access": "ya29.CjAKA5eAX-79Rdi6nTkvX6AaYGZfEzm7MJY1hopy2CVuTB1TCZEd2LjnXAgGPGD9A3E",
                             "expiration": 1466723357162,
                             "scope": "https://www.googleapis.com/auth/user.birthday.read,https://www.googleapis.com/auth/userinfo.email,https://www.googleapis.com/auth/plus.me"});
-        this._setPartners([{"label": "Abatin Wellness", "key": "abatin"},
-                            {"label": "Bloom Sandbox", "key": "mm"}]);
+        this._setPartners([{"locations":[{"phone":"+19163419482","address":{"zip":"95811","address":"1108 R Street #403","state":"CA","longitude":null,"latitude":null,"city":"Sacramento"},"website":"abatinsacramento.com","label":"Sacramento","key":"sacramento"},{"phone":"+19163419482","address":{"zip":"95811","address":"123 Main Street","state":"CA","longitude":null,"latitude":null,"city":"Oakland"},"website":"abatinoakland.com","label":"Oakland","key":"oakland"},{"phone":"+19163419482","address":{"zip":"95811","address":"123 Main Street","state":"CA","longitude":null,"latitude":null,"city":"Los Angeles"},"website":"abatinla.com","label":"Los Angeles","key":"losangeles"}],"privileges":{"sandbox":true,"beta":true},"label":"Abatin Wellness","key":"abatin"}]);
       }
     });
   </script>
