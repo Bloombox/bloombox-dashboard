@@ -182,6 +182,10 @@
       pattern="/:partner/:page"
       data="{{_routeData}}"
       tail="{{subroute}}"></app-route>
+    <app-route
+      route="{{subroute}}"
+      pattern="/:location"
+      data="{{_subrouteData}}"></app-route>
 
     <!-- Layout / UI -->
     <main>
@@ -249,13 +253,16 @@
               endpoint="[[endpoint]]"
               partner="[[partner]]"
               locations="[[locations]]"
+              location="{{location}}"
               environment="[[environment]]"></bloombox-page-menu>
             <bloombox-page-profile
               name="profile"
               endpoint="[[endpoint]]"
               partner="[[partner]]"
               locations="[[locations]]"
-              environment="[[environment]]"></bloombox-page-profile>
+              location="{{location}}"
+              environment="[[environment]]"
+              api-key="[[api.key]]"></bloombox-page-profile>
             <bloombox-page-account
               name="account"
               endpoint="[[endpoint]]"
@@ -317,10 +324,21 @@
         },
 
         /**
-         * Object containing result of parsed data from URL. This stops
-         * after finding the required properties `partner` and `home`.
+         * Object containing result of parsed data from the URL. This
+         * stops after finding the required properties `partner` and
+         * `home`.
          */
         _routeData: {
+          type: Object,
+          notify: true
+        },
+
+        /**
+         * Object containing result of parsed subroute data from URL.
+         * This continues after `_routeData` to parse a `location`
+         * name, if specified.
+         */
+        _subrouteData: {
           type: Object,
           notify: true
         },
@@ -446,6 +464,15 @@
          */
         locations: {
           type: Array,
+          notify: true,
+          observer: '_locationsLoaded'
+        },
+
+        /**
+         * Available locations for the currently-active partner.
+         */
+        location: {
+          type: String,
           notify: true
         },
 
@@ -479,7 +506,7 @@
       observers: [
         '_routePageChanged(_routeData.page)',
         '_routePartnerChanged(_routeData.partner)',
-        '_routeChanged(partner, page)',
+        '_routeChanged(partner, page, location)',
         '_transportLoaded(transport, firebase)',
         '_bootDashboard(user, transport, api, partners, credentials, firebase, environment)'
       ],
@@ -528,6 +555,10 @@
           // we loaded the partner via a URL reference, so re-run our `_partnerChanged` observer
           this._partnerChanged(existingPartner, existingPartner);
         }
+      },
+
+      _locationsLoaded: function(locations) {
+        this.location = locations[0].key;
       },
 
       _computeEndpoint: function(environment, partner) {
@@ -603,16 +634,20 @@
         }
       },
 
-      _routeChanged: function(partner, page) {
+      _routeChanged: function(partner, page, location) {
         var existingRoute = this.get("route") || {};
         if (partner != null && partner != undefined && partner != "" && page != null && page != undefined) {
           document.title = page.charAt(0).toUpperCase() + page.substr(1) + " - " + partner.charAt(0).toUpperCase() + partner.substr(1) + " - " + "Bloombox Dashboard";
           if (existingRoute.path == "/" + partner + "/" + page) {
             // skip: we are already there
           } else {
-            this.route = {"prefix": "", "path": "/" + partner + "/" + page, "__queryParams": {}};
-            if (window.location.pathname.length < 3) {
-              window.location.pathname = "/" + partner + "/" + page;
+            if (page == "menu" || page == "profile") {
+              this.route = {"prefix": "", "path": "/" + partner + "/" + page + "/" + location, "__queryParams": {}};
+            } else {
+              this.route = {"prefix": "", "path": "/" + partner + "/" + page, "__queryParams": {}};
+              if (window.location.pathname.length < 3) {
+                window.location.pathname = "/" + partner + "/" + page;
+              }
             }
           }
         }
@@ -650,7 +685,7 @@
                      "lastname": "Gammon"});
         this._setTransport({"base": "bloombox-io",
                           "environment": "sandbox",
-                          "token": "eyJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJodHRwczovL2lkZW50aXR5dG9vbGtpdC5nb29nbGVhcGlzLmNvbS9nb29nbGUuaWRlbnRpdHkuaWRlbnRpdHl0b29sa2l0LnYxLklkZW50aXR5VG9vbGtpdCIsImNsYWltcyI6eyJlbnZpcm9ubWVudCI6InNhbmRib3giLCJwYXJ0bmVycyI6eyJhYmF0aW4iOnRydWV9LCJlbWFpbCI6InNhbUBtb21lbnR1bS5pbyIsImFkbWluIjp0cnVlLCJrZXkiOiJhZzF6Zm1Kc2IyOXRZbTk0TFdsdmNrMExFZ2RCWTJOdmRXNTBJa0E0TUdRMlltWTBaVGc0TURjNE9HRmpPV0kwTlRGbFptSm1ZMlptTnpobE5qZ3lOR00zWkRSaU0yVm1ZV1kyTURZNFl6WXpNREptWm1KaE4yRmlOMlZsREtJQkIzWXpZbVYwWVRFIn0sImV4cCI6MTQ2NjgzMDA5NiwiaWF0IjoxNDY2ODI2NDk2LCJpc3MiOiJwbGF0Zm9ybUBibG9vbWJveC1pby5pYW0uZ3NlcnZpY2VhY2NvdW50LmNvbSIsInN1YiI6InBsYXRmb3JtQGJsb29tYm94LWlvLmlhbS5nc2VydmljZWFjY291bnQuY29tIiwidWlkIjoiMThjZGUwMzFiMjNmMDE3N2E0Y2QxY2UxMGRhYWUzOTMxNzk5NTQ2YjIyNDQ0NWVmYWQ1Y2YwYzAzOTdhOWE0NiJ9.WCSzILlUpN1VHI-3N2hIBCEZEvxlAirBisuHgsQVOOCiFo2Qi2YOuSp5i80rYzaA-3gQaG6RrxBvOXn6yFISKx0wL1azmEe9vEwaETTXaWbEsOvyYDh1-Ub4nm3NLI62SZq9ON6T0zXqf2Bp_0XqU4bKA7kTab3X5G_Y8TO9F0WeqOQMczf8BC9mtuDCQBBBHqW4fEXQet36bODfRjuZEVxSSvixLGzwzvM3JAhmooHedO7U4wYEoC1P1P-UjluUOwwj6j0qQdYsVHc7u86p0Tdhm0Kvi5KaKThZuKmWiXjBepIxdBz7WOBcJ9YWJ4VhBhz2L1lKCQC1zLz68_4Tkw"});
+                          "token": "eyJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJodHRwczovL2lkZW50aXR5dG9vbGtpdC5nb29nbGVhcGlzLmNvbS9nb29nbGUuaWRlbnRpdHkuaWRlbnRpdHl0b29sa2l0LnYxLklkZW50aXR5VG9vbGtpdCIsImNsYWltcyI6eyJlbnZpcm9ubWVudCI6InNhbmRib3giLCJwYXJ0bmVycyI6eyJhYmF0aW4iOnRydWV9LCJlbWFpbCI6InNhbUBtb21lbnR1bS5pbyIsImFkbWluIjp0cnVlLCJrZXkiOiJhZzF6Zm1Kc2IyOXRZbTk0TFdsdmNrMExFZ2RCWTJOdmRXNTBJa0E0TUdRMlltWTBaVGc0TURjNE9HRmpPV0kwTlRGbFptSm1ZMlptTnpobE5qZ3lOR00zWkRSaU0yVm1ZV1kyTURZNFl6WXpNREptWm1KaE4yRmlOMlZsREtJQkIzWXpZbVYwWVRFIn0sImV4cCI6MTQ2Njg5NDIxMiwiaWF0IjoxNDY2ODkwNjEyLCJpc3MiOiJwbGF0Zm9ybUBibG9vbWJveC1pby5pYW0uZ3NlcnZpY2VhY2NvdW50LmNvbSIsInN1YiI6InBsYXRmb3JtQGJsb29tYm94LWlvLmlhbS5nc2VydmljZWFjY291bnQuY29tIiwidWlkIjoiMThjZGUwMzFiMjNmMDE3N2E0Y2QxY2UxMGRhYWUzOTMxNzk5NTQ2YjIyNDQ0NWVmYWQ1Y2YwYzAzOTdhOWE0NiJ9.bD6xuDrK5qlLFPn6W7z7oZwFYxXb-V0TwC73OG3QpH8AAjHpMsKmhHLlstbaGMrjX5wNee96tY4JOpewAPs3w7DJwZsVCzx_mAG_hZHwSPqhJehCsdcG7gyhQH-0lzF4lalOcKpsRuieZzBS8e5XVwINY_b1oBMQI6iykmtbTsLXqHun44lLhZQonMT2BqDqUSNrBzDtWNynsdcROi-xUdjb_qwGZX_-kgy3t4w_Peoi5JZtCIQK9aAR33ZjoLl_BR36oC8RJWZlyoaOuYQIfZfD5YQmtHgmiipo0HsmpTGG1kvnKEmE0YLHwNvYhTOvETig9d9fvcjR6HhifbOCzw"});
         this._setApi({load: [["accounts","v1"],["analytics","v1"],["partner","v1"],["device","v1"]],
                     key: "AIzaSyCQx80_10nt75jjovZqb1n8EJJb6bJu6hc",
                     endpoint: "https://bloombox-io.appspot.com/_ah/api"});
@@ -658,7 +693,7 @@
                             "access": "ya29.CjAKA5eAX-79Rdi6nTkvX6AaYGZfEzm7MJY1hopy2CVuTB1TCZEd2LjnXAgGPGD9A3E",
                             "expiration": 1466723357162,
                             "scope": "https://www.googleapis.com/auth/user.birthday.read,https://www.googleapis.com/auth/userinfo.email,https://www.googleapis.com/auth/plus.me"});
-        this._setPartners([{"locations":[{"phone":"+19163419482","address":{"zip":"95811","address":"1108 R Street #403","state":"CA","longitude":null,"latitude":null,"city":"Sacramento"},"website":"abatinsacramento.com","label":"Sacramento","key":"sacramento"},{"phone":"+19163419482","address":{"zip":"95811","address":"123 Main Street","state":"CA","longitude":null,"latitude":null,"city":"Oakland"},"website":"abatinoakland.com","label":"Oakland","key":"oakland"},{"phone":"+19163419482","address":{"zip":"95811","address":"123 Main Street","state":"CA","longitude":null,"latitude":null,"city":"Los Angeles"},"website":"abatinla.com","label":"Los Angeles","key":"losangeles"}],"privileges":{"sandbox":true,"beta":true},"label":"Abatin Wellness","key":"abatin"}]);
+        this._setPartners([{"locations":[{"phone":"+19163419482","address":{"zip":"95811","address":"2100 29th Street","state":"CA","longitude":-121.4739249,"latitude":38.5613719,"city":"Sacramento"},"website":"abatinsacramento.com","label":"Sacramento","key":"sacramento"},{"phone":"+19163419482","address":{"zip":"94621","address":"7000 Coliseum Way","state":"CA","longitude":-122.2028616,"latitude":37.750277,"city":"Oakland"},"website":"abatinoakland.com","label":"Oakland","key":"oakland"},{"phone":"+19163419482","address":{"zip":"90012","address":"1000 Elysian Park Ave","state":"CA","longitude":-118.2407774,"latitude":34.073873,"city":"Los Angeles"},"website":"abatinla.com","label":"Los Angeles","key":"losangeles"}],"privileges":{"sandbox":true,"beta":true},"label":"Abatin Wellness","key":"abatin"}]);
       }
     });
   </script>

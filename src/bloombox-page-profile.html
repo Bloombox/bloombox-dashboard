@@ -1,58 +1,177 @@
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-label/iron-label.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+
+<link rel="import" href="../bower_components/google-map/google-map.html">
+
+<link rel="import" href="../bower_components/bloombox-styles/bloombox-styles.html">
+
 
 <dom-module id="bloombox-page-profile">
-
   <template>
-
-    <style>
+    <style is="custom-style" include="bloombox-styles">
       :host {
         display: block;
-        padding: 10px;
-      }
-      .card {
-        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
-        padding: 16px;
-        margin: 24px;
-        border-radius: 5px;
-        background-color: #fff;
-        color: #757575;
-      }
-      .circle {
-        display: inline-block;
-        height: 64px;
-        width: 64px;
-        border-radius: 50%;
-        background: #ddd;
-        line-height: 64px;
-        font-size: 30px;
-        color: #555;
-        text-align: center;
+        padding: 40px;
       }
       h1 {
-        font-size: 22px;
+        font-size: 28px;
         margin: 16px 0;
         color: #212121;
+        display: inline-block;
+      }
+      :host paper-card {
+        background-color: white;
+        width: 100%;
+      }
+      :host paper-card .card-content iron-label {
+        display: block;
+      }
+      :host paper-card .card-content iron-label span {
+        margin-right: 10px;
+        font-weight: bold;
+      }
+      :host paper-card .card-content iron-label span:after {
+        content: ":";
+      }
+      :host paper-card .card-content iron-label a {
+        color: var(--google-blue-500);
+        text-decoration: none;
+      }
+      :host paper-card .card-content iron-label a:visited {
+        color: var(--google-blue-500);
+        text-decoration: none;
+      }
+      :host paper-card .card-content h4 {
+        margin: 0;
+        color: #888;
+      }
+      :host paper-card .card-content .location-info-block {
+        margin-top: 20px;
+      }
+      :host div.location-selector {
+        display: inline-block;
+        margin-left: 30px;
+      }
+      :host div.location-profile {
+        margin-top: 20px;
+      }
+      :host google-map {
+        height: 400px;
       }
     </style>
 
-    <div class="card">
-      <div class="circle">3</div>
-      <h1>Profile</h1>
-      <p>Modus commodo minimum eum te, vero utinam assueverit per eu.</p>
-      <p>Ea duis bonorum nec, falli paulo aliquid ei eum.Has at minim mucius aliquam, est id tempor laoreet.Pro saepe pertinax ei, ad pri animal labores suscipiantur.</p>
-    </div>
+    <h1>Location Profile</h1>
 
+    <div class="location-selector">
+      <paper-dropdown-menu noink>
+        <paper-listbox selected="{{location}}" attr-for-selected="key" class="dropdown-content">
+          <template is="dom-repeat" items="[[locations]]">
+            <paper-item key="[[item.key]]">[[item.label]]</paper-item>
+          </template>
+        </paper-listbox>
+      </paper-dropdown-menu>
+    </div><!-- end div.location-selector -->
+    <div class="location-profile">
+      <paper-card hidden$="[[_hideProfile]]">
+        <div class="location-map">
+          <google-map
+            disable-default-ui
+            disable-zoom
+            fit-to-markers
+            zoom="15"
+            api-key="[[apiKey]]"
+            latitude="[[_locationData.address.latitude]]"
+            longitude="[[_locationData.address.longitude]]">
+            <google-map-marker
+              animation="drop"
+              latitude="[[_locationData.address.latitude]]"
+              longitude="[[_locationData.address.longitude]]"></google-map-marker>
+          </google-map>
+        </div><!-- end div.location-map -->
+        <div class="card-content">
+          <h4>[[_locationData.address.address]] [[_locationData.address.city]], [[_locationData.address.state]] [[_locationData.address.zip]]</h4>
+
+          <div class="location-info-block">
+            <iron-label><span>Phone</span>[[_locationData.phone]]</iron-label>
+            <iron-label><span>Website</span><a href="http://[[_locationData.website]]" target="_blank">[[_locationData.website]]</a></iron-label>
+          </div><!-- end div.location-info-list -->
+        </div><!-- end div.card-content -->
+      </paper-card>
+    </div><!-- end div.location-profile -->
   </template>
 
   <script>
+    var BloomboxProfileLocations = {};
 
-    Polymer({
+    Polymer.BloomboxPageProfile = Polymer({
+      is: 'bloombox-page-profile',
 
-      is: 'bloombox-page-profile'
+      properties: {
+        _locationData: {
+          type: Object,
+          notify: true
+        },
 
+        _hideProfile: {
+          type: Boolean,
+          notify: true,
+          computed: '_computeHideProfile(location)'
+        },
+
+        locations: {
+          type: Array,
+          notify: true,
+          readOnly: true,
+          observer: '_locationsLoaded'
+        },
+
+        location: {
+          type: String,
+          notify: true,
+          observer: '_locationChanged'
+        },
+
+        partner: {
+          type: String,
+          notify: true
+        },
+
+        environment: {
+          type: String,
+          notify: true
+        },
+
+        apiKey: {
+          type: String,
+          notify: true
+        }
+      },
+
+      _computeHideProfile: function(location) {
+        return location == null || location == undefined;
+      },
+
+      _locationsLoaded: function(locations) {
+        var location = this.location, initial, li;
+
+        for (_li in locations) {
+          BloomboxProfileLocations[locations[_li].key] = locations[_li];
+        }
+
+        console.info("Locations loaded.", locations, BloomboxProfileLocations);
+        this.location = locations[0].key;
+      },
+
+      _locationChanged: function(location) {
+        var locationData = BloomboxProfileLocations[location];
+        this._locationData = locationData;
+        console.info("Switching to location '" + location + "'.", locationData);
+      }
     });
-
   </script>
-
 </dom-module>
