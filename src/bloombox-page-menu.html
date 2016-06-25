@@ -40,7 +40,11 @@
       }
 
       :host bloombox-strain,
-      :host bloombox-apothecary {
+      :host bloombox-apothecary,
+      :host bloombox-edible,
+      :host bloombox-concentrate,
+      :host bloombox-cartridge,
+      :host bloombox-preroll {
         margin-bottom: 20px;
         width: 100%;
       }
@@ -52,10 +56,29 @@
 
     <!-- Firebase Collections -->
     <firebase-document
-      id="strainsCollection"
       log$="[[debug]]"
-      path="[[_menuEndpoint]]"
-      data="{{data}}"></firebase-document>
+      path="[[_menuEndpoint]]/flowers"
+      data="{{flowers}}"></firebase-document>
+    <firebase-document
+      log$="[[debug]]"
+      path="[[_menuEndpoint]]/edibles"
+      data="{{edibles}}"></firebase-document>
+    <firebase-document
+      log$="[[debug]]"
+      path="[[_menuEndpoint]]/concentrates"
+      data="{{concentrates}}"></firebase-document>
+    <firebase-document
+      log$="[[debug]]"
+      path="[[_menuEndpoint]]/prerolls"
+      data="{{prerolls}}"></firebase-document>
+    <firebase-document
+      log$="[[debug]]"
+      path="[[_menuEndpoint]]/apothecary"
+      data="{{apothecary}}"></firebase-document>
+    <firebase-document
+      log$="[[debug]]"
+      path="[[_menuEndpoint]]/cartridges"
+      data="{{cartridges}}"></firebase-document>
 
     <!-- Card UI -->
     <h1>Menu Manager</h1>
@@ -90,22 +113,22 @@
             <bloombox-strain
               class="newEntry"
               hidden
-              partner="[[partner.key]]"
+              partner="[[partner]]"
               zerostate></bloombox-strain>
           </div>
 
           <!-- Sample State: Current Entries -->
           <div class="menu-items-container">
             <!-- No Strains/Not Loaded -->
-            <template is="dom-if" if="[[!data]]">
+            <template is="dom-if" if="[[!flowers]]">
               <b>Loading / No Content</b>
             </template>
 
-            <template is="dom-if" if="[[data]]">
-              <template is="dom-repeat" items="[[_toArray(data)]]" as="strain">
+            <template is="dom-if" if="[[flowers]]">
+              <template is="dom-repeat" initial-count="5" items="[[_toArray(flowers)]]" as="strain">
                 <bloombox-strain
                   key="[[strain.key]]"
-                  partner="[[partner.key]]"
+                  partner="[[partner]]"
                   name="[[strain.value.name]]"
                   pricing="[[formatPricelist(strain.value.pricelist)]]"
                   grow="[[strain.value.grow]]"
@@ -126,23 +149,208 @@
         </div><!-- end div.menu-page.flowers-menu-page -->
 
         <div class="menu-page edibles-menu-page" section="edibles">
-          <b>EDIBLES</b>
+          <!-- Zero-State: Entry Creation -->
+          <div class="newEntryContainer">
+            <bloombox-edible
+              class="newEntry"
+              hidden
+              partner="[[partner]]"
+              zerostate></bloombox-edible>
+          </div>
+
+          <!-- Sample State: Current Entries -->
+          <div class="menu-items-container">
+            <!-- No Strains/Not Loaded -->
+            <template is="dom-if" if="[[!edibles]]">
+              <b>Loading / No Content</b>
+            </template>
+
+            <template is="dom-if" if="[[edibles]]">
+              <template is="dom-repeat" initial-count="5" items="[[_toArray(edibles)]]" as="edible">
+                <bloombox-edible
+                  key="[[edible.key]]"
+                  partner="[[partner]]"
+                  name="[[edible.value.name]]"
+                  brand="[[edible.value.brand]]"
+                  type="[[edible.value.type]]"
+                  pricing="[[edible.value.pricing]]"
+                  visible="[[edible.value.flags.visible]]"
+                  description$="[[edible.value.description]]"
+                  tests$="[[edible.value.tests]]"
+                  sale$="[[edible.value.flags.sale]]"
+                  bogo$="[[edible.value.flags.bogo]]"
+                  premium$="[[edible.value.flags.premium]]"
+                  vegan="[[edible.value.flags.vegan]]"
+                  organic="[[edible.value.flags.organic]]"
+                  glutenfree="[[edible.value.flags.glutenfree]]"
+                  photos$="[[edible.value.photos]]"
+                  hidden$="[[_shouldHideProduct(instock, edible)]]"
+                  display-mode="[[_menuDisplayMode]]"></bloombox-edible><!-- end bloombox-edible -->
+              </template>
+            </template>
+          </div><!-- end div.menu-items-container -->
         </div><!-- end div.menu-page.edibles-menu-page -->
 
         <div class="menu-page concentrates-menu-page" section="concentrates">
-          <b>CONCENTRATES</b>
+          <!-- Zero-State: Entry Creation -->
+          <div class="newEntryContainer">
+            <bloombox-concentrate
+              class="newEntry"
+              hidden
+              partner="[[partner]]"
+              zerostate></bloombox-concentrate>
+          </div>
+
+          <!-- Sample State: Current Entries -->
+          <div class="menu-items-container">
+            <!-- No Strains/Not Loaded -->
+            <template is="dom-if" if="[[!concentrates]]">
+              <b>Loading / No Content</b>
+            </template>
+
+            <template is="dom-if" if="[[concentrates]]">
+              <template is="dom-repeat" initial-count="5" items="[[_toArray(concentrates)]]" as="concentrate">
+                <bloombox-concentrate
+                  key="[[concentrate.key]]"
+                  partner="[[partner]]"
+                  name="[[concentrate.value.name]]"
+                  brand="[[concentrate.value.brand]]"
+                  type="[[concentrate.value.type]]"
+                  pricing="[[concentrate.value.pricing]]"
+                  visible="[[concentrate.value.flags.visible]]"
+                  description$="[[concentrate.value.description]]"
+                  tests$="[[concentrate.value.tests]]"
+                  sale$="[[concentrate.value.flags.sale]]"
+                  bogo$="[[concentrate.value.flags.bogo]]"
+                  premium$="[[concentrate.value.flags.premium]]"
+                  photos$="[[concentrate.value.photos]]"
+                  hidden$="[[_shouldHideProduct(instock, concentrate)]]"
+                  display-mode="[[_menuDisplayMode]]"></bloombox-concentrate><!-- end bloombox-concentrate -->
+              </template>
+            </template>
+          </div><!-- end div.menu-items-container -->
         </div><!-- end div.menu-page.concentrates-menu-page -->
 
         <div class="menu-page prerolls-menu-page" section="prerolls">
-          <b>PRE-ROLLS</b>
+          <!-- Zero-State: Entry Creation -->
+          <div class="newEntryContainer">
+            <bloombox-preroll
+              class="newEntry"
+              hidden
+              partner="[[partner]]"
+              zerostate></bloombox-preroll>
+          </div>
+
+          <!-- Sample State: Current Entries -->
+          <div class="menu-items-container">
+            <!-- No Strains/Not Loaded -->
+            <template is="dom-if" if="[[!prerolls]]">
+              <b>Loading / No Content</b>
+            </template>
+
+            <template is="dom-if" if="[[prerolls]]">
+              <template is="dom-repeat" initial-count="5" items="[[_toArray(prerolls)]]" as="preroll">
+                <bloombox-preroll
+                  key="[[preroll.key]]"
+                  partner="[[partner]]"
+                  name="[[preroll.value.name]]"
+                  brand="[[preroll.value.brand]]"
+                  type="[[preroll.value.type]]"
+                  pricing="[[preroll.value.pricing]]"
+                  species="[[preroll.value.species]]"
+                  grow="[[preroll.value.grow]]"
+                  visible="[[preroll.value.flags.visible]]"
+                  description$="[[preroll.value.description]]"
+                  tests$="[[preroll.value.tests]]"
+                  sale$="[[preroll.value.flags.sale]]"
+                  bogo$="[[preroll.value.flags.bogo]]"
+                  premium$="[[preroll.value.flags.premium]]"
+                  photos$="[[preroll.value.photos]]"
+                  hidden$="[[_shouldHideProduct(instock, preroll)]]"
+                  display-mode="[[_menuDisplayMode]]"></bloombox-preroll><!-- end bloombox-preroll -->
+              </template>
+            </template>
+          </div><!-- end div.menu-items-container -->
         </div><!-- end div.menu-page.prerolls-menu-page -->
 
         <div class="menu-page apothecary-menu-page" section="apothecary">
-          <b>APOTHECARY</b>
+          <!-- Zero-State: Entry Creation -->
+          <div class="newEntryContainer">
+            <bloombox-apothecary
+              class="newEntry"
+              hidden
+              partner="[[partner]]"
+              zerostate></bloombox-apothecary>
+          </div>
+
+          <!-- Sample State: Current Entries -->
+          <div class="menu-items-container">
+            <!-- No Strains/Not Loaded -->
+            <template is="dom-if" if="[[!apothecary]]">
+              <b>Loading / No Content</b>
+            </template>
+
+            <template is="dom-if" if="[[apothecary]]">
+              <template is="dom-repeat" initial-count="5" items="[[_toArray(apothecary)]]" as="apothecary">
+                <bloombox-apothecary
+                  key="[[apothecary.key]]"
+                  partner="[[partner]]"
+                  name="[[apothecary.value.name]]"
+                  brand="[[apothecary.value.brand]]"
+                  type="[[apothecary.value.type]]"
+                  pricing="[[apothecary.value.pricing]]"
+                  visible="[[apothecary.value.flags.visible]]"
+                  description$="[[apothecary.value.description]]"
+                  tests$="[[apothecary.value.tests]]"
+                  sale$="[[apothecary.value.flags.sale]]"
+                  bogo$="[[apothecary.value.flags.bogo]]"
+                  premium$="[[apothecary.value.flags.premium]]"
+                  photos$="[[apothecary.value.photos]]"
+                  hidden$="[[_shouldHideProduct(instock, apothecary)]]"
+                  display-mode="[[_menuDisplayMode]]"></bloombox-apothecary><!-- end bloombox-apothecary -->
+              </template>
+            </template>
+          </div><!-- end div.menu-items-container -->
         </div><!-- end div.menu-page.apothecary-menu-page -->
 
         <div class="menu-page cartridges-menu-page" section="cartridges">
-          <b>CARTRIDGES</b>
+          <!-- Zero-State: Entry Creation -->
+          <div class="newEntryContainer">
+            <bloombox-cartridge
+              class="newEntry"
+              hidden
+              partner="[[partner]]"
+              zerostate></bloombox-cartridge>
+          </div>
+
+          <!-- Sample State: Current Entries -->
+          <div class="menu-items-container">
+            <!-- No Strains/Not Loaded -->
+            <template is="dom-if" if="[[!cartridges]]">
+              <b>Loading / No Content</b>
+            </template>
+
+            <template is="dom-if" if="[[cartridges]]">
+              <template is="dom-repeat" initial-count="5" items="[[_toArray(cartridges)]]" as="cartridge">
+                <bloombox-cartridge
+                  key="[[cartridge.key]]"
+                  partner="[[partner]]"
+                  name="[[cartridge.value.name]]"
+                  brand="[[cartridge.value.brand]]"
+                  type="[[cartridge.value.type]]"
+                  pricing="[[cartridge.value.pricing]]"
+                  visible="[[cartridge.value.flags.visible]]"
+                  description$="[[cartridge.value.description]]"
+                  tests$="[[cartridge.value.tests]]"
+                  sale$="[[cartridge.value.flags.sale]]"
+                  bogo$="[[cartridge.value.flags.bogo]]"
+                  premium$="[[cartridge.value.flags.premium]]"
+                  photos$="[[cartridge.value.photos]]"
+                  hidden$="[[_shouldHideProduct(instock, cartridge)]]"
+                  display-mode="[[_menuDisplayMode]]"></bloombox-cartridge><!-- end bloombox-cartridge -->
+              </template>
+            </template>
+          </div><!-- end div.menu-items-container -->
         </div><!-- end div.menu-page.cartridges-menu-page -->
       </iron-pages><!-- end iron-pages#menuPages -->
     </div><!-- end div#menuWrap.menu-content -->
@@ -157,7 +365,7 @@
         _menuEndpoint: {
           type: String,
           notify: true,
-          computed: '_computeMenuEndpoint(endpoint, location, section)'
+          computed: '_computeMenuEndpoint(endpoint, location)'
         },
 
         debug: {
@@ -166,6 +374,11 @@
           value: function() {
             return window && window["__debug"] || false;
           }
+        },
+
+        partner: {
+          type: String,
+          notify: true
         },
 
         section: {
@@ -192,7 +405,27 @@
           notify: true
         },
 
-        data: {
+        flowers: {
+          type: Object,
+          notify: true
+        },
+
+        edibles: {
+          type: Object,
+          notify: true
+        },
+
+        concentrates: {
+          type: Object,
+          notify: true
+        },
+
+        prerolls: {
+          type: Object,
+          notify: true
+        },
+
+        cartridges: {
           type: Object,
           notify: true
         }
@@ -207,8 +440,8 @@
         });
       },
 
-      _computeMenuEndpoint: function(endpoint, location, section) {
-        return endpoint + "/locations/" + location + "/menu/" + section;
+      _computeMenuEndpoint: function(endpoint, location) {
+        return endpoint + "/locations/" + location + "/menu";
       },
 
       _locationsLoaded: function(locations) {

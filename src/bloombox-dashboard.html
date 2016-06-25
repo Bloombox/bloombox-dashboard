@@ -215,7 +215,7 @@
                 </div><!-- end div.toggle-container -->
               </div>
               <div class="toolbar-utils">
-                <paper-dropdown-menu id="partnerSelection" noink disabled$="[[loading]]">
+                <paper-dropdown-menu id="partnerSelection" hidden$="[[!_multiplePartners()]]" noink disabled$="[[loading]]">
                   <paper-listbox id="dispensaryMenuItems" class="dropdown-content" selected="{{partner}}" attr-for-selected="key">
                     <template is="dom-repeat" items="[[partners]]">
                       <paper-item key="[[item.key]]">[[item.label]]</paper-item>
@@ -499,6 +499,11 @@
         });
       },
 
+      _multiplePartners: function() {
+        var partners = this.partners || [];
+        return partners.length > 1;
+      },
+
       _apiConfigLoaded: function(api) {
         console.info("Loaded API configuration.", api);
       },
@@ -645,7 +650,7 @@
                      "lastname": "Gammon"});
         this._setTransport({"base": "bloombox-io",
                           "environment": "sandbox",
-                          "token": "eyJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJodHRwczovL2lkZW50aXR5dG9vbGtpdC5nb29nbGVhcGlzLmNvbS9nb29nbGUuaWRlbnRpdHkuaWRlbnRpdHl0b29sa2l0LnYxLklkZW50aXR5VG9vbGtpdCIsImNsYWltcyI6eyJlbnZpcm9ubWVudCI6InNhbmRib3giLCJwYXJ0bmVycyI6eyJhYmF0aW4iOnRydWV9LCJlbWFpbCI6InNhbUBtb21lbnR1bS5pbyIsImFkbWluIjp0cnVlLCJrZXkiOiJhZzF6Zm1Kc2IyOXRZbTk0TFdsdmNrMExFZ2RCWTJOdmRXNTBJa0E0TUdRMlltWTBaVGc0TURjNE9HRmpPV0kwTlRGbFptSm1ZMlptTnpobE5qZ3lOR00zWkRSaU0yVm1ZV1kyTURZNFl6WXpNREptWm1KaE4yRmlOMlZsREtJQkIzWXpZbVYwWVRFIn0sImV4cCI6MTQ2NjgxMDQ0OSwiaWF0IjoxNDY2ODA2ODQ5LCJpc3MiOiJwbGF0Zm9ybUBibG9vbWJveC1pby5pYW0uZ3NlcnZpY2VhY2NvdW50LmNvbSIsInN1YiI6InBsYXRmb3JtQGJsb29tYm94LWlvLmlhbS5nc2VydmljZWFjY291bnQuY29tIiwidWlkIjoiMThjZGUwMzFiMjNmMDE3N2E0Y2QxY2UxMGRhYWUzOTMxNzk5NTQ2YjIyNDQ0NWVmYWQ1Y2YwYzAzOTdhOWE0NiJ9.VsUbbRaHDXrbSLBlQDj51aGRpAwv0z6ny6Id29SWrq8Kvbx0KYX2xM5pwgSU0J_zfkt1vlhYktTmFZdd8SCcq2woyo-RwRsTi0sG0MzlBd7__1jDVuAwrHKnrdOoC27slnP3H_MX28AKie67NVeXJs11mfaIFP0CQ3QFCEulyYEr-RBxJ35j2xH2hKsB3JGX48ttDNpUry-XtOYNtYhgEXF4MZZDaPzsywHo5z7CuZtLD9fXEmm-cg_C5eDlrQofceth5Xa9NhLkfyDueeV1cC-rL9GtDvL4y0YvYVgcki9mo8HaMJysdBiU8Bjyb4ygYIAtIacE9c7IOSxKFa3CZA"});
+                          "token": "eyJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJodHRwczovL2lkZW50aXR5dG9vbGtpdC5nb29nbGVhcGlzLmNvbS9nb29nbGUuaWRlbnRpdHkuaWRlbnRpdHl0b29sa2l0LnYxLklkZW50aXR5VG9vbGtpdCIsImNsYWltcyI6eyJlbnZpcm9ubWVudCI6InNhbmRib3giLCJwYXJ0bmVycyI6eyJhYmF0aW4iOnRydWV9LCJlbWFpbCI6InNhbUBtb21lbnR1bS5pbyIsImFkbWluIjp0cnVlLCJrZXkiOiJhZzF6Zm1Kc2IyOXRZbTk0TFdsdmNrMExFZ2RCWTJOdmRXNTBJa0E0TUdRMlltWTBaVGc0TURjNE9HRmpPV0kwTlRGbFptSm1ZMlptTnpobE5qZ3lOR00zWkRSaU0yVm1ZV1kyTURZNFl6WXpNREptWm1KaE4yRmlOMlZsREtJQkIzWXpZbVYwWVRFIn0sImV4cCI6MTQ2NjgyNTQ2OCwiaWF0IjoxNDY2ODIxODY4LCJpc3MiOiJwbGF0Zm9ybUBibG9vbWJveC1pby5pYW0uZ3NlcnZpY2VhY2NvdW50LmNvbSIsInN1YiI6InBsYXRmb3JtQGJsb29tYm94LWlvLmlhbS5nc2VydmljZWFjY291bnQuY29tIiwidWlkIjoiMThjZGUwMzFiMjNmMDE3N2E0Y2QxY2UxMGRhYWUzOTMxNzk5NTQ2YjIyNDQ0NWVmYWQ1Y2YwYzAzOTdhOWE0NiJ9.I9HFCQft-vRskp3NQVidZU95XFP565jDjObE4pRye6enfvdD1AezgXudM5gGKdR0VUYwLBqgC9gnxON1nLUDwmP8weayilWWUV35al_PVr-M0IrPJ52uAh5BHUqIYGrgH4FY13Gp5V5YvJVS-XpwYgP4wvHrZTV7GkFXK-XjnoIWIW2fouSKVUawvh8Z0tEi4Zbq7KlQRa9IB3qhOA0FObaMCa7wtHCyTURmCNTLiH4tN9T1aBDyLQhW5l_CblF5aJvSVtU7eAjBboCvhZ92v7HzmeB-ksnfptbA9DqHWu0Tm7OE8icey-eKlPN13XC_VTscXrLwItsDVhxQ2UDpUA"});
         this._setApi({load: [["accounts","v1"],["analytics","v1"],["partner","v1"],["device","v1"]],
                     key: "AIzaSyCQx80_10nt75jjovZqb1n8EJJb6bJu6hc",
                     endpoint: "https://bloombox-io.appspot.com/_ah/api"});

@@ -1,5 +1,8 @@
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-document.html">
+
+<link rel="import" href="../bower_components/bloombox-device/bloombox-device.html">
 <link rel="import" href="../bower_components/bloombox-styles/bloombox-styles.html">
 
 
@@ -8,46 +11,74 @@
     <style is="custom-style" include="bloombox-styles">
       :host {
         display: block;
-        padding: 10px;
-      }
-      .card {
-        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
-        padding: 16px;
-        margin: 24px;
-        border-radius: 5px;
-        background-color: #fff;
-        color: #757575;
-      }
-      .circle {
-        display: inline-block;
-        height: 64px;
-        width: 64px;
-        border-radius: 50%;
-        background: #ddd;
-        line-height: 64px;
-        font-size: 30px;
-        color: #555;
-        text-align: center;
+        padding: 20px 40px;
       }
       h1 {
-        font-size: 22px;
+        font-size: 28px;
         margin: 16px 0;
         color: #212121;
       }
+      :host bloombox-device {
+        margin-bottom: 20px;
+      }
     </style>
 
-    <!-- Card UI -->
-    <div class="card">
-      <div class="circle">1</div>
-      <h1>Home</h1>
-      <p>Modus commodo minimum eum te, vero utinam assueverit per eu.</p>
-      <p>Ea duis bonorum nec, falli paulo aliquid ei eum.Has at minim mucius aliquam, est id tempor laoreet.Pro saepe pertinax ei, ad pri animal labores suscipiantur.</p>
-    </div>
+    <!-- Device Collection -->
+    <firebase-document
+      log$="[[debug]]"
+      path="[[endpoint]]/devices"
+      data="{{devices}}"></firebase-document>
+
+    <h1>Active Devices</h1>
+
+    <div class="device-list-wrap">
+      <template is="dom-repeat" items="[[_toArray(devices)]]" as="device">
+        <bloombox-device
+          partner="[[partner]]"
+          name="[[device.key]]"
+          label="[[device.value.label]]"
+          online="[[device.value.online]]"
+          software-version="[[device.value.version]]"
+          hardware-version="V1.R1"
+          type="MENU"
+          visibility="PRIVATE"></bloombox-device>
+      </template>
+    </div><!-- end .device-list-wrap -->
   </template>
 
   <script>
     Polymer.BloomboxPageHome = Polymer({
-      is: 'bloombox-page-home'
+      is: 'bloombox-page-home',
+
+      properties: {
+        partner: {
+          type: String,
+          notify: true
+        },
+
+        endpoint: {
+          type: String,
+          notify: true
+        },
+
+        devices: {
+          type: String,
+          notify: true
+        }
+      },
+
+      _toArray: function(obj) {
+        return Object.keys(obj).map(function(key) {
+          return {
+            key: key,
+            value: obj[key]
+          };
+        });
+      },
+
+      _defaultDeviceLabel: function(device) {
+        return device.label || device.name;
+      }
     });
   </script>
 </dom-module>
