@@ -168,13 +168,6 @@
       }
     </style>
 
-    <!-- Persistence -->
-    <firebase-app
-      api-key="[[api.key]]"
-      app="{{firebase}}"
-      database-url="https://[[transport.base]].firebaseio.com/"
-      auth-domain="[[transport.base]].firebaseapp.com"></firebase-app>
-
     <!-- App State -->
     <app-location route="{{route}}"></app-location>
     <app-route
@@ -186,6 +179,24 @@
       route="{{subroute}}"
       pattern="/:location"
       data="{{_subrouteData}}"></app-route>
+
+    <!-- Persistence -->
+    <firebase-app
+      api-key="[[api.key]]"
+      app="{{firebase}}"
+      database-url="https://[[transport.base]].firebaseio.com/"
+      auth-domain="[[transport.base]].firebaseapp.com"></firebase-app>
+
+    <!-- JavaScript Context -->
+    <iron-ajax
+      id="appContext"
+      url="/api/context.json"
+      verbose$="[[_debug]]"
+      auto
+      json-prefix="^.^"
+      with-credentials
+      last-response="{{_context}}"
+      content-type="application/json"></iron-ajax>
 
     <!-- Layout / UI -->
     <main>
@@ -305,6 +316,17 @@
       is: 'bloombox-dashboard',
       properties: {
         /**
+         * Global debug flag. Activates logging and other verbosity
+         * features when `true`/truthy.
+         */
+        _debug: {
+          type: Boolean,
+          value: function() {
+            return window["__debug"] || false;
+          }
+        },
+
+        /**
          * Private property that holds onto a reference to the main
          * loading overlay.
          */
@@ -341,6 +363,17 @@
         _subrouteData: {
           type: Object,
           notify: true
+        },
+
+        /**
+         * Holds complete JS context provided by the server, before it is
+         * divvied up into its different components (such as `user`, `api`
+         * and `credentials`).
+         */
+        _context: {
+          type: Object,
+          notify: true,
+          observer: '_contextLoaded'
         },
 
         /**
@@ -511,19 +544,42 @@
         '_bootDashboard(user, transport, api, partners, credentials, firebase, environment)'
       ],
 
-      _transportLoaded: function(transport, app) {
-        var firebase = window["firebase"],
-            that = this;
-        console.info("Loaded transport layer.", transport);
-        console.log("Selecting environment '" + transport.environment + "'.");
+      _contextLoaded: function(context) {
+        var debug = window["__debug"] || false;
 
-        firebase.auth().signInWithCustomToken(transport.token).then(function() {
-          // set environment now that we're logged in
-          that.environment = transport.environment;
-        }).catch(function(error) {
-          // error occurred, report it
-          console.error("An error occurred authenticating with storage:", error);
-        });
+        if (debug) {
+          console.info("Loading server-provided application context...", context);
+        }
+
+        if (context !== undefined && context !== null) {
+          if (context.user != null) {
+            this._setUser(context.user);
+          }
+          if (context.transport != null) {
+            this._setTransport(context.transport);
+          }
+          if (context.api != null) {
+            this._setApi(context.api);
+          }
+          if (context.credentials != null) {
+            this._setCredentials(context.credentials);
+          }
+          if (context.partners != null) {
+            this._setPartners(context.partners);
+          }
+        }
+      },
+
+      _transportLoaded: function(transport, app) {
+        var debug = window["__debug"] || false,
+            firebase = window["firebase"];
+
+        if (debug) {
+          console.info("Loaded transport layer.", transport);
+          console.log("Selecting environment '" + transport.environment + "'.");
+        }
+
+        this.authorize(transport.token, transport.environment);
       },
 
       _multiplePartners: function() {
@@ -532,16 +588,28 @@
       },
 
       _apiConfigLoaded: function(api) {
-        console.info("Loaded API configuration.", api);
+        var debug = window["__debug"] || false;
+
+        if (debug) {
+          console.info("Loaded API configuration.", api);
+        }
       },
 
       _credentialsLoaded: function(credentials) {
-        console.info("Loaded user credentials.", credentials);
+        var debug = window["__debug"] || false;
+
+        if (debug) {
+          console.info("Loaded user credentials.", credentials);
+        }
       },
 
       _partnersLoaded: function(partners, oldValue) {
-        var existingPartner = this.partner;
-        console.info("Loaded user partner access.", partners);
+        var debug = window["__debug"] || false,
+            existingPartner = this.partner;
+
+        if (debug) {
+          console.info("Loaded user partner access.", partners);
+        }
 
         BloomboxPartnerCache = {};
         for (partner in partners) {
@@ -661,6 +729,23 @@
         }, BloomboxDashboardConfig.spinner.delay);
       },
 
+      authorize: function(token, environment) {
+        var debug = window["__debug"] || false,
+            that = this;
+        firebase.auth().signInWithCustomToken(token).then(function() {
+          // set environment now that we're logged in
+          if (that.environment != environment) {
+            that.environment = environment;
+          }
+          if (debug) {
+            console.log("Platform authorization granted.");
+          }
+        }).catch(function(error) {
+          // error occurred, report it
+          console.error("An error occurred authenticating with Firebase:", error);
+        });
+      },
+
       navigate: function(event) {
         var partner = this.partner,
             page = event.target.getAttribute("name");
@@ -673,27 +758,6 @@
             that = this;
         this._set_overlay(overlay);
         console.info("Dashboard is ready to boot.");
-
-        // this would be the loading order...
-        this._setUser({"email": "sam@momentum.io",
-                     "id": "116744996931216702695",
-                     "image": "https://lh5.googleusercontent.com/-hdqCivz5y4I/AAAAAAAAAAI/AAAAAAAAAZ8/orvrIMNGHmU/photo.jpg",
-                     "domain": "momentum.io",
-                     "admin": true,
-                     "fullname": "Sam Gammon",
-                     "firstname": "Sam",
-                     "lastname": "Gammon"});
-        this._setTransport({"base": "bloombox-io",
-                          "environment": "sandbox",
-                          "token": "eyJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJodHRwczovL2lkZW50aXR5dG9vbGtpdC5nb29nbGVhcGlzLmNvbS9nb29nbGUuaWRlbnRpdHkuaWRlbnRpdHl0b29sa2l0LnYxLklkZW50aXR5VG9vbGtpdCIsImNsYWltcyI6eyJlbnZpcm9ubWVudCI6InNhbmRib3giLCJwYXJ0bmVycyI6eyJhYmF0aW4iOnRydWV9LCJlbWFpbCI6InNhbUBtb21lbnR1bS5pbyIsImFkbWluIjp0cnVlLCJrZXkiOiJhZzF6Zm1Kc2IyOXRZbTk0TFdsdmNrMExFZ2RCWTJOdmRXNTBJa0E0TUdRMlltWTBaVGc0TURjNE9HRmpPV0kwTlRGbFptSm1ZMlptTnpobE5qZ3lOR00zWkRSaU0yVm1ZV1kyTURZNFl6WXpNREptWm1KaE4yRmlOMlZsREtJQkIzWXpZbVYwWVRFIn0sImV4cCI6MTQ2NzA2OTE4NiwiaWF0IjoxNDY3MDY1NTg2LCJpc3MiOiJwbGF0Zm9ybUBibG9vbWJveC1pby5pYW0uZ3NlcnZpY2VhY2NvdW50LmNvbSIsInN1YiI6InBsYXRmb3JtQGJsb29tYm94LWlvLmlhbS5nc2VydmljZWFjY291bnQuY29tIiwidWlkIjoiMThjZGUwMzFiMjNmMDE3N2E0Y2QxY2UxMGRhYWUzOTMxNzk5NTQ2YjIyNDQ0NWVmYWQ1Y2YwYzAzOTdhOWE0NiJ9.MNN8kXSciNlIPHoZZAz2hfVKI1o0c8knqAWItdKlAecJ2ZEPOFiRFpHyHzY0C0OP7dfcNOxAOzSZsmvWGh7KxioLvuBKTs9VZaCI-dJiQxF0xtce-d7gL3VWSKyzUZdXrSwpKzVmxoXxjKsDLBE-xE6Mzg-wIJZIVwnX6tFT-IXSyy1EFCIYiag9olToYCXYLBRb0LNqSAQDjZv-2i0D0bOh76-pbdCyEx684AUiwO7g25BCNidLUAME7VknJv79H29p9wUDknY_sqQsmKZRvka1__p_mZb-ZXQNTEJE1mv_urjLRF_4Alinwc34N_wcVQa0ydDwNAL3r5mpk-6JNw"});
-        this._setApi({load: [["accounts","v1"],["analytics","v1"],["partner","v1"],["device","v1"]],
-                    key: "AIzaSyCQx80_10nt75jjovZqb1n8EJJb6bJu6hc",
-                    endpoint: "https://bloombox-io.appspot.com/_ah/api"});
-        this._setCredentials({"id": "690823427095-h9n5cdoa6jnlittcpi7j8i2cq4isugob.apps.googleusercontent.com",
-                            "access": "ya29.CjAKA5eAX-79Rdi6nTkvX6AaYGZfEzm7MJY1hopy2CVuTB1TCZEd2LjnXAgGPGD9A3E",
-                            "expiration": 1466723357162,
-                            "scope": "https://www.googleapis.com/auth/user.birthday.read,https://www.googleapis.com/auth/userinfo.email,https://www.googleapis.com/auth/plus.me"});
-        this._setPartners([{"locations":[{"phone":"+19163419482","address":{"zip":"95811","address":"2100 29th Street","state":"CA","longitude":-121.4739249,"latitude":38.5613719,"city":"Sacramento"},"website":"abatinsacramento.com","label":"Sacramento","key":"sacramento"},{"phone":"+19163419482","address":{"zip":"94621","address":"7000 Coliseum Way","state":"CA","longitude":-122.2028616,"latitude":37.750277,"city":"Oakland"},"website":"abatinoakland.com","label":"Oakland","key":"oakland"},{"phone":"+19163419482","address":{"zip":"90012","address":"1000 Elysian Park Ave","state":"CA","longitude":-118.2407774,"latitude":34.073873,"city":"Los Angeles"},"website":"abatinla.com","label":"Los Angeles","key":"losangeles"}],"privileges":{"sandbox":true,"beta":true},"label":"Abatin Wellness","key":"abatin"}]);
       }
     });
   </script>
