@@ -1,9 +1,16 @@
 
 <!-- Polymer / Firebase -->
 <link rel="import" href="../bower_components/polymer/polymer.html">
-<link rel="import" href="../bower_components/paper-card/paper-card.html">
+
+<link rel="import" href="../bower_components/iron-list/iron-list.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+
 <link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
 <link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+
+<link rel="import" href="../bower_components/polymerfire/firebase-query.html">
 <link rel="import" href="../bower_components/polymerfire/firebase-document.html">
 
 <!-- Bloombox Commons -->
@@ -125,25 +132,27 @@
             </template>
 
             <template is="dom-if" if="[[flowers]]">
-              <template is="dom-repeat" initial-count="5" items="[[_toArray(flowers)]]" as="strain">
-                <bloombox-strain
-                  key="[[strain.key]]"
-                  partner="[[partner]]"
-                  name="[[strain.value.name]]"
-                  pricing="[[formatPricelist(strain.value.pricelist)]]"
-                  grow="[[strain.value.grow]]"
-                  species="[[strain.value.species]]"
-                  visible="[[strain.value.flags.visible]]"
-                  description$="[[strain.value.description]]"
-                  tests$="[[strain.value.tests]]"
-                  ancestry$="[[strain.value.ancestry]]"
-                  sale$="[[strain.value.flags.sale]]"
-                  bogo$="[[strain.value.flags.bogo]]"
-                  premium$="[[strain.value.flags.premium]]"
-                  pictures$="[[strain.value.pictures]]"
-                  hidden$="[[_shouldHideProduct(instock, strain)]]"
-                  display-mode="[[_menuDisplayMode]]"></bloombox-strain><!-- end bloombox-strain -->
-              </template>
+              <iron-list items="[[_toArray(flowers)]]" as="strain" scroll-target="menuWrap">
+                <template>
+                  <bloombox-strain
+                    key="[[strain.key]]"
+                    partner="[[partner]]"
+                    name="[[strain.value.name]]"
+                    pricing="[[formatPricelist(strain.value.pricelist)]]"
+                    grow="[[strain.value.grow]]"
+                    species="[[strain.value.species]]"
+                    visible="[[strain.value.flags.visible]]"
+                    description$="[[strain.value.description]]"
+                    tests$="[[strain.value.tests]]"
+                    ancestry$="[[strain.value.ancestry]]"
+                    sale$="[[strain.value.flags.sale]]"
+                    bogo$="[[strain.value.flags.bogo]]"
+                    premium$="[[strain.value.flags.premium]]"
+                    pictures$="[[strain.value.pictures]]"
+                    hidden$="[[_shouldHideProduct(instock, strain)]]"
+                    display-mode="[[_menuDisplayMode]]"></bloombox-strain><!-- end bloombox-strain -->
+                </template>
+              </iron-list>
             </template>
           </div><!-- end div.menu-items-container -->
         </div><!-- end div.menu-page.flowers-menu-page -->
@@ -461,8 +470,8 @@
         console.info("Loading menu for location '" + location + "'...");
       },
 
-      _shouldHideProduct: function(instock, strain) {
-        if (!instock && strain && strain.value && strain.value.flags && !strain.value.flags.visible)
+      _shouldHideProduct: function(instock, product) {
+        if (!instock && product && product.value && product.value.flags && !product.value.flags.visible)
           return true;
         return false;
       },
