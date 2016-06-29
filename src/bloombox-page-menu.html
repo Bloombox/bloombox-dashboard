@@ -43,16 +43,17 @@
 
       paper-button.addEntryButton {
         color: #333;
-        min-width: 200px;
+        min-width: 150px;
         background: #fefefe;
         margin-bottom: 40px;
-        font-size: 60%;
+        font-size: 80%;
         text-transform: uppercase;
       }
 
       paper-button.addEntryButton iron-icon {
         width: 16px;
         height: 16px;
+        margin-right: 5px;
       }
 
       paper-button[active] {
@@ -153,6 +154,7 @@
               class="newEntry"
               hidden
               partner="[[partner]]"
+              environment="[[environment]]"
               zerostate></bloombox-strain>
           </div>
 
@@ -165,27 +167,24 @@
 
             <template is="dom-if" if="[[flowers]]">
               <template is="dom-repeat" initial-count="5" items="[[_toArray(flowers)]]" as="strain">
-              <!--<iron-list items="[[_toArray(flowers)]]" as="strain" scroll-target="menuWrap">
-                <template>-->
-                  <bloombox-strain
-                    key="[[strain.key]]"
-                    partner="[[partner]]"
-                    name="[[strain.value.name]]"
-                    pricing="[[formatPricelist(strain.value.pricelist)]]"
-                    grow="[[strain.value.grow]]"
-                    species="[[strain.value.species]]"
-                    visible="[[strain.value.flags.visible]]"
-                    description$="[[strain.value.description]]"
-                    tests$="[[strain.value.tests]]"
-                    ancestry$="[[strain.value.ancestry]]"
-                    sale$="[[strain.value.flags.sale]]"
-                    bogo$="[[strain.value.flags.bogo]]"
-                    premium$="[[strain.value.flags.premium]]"
-                    pictures$="[[strain.value.pictures]]"
-                    hidden$="[[_shouldHideProduct(instock, strain)]]"
-                    display-mode="[[_menuDisplayMode]]"></bloombox-strain><!-- end bloombox-strain -->
-                <!--</template>
-              </iron-list>-->
+                <bloombox-strain
+                  key="[[strain.key]]"
+                  partner="[[partner]]"
+                  environment="[[environment]]"
+                  name="[[strain.value.name]]"
+                  pricing="[[formatPricelist(strain.value.pricelist)]]"
+                  grow="[[strain.value.grow]]"
+                  species="[[strain.value.species]]"
+                  visible="[[strain.value.flags.visible]]"
+                  description$="[[strain.value.description]]"
+                  tests$="[[strain.value.tests]]"
+                  ancestry$="[[strain.value.ancestry]]"
+                  sale$="[[strain.value.flags.sale]]"
+                  bogo$="[[strain.value.flags.bogo]]"
+                  premium$="[[strain.value.flags.premium]]"
+                  pictures$="[[strain.value.pictures]]"
+                  hidden$="[[_shouldHideProduct(instock, strain)]]"
+                  display-mode="[[_menuDisplayMode]]"></bloombox-strain><!-- end bloombox-strain -->
               </template>
             </template>
           </div><!-- end div.menu-items-container -->
@@ -199,11 +198,12 @@
             on-tap="toggleAddEntry">
             <iron-icon icon="create"></iron-icon>Add Edible</paper-button>
 
-          <div class="newEntryContainer">
+          <div class="edibles-create-container newEntryContainer">
             <bloombox-edible
               class="newEntry"
               hidden
               partner="[[partner]]"
+              environment="[[environment]]"
               zerostate></bloombox-edible>
           </div>
 
@@ -219,6 +219,7 @@
                 <bloombox-edible
                   key="[[edible.key]]"
                   partner="[[partner]]"
+                  environment="[[environment]]"
                   name="[[edible.value.name]]"
                   brand="[[edible.value.brand]]"
                   type="[[edible.value.type]]"
@@ -248,11 +249,12 @@
             <iron-icon icon="create"></iron-icon>Add Concentrate</paper-button>
 
           <!-- Zero-State: Entry Creation -->
-          <div class="newEntryContainer">
+          <div class="concentrates-create-container newEntryContainer">
             <bloombox-concentrate
               class="newEntry"
               hidden
               partner="[[partner]]"
+              environment="[[environment]]"
               zerostate></bloombox-concentrate>
           </div>
 
@@ -268,6 +270,7 @@
                 <bloombox-concentrate
                   key="[[concentrate.key]]"
                   partner="[[partner]]"
+                  environment="[[environment]]"
                   name="[[concentrate.value.name]]"
                   brand="[[concentrate.value.brand]]"
                   type="[[concentrate.value.type]]"
@@ -294,11 +297,12 @@
             on-tap="toggleAddEntry">
             <iron-icon icon="create"></iron-icon>Add Preroll</paper-button>
 
-          <div class="newEntryContainer">
+          <div class="prerolls-create-container newEntryContainer">
             <bloombox-preroll
               class="newEntry"
               hidden
               partner="[[partner]]"
+              environment="[[environment]]"
               zerostate></bloombox-preroll>
           </div>
 
@@ -314,6 +318,7 @@
                 <bloombox-preroll
                   key="[[preroll.key]]"
                   partner="[[partner]]"
+                  environment="[[environment]]"
                   name="[[preroll.value.name]]"
                   brand="[[preroll.value.brand]]"
                   type="[[preroll.value.type]]"
@@ -342,11 +347,12 @@
             on-tap="toggleAddEntry">
             <iron-icon icon="create"></iron-icon>Add Apothecary</paper-button>
 
-          <div class="newEntryContainer">
+          <div class="apothecary-create-container newEntryContainer">
             <bloombox-apothecary
               class="newEntry"
               hidden
               partner="[[partner]]"
+              environment="[[environment]]"
               zerostate></bloombox-apothecary>
           </div>
 
@@ -362,6 +368,7 @@
                 <bloombox-apothecary
                   key="[[apothecary.key]]"
                   partner="[[partner]]"
+                  environment="[[environment]]"
                   name="[[apothecary.value.name]]"
                   brand="[[apothecary.value.brand]]"
                   type="[[apothecary.value.type]]"
@@ -388,11 +395,12 @@
             on-tap="toggleAddEntry">
             <iron-icon icon="create"></iron-icon>Add Cartridges</paper-button>
 
-          <div class="newEntryContainer">
+          <div class="cartridges-create-container newEntryContainer">
             <bloombox-cartridge
               class="newEntry"
               hidden
               partner="[[partner]]"
+              environment="[[environment]]"
               zerostate></bloombox-cartridge>
           </div>
 
@@ -408,6 +416,7 @@
                 <bloombox-cartridge
                   key="[[cartridge.key]]"
                   partner="[[partner]]"
+                  environment="[[environment]]"
                   name="[[cartridge.value.name]]"
                   brand="[[cartridge.value.brand]]"
                   type="[[cartridge.value.type]]"
@@ -567,7 +576,7 @@
 
         if (newObjButton.hasAttribute("active") || newObjButton.active === true) {
           // button is active: hide the component
-          newObjEntry.addAttribute("hidden");
+          newObjEntry.setAttribute("hidden", true);
         } else {
           // button is not active: show the component
           newObjEntry.removeAttribute("hidden");
