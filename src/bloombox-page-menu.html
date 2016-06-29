@@ -246,7 +246,7 @@
             toggles
             class="addEntryButton"
             on-tap="toggleAddEntry">
-            <iron-icon icon="create"></iron-icon>Add Concentrate</paper-button>
+            <iron-icon icon="create"></iron-icon>Add Item</paper-button>
 
           <!-- Zero-State: Entry Creation -->
           <div class="concentrates-create-container newEntryContainer">
@@ -345,7 +345,7 @@
             toggles
             class="addEntryButton"
             on-tap="toggleAddEntry">
-            <iron-icon icon="create"></iron-icon>Add Apothecary</paper-button>
+            <iron-icon icon="create"></iron-icon>Add Item</paper-button>
 
           <div class="apothecary-create-container newEntryContainer">
             <bloombox-apothecary
@@ -393,7 +393,7 @@
             toggles
             class="addEntryButton"
             on-tap="toggleAddEntry">
-            <iron-icon icon="create"></iron-icon>Add Cartridges</paper-button>
+            <iron-icon icon="create"></iron-icon>Add Cartridge</paper-button>
 
           <div class="cartridges-create-container newEntryContainer">
             <bloombox-cartridge
@@ -575,11 +575,11 @@
             newObjButton = this.$$("." + section + "-menu-page .addEntryButton");
 
         if (newObjButton.hasAttribute("active") || newObjButton.active === true) {
-          // button is active: hide the component
-          newObjEntry.setAttribute("hidden", true);
-        } else {
-          // button is not active: show the component
+          // button is active: show the component
           newObjEntry.removeAttribute("hidden");
+        } else {
+          // button is not active: hide the component
+          newObjEntry.setAttribute("hidden", true);
         }
       },
 
