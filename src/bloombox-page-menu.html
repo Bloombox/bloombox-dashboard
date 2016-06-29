@@ -491,6 +491,43 @@
           {"label": "14g", "available": pricelist["half"]["available"], "price": pricelist["half"]["price"]},
           {"label": "28g", "available": pricelist["ounce"]["available"], "price": pricelist["ounce"]["price"]}
         ];
+      },
+
+      attachAsset: function(mediaElement, callback) {
+        // callback(uuid, error);
+        var targetName = mediaElement.getNewFileName(),
+            fileObject = mediaElement.getFile(),
+            resolvedPath = this.generateAssetURL(targetName),
+            firebase = window["firebase"] || this["firebase"] || null,
+            uploadTask;
+        if (firebase === null) {
+          console.error("Unable to resolve Firebase library. Failing asset attachment call.");
+          callback(null, "DATABASE_ERROR");
+        } else {
+          uploadTask = firebase.storage().ref().child(resolvedPath).put(fileObject.file);
+          uploadTask.on("state_changed", function(snapshot) {
+            // Handle progress events
+            var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            console.log("Media upload completion: ", progress);
+            mediaElement.setProgress(progress);
+          }, function(error) {
+            // Handle unsuccessful uploads
+            console.error("Error occurred during media upload:", error);
+            callback(null, error);
+          }, function() {
+            // Handle completion
+            var downloadURL = uploadTask.snapshot.downloadURL;
+            console.log("New asset is available at download URL: ", downloadURL);
+            callback(targetName, undefined);
+          });
+        }
+      },
+
+      generateAssetURL: function(targetName) {
+        var prefix = this.get("storage");
+        if (!prefix)
+          console.warn("Unable to resolve storage prefix. Uploads may break.");
+        return prefix + "/" + targetName;
       }
     });
   </script>
