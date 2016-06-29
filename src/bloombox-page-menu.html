@@ -41,6 +41,25 @@
         color: #212121;
       }
 
+      paper-button.newEntry {
+        color: #333;
+        min-width: 200px;
+        background: #fefefe;
+        margin-bottom: 40px;
+        font-size: 60%;
+        text-transform: uppercase;
+      }
+
+      paper-button.newEntry iron-icon {
+        width: 16px;
+        height: 16px;
+      }
+
+      paper-button[active] {
+        background-color: #4c9d2f;
+        color: white;
+      }
+
       :host paper-card.menutools-container,
       :host paper-card.menutools-container .card-content {
         background-color: white;
@@ -127,7 +146,7 @@
             toggles
             class="addEntryButton"
             on-tap="toggleAddEntry">
-            <iron-icon icon="create">Add Flower</iron-icon></paper-button>
+            <iron-icon icon="create"></iron-icon>Add Flower</paper-button>
 
           <div class="flowers-create-container newEntryContainer">
             <bloombox-strain
@@ -178,7 +197,7 @@
             toggles
             class="addEntryButton"
             on-tap="toggleAddEntry">
-            <iron-icon icon="create">Add Edible</iron-icon></paper-button>
+            <iron-icon icon="create"></iron-icon>Add Edible</paper-button>
 
           <div class="newEntryContainer">
             <bloombox-edible
@@ -226,7 +245,7 @@
             toggles
             class="addEntryButton"
             on-tap="toggleAddEntry">
-            <iron-icon icon="create">Add Concentrate</iron-icon></paper-button>
+            <iron-icon icon="create"></iron-icon>Add Concentrate</paper-button>
 
           <!-- Zero-State: Entry Creation -->
           <div class="newEntryContainer">
@@ -273,7 +292,7 @@
             toggles
             class="addEntryButton"
             on-tap="toggleAddEntry">
-            <iron-icon icon="create">Add Preroll</iron-icon></paper-button>
+            <iron-icon icon="create"></iron-icon>Add Preroll</paper-button>
 
           <div class="newEntryContainer">
             <bloombox-preroll
@@ -321,7 +340,7 @@
             toggles
             class="addEntryButton"
             on-tap="toggleAddEntry">
-            <iron-icon icon="create">Add Apothecary</iron-icon></paper-button>
+            <iron-icon icon="create"></iron-icon>Add Apothecary</paper-button>
 
           <div class="newEntryContainer">
             <bloombox-apothecary
@@ -367,7 +386,7 @@
             toggles
             class="addEntryButton"
             on-tap="toggleAddEntry">
-            <iron-icon icon="create">Add Cartridges</iron-icon></paper-button>
+            <iron-icon icon="create"></iron-icon>Add Cartridges</paper-button>
 
           <div class="newEntryContainer">
             <bloombox-cartridge
