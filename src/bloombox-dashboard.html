@@ -2,8 +2,10 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
-<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../bower_components/iron-iconset-svg/iron-iconset-svg.html">
+<link rel="import" href="../bower_components/iron-iconset/iron-iconset.html">
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 
@@ -248,47 +250,49 @@
           </app-header>
 
           <iron-pages role="main" selected="[[page]]" attr-for-selected="name">
-            <bloombox-page-home
-              name="home"
-              endpoint="[[endpoint]]"
-              partner="[[partner]]"
-              environment="[[environment]]"></bloombox-page-home>
-            <bloombox-page-analytics
-              name="analytics"
-              endpoint="[[endpoint]]"
-              partner="[[partner]]"
-              locations="[[locations]]"
-              environment="[[environment]]"></bloombox-page-analytics>
-            <bloombox-page-menu
-              name="menu"
-              endpoint="[[endpoint]]"
-              partner="[[partner]]"
-              locations="[[locations]]"
-              location="{{location}}"
-              environment="[[environment]]"></bloombox-page-menu>
-            <bloombox-page-profile
-              name="profile"
-              endpoint="[[endpoint]]"
-              partner="[[partner]]"
-              locations="[[locations]]"
-              location="{{location}}"
-              environment="[[environment]]"
-              api-key="[[api.key]]"></bloombox-page-profile>
-            <bloombox-page-account
-              name="account"
-              endpoint="[[endpoint]]"
-              partner="[[partner]]"
-              environment="[[environment]]"></bloombox-page-account>
-            <bloombox-page-settings
-              name="settings"
-              endpoint="[[endpoint]]"
-              partner="[[partner]]"
-              environment="[[environment]]"></bloombox-page-settings>
-            <bloombox-page-admin
-              name="admin"
-              endpoint="[[endpoint]]"
-              partner="[[partner]]"
-              environment="[[environment]]"></bloombox-page-admin>
+            <template is="dom-if" if="[[_booted]]" restamp>
+              <bloombox-page-home
+                name="home"
+                endpoint="[[endpoint]]"
+                partner="[[partner]]"
+                environment="[[environment]]"></bloombox-page-home>
+              <bloombox-page-analytics
+                name="analytics"
+                endpoint="[[endpoint]]"
+                partner="[[partner]]"
+                locations="[[locations]]"
+                environment="[[environment]]"></bloombox-page-analytics>
+              <bloombox-page-menu
+                name="menu"
+                endpoint="[[endpoint]]"
+                partner="[[partner]]"
+                locations="[[locations]]"
+                location="{{location}}"
+                environment="[[environment]]"></bloombox-page-menu>
+              <bloombox-page-profile
+                name="profile"
+                endpoint="[[endpoint]]"
+                partner="[[partner]]"
+                locations="[[locations]]"
+                location="{{location}}"
+                environment="[[environment]]"
+                api-key="[[api.key]]"></bloombox-page-profile>
+              <bloombox-page-account
+                name="account"
+                endpoint="[[endpoint]]"
+                partner="[[partner]]"
+                environment="[[environment]]"></bloombox-page-account>
+              <bloombox-page-settings
+                name="settings"
+                endpoint="[[endpoint]]"
+                partner="[[partner]]"
+                environment="[[environment]]"></bloombox-page-settings>
+              <bloombox-page-admin
+                name="admin"
+                endpoint="[[endpoint]]"
+                partner="[[partner]]"
+                environment="[[environment]]"></bloombox-page-admin>
+            </template>
           </iron-pages>
         </app-header-layout>
       </app-drawer-layout>
@@ -324,6 +328,15 @@
           value: function() {
             return window["__debug"] || false;
           }
+        },
+
+        /**
+         * Boolean flag indicating that the dashboard has booted and is
+         * currently running.
+         */
+        _booted: {
+          type: Boolean,
+          notify: true
         },
 
         /**
@@ -547,25 +560,27 @@
       _contextLoaded: function(context) {
         var debug = window["__debug"] || false;
 
-        if (debug) {
-          console.info("Loading server-provided application context...", context);
-        }
+        if (context != null) {
+          if (debug) {
+            console.info("Loading server-provided application context...", context);
+          }
 
-        if (context !== undefined && context !== null) {
-          if (context.user != null) {
-            this._setUser(context.user);
-          }
-          if (context.transport != null) {
-            this._setTransport(context.transport);
-          }
-          if (context.api != null) {
-            this._setApi(context.api);
-          }
-          if (context.credentials != null) {
-            this._setCredentials(context.credentials);
-          }
-          if (context.partners != null) {
-            this._setPartners(context.partners);
+          if (context !== undefined && context !== null) {
+            if (context.user != null) {
+              this._setUser(context.user);
+            }
+            if (context.transport != null) {
+              this._setTransport(context.transport);
+            }
+            if (context.api != null) {
+              this._setApi(context.api);
+            }
+            if (context.credentials != null) {
+              this._setCredentials(context.credentials);
+            }
+            if (context.partners != null) {
+              this._setPartners(context.partners);
+            }
           }
         }
       },
@@ -723,8 +738,10 @@
 
       _bootDashboard: function() {
         var that = this;
-        console.log("Dashboard is ready for use.");
+        this._booted = true;
+
         setTimeout(function() {
+          console.log("Dashboard is ready for use.");
           that.loading = false;
         }, BloomboxDashboardConfig.spinner.delay);
       },

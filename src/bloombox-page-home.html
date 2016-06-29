@@ -25,7 +25,7 @@
 
     <!-- Device Collection -->
     <firebase-document
-      log$="[[debug]]"
+      log$="[[_debug]]"
       path="[[endpoint]]/devices"
       data="{{devices}}"></firebase-document>
 
@@ -51,6 +51,13 @@
       is: 'bloombox-page-home',
 
       properties: {
+        _debug: {
+          type: Boolean,
+          value: function() {
+            return window["__debug"] || false;
+          }
+        },
+
         partner: {
           type: String,
           notify: true
