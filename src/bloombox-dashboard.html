@@ -273,6 +273,7 @@
                 partner="[[partner]]"
                 locations="[[locations]]"
                 location="{{location}}"
+                storage="[[storage]]"
                 environment="[[environment]]"></bloombox-page-menu>
               <bloombox-page-profile
                 name="profile"
@@ -280,6 +281,7 @@
                 partner="[[partner]]"
                 locations="[[locations]]"
                 location="{{location}}"
+                storage="[[storage]]"
                 environment="[[environment]]"
                 api-key="[[api.key]]"></bloombox-page-profile>
               <bloombox-page-account
@@ -551,6 +553,16 @@
           type: String,
           notify: true,
           computed: '_computeEndpoint(environment, partner)'
+        },
+
+        /**
+         * Computed property that generates a Firebase storage prefix for
+         * media upload and download.
+         */
+        storage: {
+          type: String,
+          notify: true,
+          computed: '_computeStorage(environment, partner)'
         }
       },
 
@@ -651,6 +663,12 @@
 
       _computeEndpoint: function(environment, partner) {
         return "/" + environment + "/partners/" + partner;
+      },
+
+      _computeStorage: function(environment, partner) {
+        if (environment === "sandbox")
+          return "/sandbox/v1/media/partners/" + partner;
+        return "/" + environment + "/media/partners/" + partner;
       },
 
       _computeDisplayMode: function() {
