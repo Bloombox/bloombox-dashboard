@@ -132,8 +132,9 @@
             </template>
 
             <template is="dom-if" if="[[flowers]]">
-              <iron-list items="[[_toArray(flowers)]]" as="strain" scroll-target="menuWrap">
-                <template>
+              <template is="dom-repeat" initial-count="5" items="[[_toArray(flowers)]]" as="strain">
+              <!--<iron-list items="[[_toArray(flowers)]]" as="strain" scroll-target="menuWrap">
+                <template>-->
                   <bloombox-strain
                     key="[[strain.key]]"
                     partner="[[partner]]"
@@ -151,8 +152,9 @@
                     pictures$="[[strain.value.pictures]]"
                     hidden$="[[_shouldHideProduct(instock, strain)]]"
                     display-mode="[[_menuDisplayMode]]"></bloombox-strain><!-- end bloombox-strain -->
-                </template>
-              </iron-list>
+                <!--</template>
+              </iron-list>-->
+              </template>
             </template>
           </div><!-- end div.menu-items-container -->
         </div><!-- end div.menu-page.flowers-menu-page -->
