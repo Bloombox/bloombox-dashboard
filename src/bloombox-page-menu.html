@@ -61,11 +61,16 @@
         color: white;
       }
 
+      :host paper-card.menutools-container {
+        width: 100%;
+        max-width: 750px;
+        min-width: 690px;
+      }
+
       :host paper-card.menutools-container,
       :host paper-card.menutools-container .card-content {
         background-color: white;
         min-width: 575px;
-        width: 100%;
       }
 
       :host bloombox-strain,
@@ -580,7 +585,7 @@
       },
 
       _shouldHideProduct: function(instock, product) {
-        if (!instock && product && product.value && product.value.flags && !product.value.flags.visible)
+        if (instock && product && product.value && product.value.flags && !product.value.flags.visible)
           return true;
         return false;
       },
