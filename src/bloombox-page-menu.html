@@ -63,26 +63,32 @@
 
     <!-- Firebase Collections -->
     <firebase-document
+      id="flowersCollection"
       log$="[[debug]]"
       path="[[_menuEndpoint]]/flowers"
       data="{{flowers}}"></firebase-document>
     <firebase-document
+      id="ediblesCollection"
       log$="[[debug]]"
       path="[[_menuEndpoint]]/edibles"
       data="{{edibles}}"></firebase-document>
     <firebase-document
+      id="concentratesCollection"
       log$="[[debug]]"
       path="[[_menuEndpoint]]/concentrates"
       data="{{concentrates}}"></firebase-document>
     <firebase-document
+      id="prerollsCollection"
       log$="[[debug]]"
       path="[[_menuEndpoint]]/prerolls"
       data="{{prerolls}}"></firebase-document>
     <firebase-document
+      id="apothecaryCollection"
       log$="[[debug]]"
       path="[[_menuEndpoint]]/apothecary"
       data="{{apothecary}}"></firebase-document>
     <firebase-document
+      id="cartridgesCollection"
       log$="[[debug]]"
       path="[[_menuEndpoint]]/cartridges"
       data="{{cartridges}}"></firebase-document>
@@ -116,7 +122,13 @@
       <iron-pages id="menuPages" selected="{{section}}" attr-for-selected="section">
         <div class="menu-page flowers-menu-page" section="flowers">
           <!-- Zero-State: Entry Creation -->
-          <div class="newEntryContainer">
+          <paper-button
+            toggles
+            class="addEntryButton"
+            on-tap="toggleAddEntry">
+            <iron-icon icon="create">Add Flower</iron-icon></paper-button>
+
+          <div class="flowers-create-container newEntryContainer">
             <bloombox-strain
               class="newEntry"
               hidden
@@ -161,6 +173,12 @@
 
         <div class="menu-page edibles-menu-page" section="edibles">
           <!-- Zero-State: Entry Creation -->
+          <paper-button
+            toggles
+            class="addEntryButton"
+            on-tap="toggleAddEntry">
+            <iron-icon icon="create">Add Edible</iron-icon></paper-button>
+
           <div class="newEntryContainer">
             <bloombox-edible
               class="newEntry"
@@ -203,6 +221,12 @@
         </div><!-- end div.menu-page.edibles-menu-page -->
 
         <div class="menu-page concentrates-menu-page" section="concentrates">
+          <paper-button
+            toggles
+            class="addEntryButton"
+            on-tap="toggleAddEntry">
+            <iron-icon icon="create">Add Concentrate</iron-icon></paper-button>
+
           <!-- Zero-State: Entry Creation -->
           <div class="newEntryContainer">
             <bloombox-concentrate
@@ -244,6 +268,12 @@
 
         <div class="menu-page prerolls-menu-page" section="prerolls">
           <!-- Zero-State: Entry Creation -->
+          <paper-button
+            toggles
+            class="addEntryButton"
+            on-tap="toggleAddEntry">
+            <iron-icon icon="create">Add Preroll</iron-icon></paper-button>
+
           <div class="newEntryContainer">
             <bloombox-preroll
               class="newEntry"
@@ -286,6 +316,12 @@
 
         <div class="menu-page apothecary-menu-page" section="apothecary">
           <!-- Zero-State: Entry Creation -->
+          <paper-button
+            toggles
+            class="addEntryButton"
+            on-tap="toggleAddEntry">
+            <iron-icon icon="create">Add Apothecary</iron-icon></paper-button>
+
           <div class="newEntryContainer">
             <bloombox-apothecary
               class="newEntry"
@@ -326,6 +362,12 @@
 
         <div class="menu-page cartridges-menu-page" section="cartridges">
           <!-- Zero-State: Entry Creation -->
+          <paper-button
+            toggles
+            class="addEntryButton"
+            on-tap="toggleAddEntry">
+            <iron-icon icon="create">Add Cartridges</iron-icon></paper-button>
+
           <div class="newEntryContainer">
             <bloombox-cartridge
               class="newEntry"
@@ -496,6 +538,20 @@
           {"label": "14g", "available": pricelist["half"]["available"], "price": pricelist["half"]["price"]},
           {"label": "28g", "available": pricelist["ounce"]["available"], "price": pricelist["ounce"]["price"]}
         ];
+      },
+
+      toggleAddEntry: function(schema) {
+        var section = schema || this.section,
+            newObjEntry = this.$$("." + section + "-create-container .newEntry"),
+            newObjButton = this.$$("." + section + "-menu-page .addEntryButton");
+
+        if (newObjButton.hasAttribute("active") || newObjButton.active === true) {
+          // button is active: hide the component
+          newObjEntry.addAttribute("hidden");
+        } else {
+          // button is not active: show the component
+          newObjEntry.removeAttribute("hidden");
+        }
       },
 
       attachAsset: function(mediaElement, callback) {
