@@ -591,6 +591,64 @@
         return prefix + "/" + targetName;
       },
 
+      saveNewObject: function(schema, entry, callback) {
+        var debug = window["__debug"] || false,
+            collectionObj = this.$$("#" + schema + "Collection"),
+            newObjContainer = this.$$("." + schema + "-create-container"),
+            newObjEntry = this.$$("." + schema + "-create-container .newEntry"),
+            newObjButton = this.$$("." + schema + "-menu-page .addEntryButton"),
+            newObjKey;
+
+        debugger;
+
+        // perform our object write
+        newObjKey = collectionObj.ref().push().key;
+        if (debug) {
+          console.log("Provisioned key for new item: '" + newObjKey + "'.", entry);
+        }
+        return collectionObj.ref()
+                            .child(newObjKey)
+                            .update(entry)
+                            .then(callback)
+                            .catch(function(error) {
+                              console.error("Encountered error persisting new object of type '" + schema + "'.", error);
+                              callback(error);
+                            });
+      },
+
+      saveEditsForEntry: function(schema, key, previous, entry, callback) {
+        var debug = window["__debug"] || false,
+            collectionObj = this.$$("#" + schema + "Collection");
+
+        debugger;
+
+        if (debug) {
+          console.log("Saving edits for item of type '" + schema + "' at key: '" + key + "'.", entry);
+        }
+        return collectionObj.ref()
+                            .child(key)
+                            .update(entry)
+                            .then(callback)
+                            .catch(function(error) {
+                              console.error("Encountered error persisting edits for object of type '" + schema + "'.", error);
+                              callback(error);
+                            });
+      },
+
+      deleteEntryAtId: function(schema, key) {
+        var debug = window["__debug"] || false,
+            collectionObj = this.$$("#" + schema + "Collection");
+
+        debugger;
+
+        if (debug) {
+          console.log("Deleting item of type '" + schema + "' at key '" + key + "'.");
+        }
+        return collectionObj.ref()
+                            .child(key)
+                            .remove();
+      },
+
       ready: function() {
         var bloom = window["bloom"];
         if (bloom !== undefined && bloom != null) {
