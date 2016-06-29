@@ -533,6 +533,13 @@
         if (!prefix)
           console.warn("Unable to resolve storage prefix. Uploads may break.");
         return prefix + "/" + targetName;
+      },
+
+      ready: function() {
+        var bloom = window["bloom"];
+        if (bloom !== undefined && bloom != null) {
+          bloom.menu = this;  // provide menu engine to JS context
+        }
       }
     });
   </script>
