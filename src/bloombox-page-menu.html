@@ -65,6 +65,7 @@
       :host paper-card.menutools-container .card-content {
         background-color: white;
         min-width: 575px;
+        width: 100%;
       }
 
       :host bloombox-strain,
@@ -123,12 +124,13 @@
           instock="{{instock}}"
           display-mode="{{_menuDisplayMode}}"
           locations="[[locations]]"
-          location="{{location}}"></bloombox-menutools>
+          location="{{location}}"
+          disabled="[[loading]]"></bloombox-menutools>
       </div><!-- end div.toolbar-content.card-content -->
 
       <!-- Menu Navigation (categories) -->
       <div class="menu-nav">
-        <paper-tabs selected="{{section}}" attr-for-selected="key" noink>
+        <paper-tabs selected="{{section}}" attr-for-selected="key" noink disabled="[[loading]]">
           <paper-tab key="flowers">Flowers</paper-tab>
           <paper-tab key="edibles">Edibles</paper-tab>
           <paper-tab key="concentrates">Concentrates</paper-tab>
@@ -146,7 +148,8 @@
           <paper-button
             toggles
             class="addEntryButton"
-            on-tap="toggleAddEntry">
+            on-tap="toggleAddEntry"
+            disabled="[[loading]]">
             <iron-icon icon="create"></iron-icon>Add Flower</paper-button>
 
           <div class="flowers-create-container newEntryContainer">
@@ -155,6 +158,7 @@
               hidden
               partner="[[partner]]"
               environment="[[environment]]"
+              disabled="[[loading]]"
               zerostate></bloombox-strain>
           </div>
 
@@ -184,7 +188,8 @@
                   premium$="[[strain.value.flags.premium]]"
                   pictures$="[[strain.value.pictures]]"
                   hidden$="[[_shouldHideProduct(instock, strain)]]"
-                  display-mode="[[_menuDisplayMode]]"></bloombox-strain><!-- end bloombox-strain -->
+                  display-mode="[[_menuDisplayMode]]"
+                  disabled="[[loading]]"></bloombox-strain><!-- end bloombox-strain -->
               </template>
             </template>
           </div><!-- end div.menu-items-container -->
@@ -195,7 +200,8 @@
           <paper-button
             toggles
             class="addEntryButton"
-            on-tap="toggleAddEntry">
+            on-tap="toggleAddEntry"
+            disabled="[[loading]]">
             <iron-icon icon="create"></iron-icon>Add Edible</paper-button>
 
           <div class="edibles-create-container newEntryContainer">
@@ -204,7 +210,8 @@
               hidden
               partner="[[partner]]"
               environment="[[environment]]"
-              zerostate></bloombox-edible>
+              zerostate
+              disabled="[[loading]]"></bloombox-edible>
           </div>
 
           <!-- Sample State: Current Entries -->
@@ -235,7 +242,8 @@
                   glutenfree="[[edible.value.flags.glutenfree]]"
                   photos$="[[edible.value.photos]]"
                   hidden$="[[_shouldHideProduct(instock, edible)]]"
-                  display-mode="[[_menuDisplayMode]]"></bloombox-edible><!-- end bloombox-edible -->
+                  display-mode="[[_menuDisplayMode]]"
+                  disabled="[[loading]]"></bloombox-edible><!-- end bloombox-edible -->
               </template>
             </template>
           </div><!-- end div.menu-items-container -->
@@ -245,7 +253,8 @@
           <paper-button
             toggles
             class="addEntryButton"
-            on-tap="toggleAddEntry">
+            on-tap="toggleAddEntry"
+            disabled="[[loading]]">
             <iron-icon icon="create"></iron-icon>Add Item</paper-button>
 
           <!-- Zero-State: Entry Creation -->
@@ -255,7 +264,8 @@
               hidden
               partner="[[partner]]"
               environment="[[environment]]"
-              zerostate></bloombox-concentrate>
+              zerostate
+              disabled="[[loading]]"></bloombox-concentrate>
           </div>
 
           <!-- Sample State: Current Entries -->
@@ -283,7 +293,8 @@
                   premium$="[[concentrate.value.flags.premium]]"
                   photos$="[[concentrate.value.photos]]"
                   hidden$="[[_shouldHideProduct(instock, concentrate)]]"
-                  display-mode="[[_menuDisplayMode]]"></bloombox-concentrate><!-- end bloombox-concentrate -->
+                  display-mode="[[_menuDisplayMode]]"
+                  disabled="[[loading]]"></bloombox-concentrate><!-- end bloombox-concentrate -->
               </template>
             </template>
           </div><!-- end div.menu-items-container -->
@@ -294,7 +305,8 @@
           <paper-button
             toggles
             class="addEntryButton"
-            on-tap="toggleAddEntry">
+            on-tap="toggleAddEntry"
+            disabled="[[loading]]">
             <iron-icon icon="create"></iron-icon>Add Preroll</paper-button>
 
           <div class="prerolls-create-container newEntryContainer">
@@ -303,7 +315,8 @@
               hidden
               partner="[[partner]]"
               environment="[[environment]]"
-              zerostate></bloombox-preroll>
+              zerostate
+              disabled="[[loading]]"></bloombox-preroll>
           </div>
 
           <!-- Sample State: Current Entries -->
@@ -333,7 +346,8 @@
                   premium$="[[preroll.value.flags.premium]]"
                   photos$="[[preroll.value.photos]]"
                   hidden$="[[_shouldHideProduct(instock, preroll)]]"
-                  display-mode="[[_menuDisplayMode]]"></bloombox-preroll><!-- end bloombox-preroll -->
+                  display-mode="[[_menuDisplayMode]]"
+                  disabled="[[loading]]"></bloombox-preroll><!-- end bloombox-preroll -->
               </template>
             </template>
           </div><!-- end div.menu-items-container -->
@@ -344,7 +358,8 @@
           <paper-button
             toggles
             class="addEntryButton"
-            on-tap="toggleAddEntry">
+            on-tap="toggleAddEntry"
+            disabled="[[loading]]">
             <iron-icon icon="create"></iron-icon>Add Item</paper-button>
 
           <div class="apothecary-create-container newEntryContainer">
@@ -353,7 +368,8 @@
               hidden
               partner="[[partner]]"
               environment="[[environment]]"
-              zerostate></bloombox-apothecary>
+              zerostate
+              disabled="[[loading]]"></bloombox-apothecary>
           </div>
 
           <!-- Sample State: Current Entries -->
@@ -381,7 +397,8 @@
                   premium$="[[apothecary.value.flags.premium]]"
                   photos$="[[apothecary.value.photos]]"
                   hidden$="[[_shouldHideProduct(instock, apothecary)]]"
-                  display-mode="[[_menuDisplayMode]]"></bloombox-apothecary><!-- end bloombox-apothecary -->
+                  display-mode="[[_menuDisplayMode]]"
+                  disabled="[[loading]]"></bloombox-apothecary><!-- end bloombox-apothecary -->
               </template>
             </template>
           </div><!-- end div.menu-items-container -->
@@ -392,7 +409,8 @@
           <paper-button
             toggles
             class="addEntryButton"
-            on-tap="toggleAddEntry">
+            on-tap="toggleAddEntry"
+            disabled="[[loading]]">
             <iron-icon icon="create"></iron-icon>Add Cartridge</paper-button>
 
           <div class="cartridges-create-container newEntryContainer">
@@ -401,6 +419,7 @@
               hidden
               partner="[[partner]]"
               environment="[[environment]]"
+              disabled="[[loading]]"
               zerostate></bloombox-cartridge>
           </div>
 
@@ -429,7 +448,8 @@
                   premium$="[[cartridge.value.flags.premium]]"
                   photos$="[[cartridge.value.photos]]"
                   hidden$="[[_shouldHideProduct(instock, cartridge)]]"
-                  display-mode="[[_menuDisplayMode]]"></bloombox-cartridge><!-- end bloombox-cartridge -->
+                  display-mode="[[_menuDisplayMode]]"
+                  disabled="[[loading]]"></bloombox-cartridge><!-- end bloombox-cartridge -->
               </template>
             </template>
           </div><!-- end div.menu-items-container -->
