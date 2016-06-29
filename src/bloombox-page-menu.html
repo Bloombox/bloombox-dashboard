@@ -657,9 +657,8 @@
             newObjContainer = this.$$("." + schema + "-create-container"),
             newObjEntry = this.$$("." + schema + "-create-container .newEntry"),
             newObjButton = this.$$("." + schema + "-menu-page .addEntryButton"),
+            that = this,
             newObjKey;
-
-        debugger;
 
         // perform our object write
         newObjKey = collectionObj.ref.push().key;
@@ -672,6 +671,7 @@
                             .then(callback)
                             .catch(function(error) {
                               console.error("Encountered error persisting new object of type '" + schema + "'.", error);
+                              that.toggleAddEntry(schema);
                               callback(error);
                             });
       },
@@ -679,8 +679,6 @@
       saveEditsForEntry: function(schema, key, previous, entry, callback) {
         var debug = window["__debug"] || false,
             collectionObj = this.$$("#" + schema + "Collection");
-
-        debugger;
 
         if (debug) {
           console.log("Saving edits for item of type '" + schema + "' at key: '" + key + "'.", entry);
@@ -698,8 +696,6 @@
       deleteEntryAtId: function(schema, key) {
         var debug = window["__debug"] || false,
             collectionObj = this.$$("#" + schema + "Collection");
-
-        debugger;
 
         if (debug) {
           console.log("Deleting item of type '" + schema + "' at key '" + key + "'.");
