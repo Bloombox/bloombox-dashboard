@@ -561,7 +561,7 @@
       },
 
       toggleAddEntry: function(schema) {
-        var section = schema || this.section,
+        var section = (typeof schema === "string") ? schema : this.section,
             newObjEntry = this.$$("." + section + "-create-container .newEntry"),
             newObjButton = this.$$("." + section + "-menu-page .addEntryButton");
 
