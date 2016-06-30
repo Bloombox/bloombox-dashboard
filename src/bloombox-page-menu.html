@@ -618,7 +618,7 @@
         var section = (typeof schema === "string") ? schema : this.section,
             newObjEntry = this.$$("." + section + "-create-container .newEntry");
 
-        newObjEntry.addEntry("hidden");
+        newObjEntry.setAttribute("hidden", true);
       },
 
       attachAsset: function(mediaElement, callback) {
