@@ -814,11 +814,6 @@
 
         if (bloom !== undefined && bloom != null) {
           bloom.app = this;  // provide app to JS context
-
-          // hand off ready dispatch to global context
-          if (bloom.ready !== undefined && typeof bloom.ready === "function") {
-            bloom.ready();
-          }
         }
       }
     });
