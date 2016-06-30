@@ -614,6 +614,13 @@
         }
       },
 
+      hideAddEntry: function(schema) {
+        var section = (typeof schema === "string") ? schema : this.section,
+            newObjEntry = this.$$("." + section + "-create-container .newEntry");
+
+        newObjEntry.addEntry("hidden");
+      },
+
       attachAsset: function(mediaElement, callback) {
         // callback(uuid, error);
         var targetName = mediaElement.getNewFileName(),
