@@ -184,7 +184,7 @@
                   pricing="[[formatPricelist(strain.value.pricelist)]]"
                   grow="[[strain.value.grow]]"
                   species="[[strain.value.species]]"
-                  visible="[[strain.value.flags.visible]]"
+                  visible="[[_processVisible(strain.value.flags.visible)]]"
                   description$="[[strain.value.description]]"
                   tests$="[[strain.value.tests]]"
                   ancestry$="[[strain.value.ancestry]]"
@@ -236,7 +236,7 @@
                   brand="[[edible.value.brand]]"
                   type="[[edible.value.type]]"
                   pricing="[[edible.value.pricing]]"
-                  visible="[[edible.value.flags.visible]]"
+                  visible="[[_processVisible(edible.value.flags.visible)]]"
                   description$="[[edible.value.description]]"
                   tests$="[[edible.value.tests]]"
                   sale$="[[edible.value.flags.sale]]"
@@ -290,7 +290,7 @@
                   brand="[[concentrate.value.brand]]"
                   type="[[concentrate.value.type]]"
                   pricing="[[concentrate.value.pricing]]"
-                  visible="[[concentrate.value.flags.visible]]"
+                  visible="[[_processVisible(concentrate.value.flags.visible)]]"
                   description$="[[concentrate.value.description]]"
                   tests$="[[concentrate.value.tests]]"
                   sale$="[[concentrate.value.flags.sale]]"
@@ -343,7 +343,7 @@
                   pricing="[[preroll.value.pricing]]"
                   species="[[preroll.value.species]]"
                   grow="[[preroll.value.grow]]"
-                  visible="[[preroll.value.flags.visible]]"
+                  visible="[[_processVisible(preroll.value.flags.visible)]]"
                   description$="[[preroll.value.description]]"
                   tests$="[[preroll.value.tests]]"
                   sale$="[[preroll.value.flags.sale]]"
@@ -394,7 +394,7 @@
                   brand="[[apothecary.value.brand]]"
                   type="[[apothecary.value.type]]"
                   pricing="[[apothecary.value.pricing]]"
-                  visible="[[apothecary.value.flags.visible]]"
+                  visible="[[_processVisible(apothecary.value.flags.visible)]]"
                   description$="[[apothecary.value.description]]"
                   tests$="[[apothecary.value.tests]]"
                   sale$="[[apothecary.value.flags.sale]]"
@@ -445,7 +445,7 @@
                   brand="[[cartridge.value.brand]]"
                   type="[[cartridge.value.type]]"
                   pricing="[[cartridge.value.pricing]]"
-                  visible="[[cartridge.value.flags.visible]]"
+                  visible="[[_processVisible(cartridge.value.flags.visible)]]"
                   description$="[[cartridge.value.description]]"
                   tests$="[[cartridge.value.tests]]"
                   sale$="[[cartridge.value.flags.sale]]"
@@ -578,6 +578,12 @@
         if (location == null || location == undefined) {
           this.location = locations[0].key;
         }
+      },
+
+      _processVisible: function(flagValue) {
+        if (flagValue === false)
+          return false;
+        return true;
       },
 
       _locationChanged: function(location) {
