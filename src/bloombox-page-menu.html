@@ -186,7 +186,7 @@
                   species="[[_processSpeciesValue(strain.value.species)]]"
                   visible="[[_processVisible(strain.value.flags.visible)]]"
                   description$="[[strain.value.description]]"
-                  tests$="[[strain.value.tests]]"
+                  tests$="_processTests([[strain.value.tests]])"
                   ancestry$="[[strain.value.ancestry]]"
                   sale$="[[strain.value.flags.sale]]"
                   bogo$="[[strain.value.flags.bogo]]"
@@ -238,7 +238,7 @@
                   pricing="[[edible.value.pricing]]"
                   visible="[[_processVisible(edible.value.flags.visible)]]"
                   description$="[[edible.value.description]]"
-                  tests$="[[edible.value.tests]]"
+                  tests$="[[_processTests(edible.value.tests)]]"
                   sale$="[[edible.value.flags.sale]]"
                   bogo$="[[edible.value.flags.bogo]]"
                   premium$="[[edible.value.flags.premium]]"
@@ -292,7 +292,7 @@
                   pricing="[[concentrate.value.pricing]]"
                   visible="[[_processVisible(concentrate.value.flags.visible)]]"
                   description$="[[concentrate.value.description]]"
-                  tests$="[[concentrate.value.tests]]"
+                  tests$="[[_processTests(concentrate.value.tests)]]"
                   sale$="[[concentrate.value.flags.sale]]"
                   bogo$="[[concentrate.value.flags.bogo]]"
                   premium$="[[concentrate.value.flags.premium]]"
@@ -345,7 +345,7 @@
                   grow="[[_processGrowValue(preroll.value.grow)]]"
                   visible="[[_processVisible(preroll.value.flags.visible)]]"
                   description$="[[preroll.value.description]]"
-                  tests$="[[preroll.value.tests]]"
+                  tests$="[[_processTests(preroll.value.tests)]]"
                   sale$="[[preroll.value.flags.sale]]"
                   bogo$="[[preroll.value.flags.bogo]]"
                   premium$="[[preroll.value.flags.premium]]"
@@ -396,7 +396,7 @@
                   pricing="[[apothecary.value.pricing]]"
                   visible="[[_processVisible(apothecary.value.flags.visible)]]"
                   description$="[[apothecary.value.description]]"
-                  tests$="[[apothecary.value.tests]]"
+                  tests$="[[_processTests(apothecary.value.tests)]]"
                   sale$="[[apothecary.value.flags.sale]]"
                   bogo$="[[apothecary.value.flags.bogo]]"
                   premium$="[[apothecary.value.flags.premium]]"
@@ -447,7 +447,7 @@
                   pricing="[[cartridge.value.pricing]]"
                   visible="[[_processVisible(cartridge.value.flags.visible)]]"
                   description$="[[cartridge.value.description]]"
-                  tests$="[[cartridge.value.tests]]"
+                  tests$="[[_processTests(cartridge.value.tests)]]"
                   sale$="[[cartridge.value.flags.sale]]"
                   bogo$="[[cartridge.value.flags.bogo]]"
                   premium$="[[cartridge.value.flags.premium]]"
@@ -596,6 +596,23 @@
         if (species != null && species != undefined && typeof species === "string")
           return "Species: " + species;
         return "Species: Unknown";
+      },
+
+      _processTests: function(tests) {
+        if (tests != null && tests != undefined && typeof tests === "object") {
+          if (tests.terpenes != null && tests.terpenes != undefined && typeof tests.terpenes === "object") {
+            return {
+              cbd: tests.cbd || 0,
+              thc: tests.thc || 0,
+              terpenes: tests.terpenes
+            };
+          }
+          return {
+            cbd: tests.cbd || 0,
+            thc: tests.thc || 0
+          };
+        }
+        return false;  // removes the `tests` attribute entirely
       },
 
       _locationChanged: function(location) {
