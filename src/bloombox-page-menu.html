@@ -182,8 +182,8 @@
                   environment="[[environment]]"
                   name="[[strain.value.name]]"
                   pricing="[[formatPricelist(strain.value.pricelist)]]"
-                  grow="[[strain.value.grow]]"
-                  species="[[strain.value.species]]"
+                  grow="[[_processGrowValue(strain.value.grow)]]"
+                  species="[[_processSpeciesValue(strain.value.species)]]"
                   visible="[[_processVisible(strain.value.flags.visible)]]"
                   description$="[[strain.value.description]]"
                   tests$="[[strain.value.tests]]"
@@ -341,8 +341,8 @@
                   brand="[[preroll.value.brand]]"
                   type="[[preroll.value.type]]"
                   pricing="[[preroll.value.pricing]]"
-                  species="[[preroll.value.species]]"
-                  grow="[[preroll.value.grow]]"
+                  species="[[_processSpeciesValue(preroll.value.species)]]"
+                  grow="[[_processGrowValue(preroll.value.grow)]]"
                   visible="[[_processVisible(preroll.value.flags.visible)]]"
                   description$="[[preroll.value.description]]"
                   tests$="[[preroll.value.tests]]"
@@ -584,6 +584,18 @@
         if (flagValue === false)
           return false;
         return true;
+      },
+
+      _processGrowValue: function(grow) {
+        if (grow != null && grow != undefined && typeof grow === "string")
+          return "Grow: " + grow;
+        return "Grow: Unknown";
+      },
+
+      _processSpeciesValue: function(species) {
+        if (species != null && species != undefined && typeof species === "string")
+          return "Species: " + species;
+        return "Species: Unknown";
       },
 
       _locationChanged: function(location) {
