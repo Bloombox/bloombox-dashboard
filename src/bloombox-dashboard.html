@@ -769,7 +769,10 @@
             // skip: we are already there
           } else {
             if (page == "menu" || page == "profile") {
-              this.route = {"prefix": "", "path": "/" + partner + "/" + page + "/" + location, "__queryParams": {}};
+              if (location != null && location != undefined && typeof location === "string" && location.length > 1) {
+                // only replace if we have a valid location coming thru
+                this.route = {"prefix": "", "path": "/" + partner + "/" + page + "/" + location, "__queryParams": {}};
+              }
             } else {
               this.route = {"prefix": "", "path": "/" + partner + "/" + page, "__queryParams": {}};
               if (window.location.pathname.length < 3) {
