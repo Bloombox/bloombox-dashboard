@@ -127,6 +127,18 @@
         transition-duration: 0.3s;
       }
 
+      :host div.dashboard-page-heading h1 {
+        color: #fefefe;
+        font-size: 100%;
+        cursor: default;
+        -webkit-margin-before: 0;
+        -webkit-margin-after: 0;
+      }
+
+      :host app-drawer-layout[narrow] div.dashboard-page-heading h1 {
+        color: red !important;
+      }
+
       div.loading-overlay.spinner-inactive {
         opacity: 0 !important;
       }
@@ -229,12 +241,15 @@
         <app-header-layout has-scrolling-region>
           <app-header fixed effects="waterfall">
             <app-toolbar>
-              <div drawer-toggle top-item>
+              <div drawer-toggle>
                 <bloombox-logo hidden mode="icon"></bloombox-logo>
                 <div class="toggle-container">
                   <paper-icon-button icon="menu" drawer-toggle></paper-icon-button>
                 </div><!-- end div.toggle-container -->
               </div>
+              <div class="dashboard-page-heading title">
+                <h1>{{_pageTitle}}</h1>
+              </div><!-- end div.dashboard-page-heading -->
               <div class="toolbar-utils">
                 <paper-dropdown-menu id="partnerSelection" hidden$="[[!_multiplePartners]]" noink disabled$="[[loading]]">
                   <paper-listbox id="dispensaryMenuItems" class="dropdown-content" selected="{{partner}}" attr-for-selected="key">
@@ -330,7 +345,16 @@
         delay: 1100,  // i'll buy it at a HIGH PRICE
         interval: 316,  // must be animation delay (300ms) plus at least on render window (16ms)
         navigationDelay: 1500  // shorter delay to let the UI catch up with major changes
-      }      
+      },
+      titles: {
+        home: "",
+        analytics: "Analytics",
+        menu: "Menu Manager",
+        profile: "Dispensary Profile",
+        account: "Account Settings",
+        admin: "Platform Manager",
+        settings: "Settings"
+      }
     };
 
     var BloomboxPartnerCache = {};
@@ -395,6 +419,15 @@
         _subrouteData: {
           type: Object,
           notify: true
+        },
+
+        /**
+         * Page title shown in the dashboard header.
+         */
+        _pageTitle: {
+          type: String,
+          notify: true,
+          value: ""
         },
 
         /**
@@ -732,7 +765,12 @@
 
       _pageChanged: function(page) {
         // load page import on demand.
+        var title = BloomboxDashboardConfig.titles[page];
         console.info("Navigating to page '" + page + "'...");
+
+        if (title !== undefined && typeof title === "string")
+          this._pageTitle = title;
+
         this.importHref(
           this.resolveUrl('bloombox-page-' + page + '.html'), null, null, true);
       },
