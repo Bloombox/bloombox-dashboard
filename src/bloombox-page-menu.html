@@ -18,6 +18,9 @@
 <link rel="import" href="../bower_components/bloombox-styles/bloombox-styles.html">
 <link rel="import" href="../bower_components/bloombox-menutools/bloombox-menutools.html">
 
+<!-- Product Listings -->
+<link rel="import" href="../bower_components/bloombox-product-list/bloombox-product-list.html">
+
 <!-- Product Cards -->
 <link rel="import" href="../bower_components/bloombox-strain/bloombox-strain.html">
 <link rel="import" href="../bower_components/bloombox-edible/bloombox-edible.html">
@@ -63,14 +66,16 @@
 
       :host paper-card.menutools-container {
         width: 100%;
-        max-width: 750px;
-        min-width: 690px;
       }
 
-      :host paper-card.menutools-container,
+      :host paper-card.menutools-container {
+        background-color: white;
+        width: 100%;
+      }
+
       :host paper-card.menutools-container .card-content {
         background-color: white;
-        min-width: 575px;
+        padding: 0;
       }
 
       :host bloombox-strain,
@@ -86,39 +91,34 @@
       :host .menu-content {
         margin-top: 40px;
       }
+
+      :host bloombox-product-list {
+        width: 400px;
+        height: 506px;
+        --bloombox-product-list-width: 400px;
+        --bloombox-product-list-height: 506px;
+        flex: 1 0 400px;
+      }
+
+      :host div.product-detail-pane {
+        background: white;
+        min-width: 500px;
+        min-height: 400px;
+        flex: 1 1 60%;
+        padding: 20px;
+      }
+
+      :host .menu-items-container {
+        display: flex;
+      }
     </style>
 
     <!-- Firebase Collections -->
     <firebase-document
       id="flowersCollection"
       log$="[[debug]]"
-      path="[[_menuEndpoint]]/flowers"
-      data="{{flowers}}"></firebase-document>
-    <firebase-document
-      id="ediblesCollection"
-      log$="[[debug]]"
-      path="[[_menuEndpoint]]/edibles"
-      data="{{edibles}}"></firebase-document>
-    <firebase-document
-      id="concentratesCollection"
-      log$="[[debug]]"
-      path="[[_menuEndpoint]]/concentrates"
-      data="{{concentrates}}"></firebase-document>
-    <firebase-document
-      id="prerollsCollection"
-      log$="[[debug]]"
-      path="[[_menuEndpoint]]/prerolls"
-      data="{{prerolls}}"></firebase-document>
-    <firebase-document
-      id="apothecaryCollection"
-      log$="[[debug]]"
-      path="[[_menuEndpoint]]/apothecary"
-      data="{{apothecary}}"></firebase-document>
-    <firebase-document
-      id="cartridgesCollection"
-      log$="[[debug]]"
-      path="[[_menuEndpoint]]/cartridges"
-      data="{{cartridges}}"></firebase-document>
+      path="[[_menuEndpoint]]/[[section]]"
+      data="{{products}}"></firebase-document>
 
     <!-- Card UI -->
     <paper-card class="fullwidth menutools-container">
@@ -169,13 +169,22 @@
 
           <!-- Sample State: Current Entries -->
           <div class="menu-items-container">
-            <!-- No Strains/Not Loaded -->
-            <template is="dom-if" if="[[!flowers]]">
-              <b>Loading / No Content</b>
-            </template>
+            <bloombox-product-list
+              section="flowers"
+              heading="Flowers"
+              products="{{products}}"
+              selected="{{selected}}"></bloombox-product-list>
 
-            <template is="dom-if" if="[[flowers]]">
-              <template is="dom-repeat" initial-count="5" items="[[_toArray(flowers)]]" as="strain">
+            <div class="product-detail-pane">
+              <template is="dom-if" if="{{multiselect}}">
+                <b>Multiselecting...</b>
+              </template>
+              <template is="dom-if" if="{{!multiselect}}">
+                <b>{{selectedItem.value.name}}</b>
+              </template>
+            </div><!-- end div.product-detail-pane -->
+
+              <!--<template is="dom-repeat" initial-count="5" items="[[_toArray(flowers)]]" as="strain">
                 <bloombox-strain
                   key="[[strain.key]]"
                   partner="[[partner]]"
@@ -194,8 +203,8 @@
                   pictures$="[[strain.value.pictures]]"
                   hidden$="[[_shouldHideProduct(instock, strain)]]"
                   display-mode="[[_menuDisplayMode]]"
-                  disabled="[[loading]]"></bloombox-strain><!-- end bloombox-strain -->
-              </template>
+                  disabled="[[loading]]"></bloombox-strain><!-- end bloombox-strain --
+              </template>-->
             </template>
           </div><!-- end div.menu-items-container -->
         </div><!-- end div.menu-page.flowers-menu-page -->
@@ -514,6 +523,11 @@
           notify: true
         },
 
+        products: {
+          type: Object,
+          notify: true
+        },
+
         section: {
           type: String,
           notify: true,
@@ -525,7 +539,7 @@
           notify: true,
           observer: '_locationsLoaded',
           value: function() {
-            return bloom.app ? bloom.app.locations : [];
+            return window["bloom"] ? bloom.app.locations : [];
           }
         },
 
@@ -546,29 +560,27 @@
           notify: true
         },
 
-        flowers: {
+        multiselect: {
+          type: Boolean,
+          notify: true,
+          reflectToAttribute: true,
+          value: false
+        },
+
+        products: {
           type: Object,
           notify: true
         },
 
-        edibles: {
-          type: Object,
+        selected: {
+          type: Array,
           notify: true
         },
 
-        concentrates: {
+        selectedItem: {
           type: Object,
-          notify: true
-        },
-
-        prerolls: {
-          type: Object,
-          notify: true
-        },
-
-        cartridges: {
-          type: Object,
-          notify: true
+          notify: true,
+          computed: '_computeSelectedItem(multiselect, selected)'
         }
       },
 
@@ -583,6 +595,16 @@
 
       _computeMenuEndpoint: function(endpoint, location) {
         return endpoint + "/locations/" + location + "/menu";
+      },
+
+      _computeSelectedItem: function(multiselect, selected) {
+        if (multiselect === true) {
+          return null;
+        }
+        if (selected.length > 0) {
+          return selected[0];
+        }
+        return null;
       },
 
       _locationsLoaded: function(locations) {
