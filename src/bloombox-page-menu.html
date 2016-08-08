@@ -33,6 +33,11 @@
 <dom-module id="bloombox-page-menu">
   <template>
     <style is="custom-style" include="bloombox-styles">
+      :root {
+        --bloombox-product-list-width: 420px;
+        --bloombox-product-list-height: 606px;
+      }
+
       :host {
         display: block;
         padding: 40px;
@@ -89,19 +94,16 @@
       }
 
       :host .menu-content {
-        margin-top: 40px;
+        margin-top: 20px;
       }
 
       :host bloombox-product-list {
-        width: 400px;
-        height: 506px;
-        --bloombox-product-list-width: 400px;
-        --bloombox-product-list-height: 506px;
+        width: 420px;
+        height: 606px;
         flex: 1 0 400px;
       }
 
       :host div.product-detail-pane {
-        background: white;
         min-width: 500px;
         min-height: 400px;
         flex: 1 1 60%;
@@ -111,11 +113,24 @@
       :host .menu-items-container {
         display: flex;
       }
+
+      :host #menuWrap {
+        display: flex;
+        background-color: #fefefe;
+      }
+
+      :host #productsContainer {
+        flex: 1 1 400px;
+      }
+
+      :host #menuPages {
+        flex: 1 1 80%;
+      }
     </style>
 
     <!-- Firebase Collections -->
     <firebase-document
-      id="flowersCollection"
+      id="dataCollection"
       log$="[[debug]]"
       path="[[_menuEndpoint]]/[[section]]"
       data="{{products}}"></firebase-document>
@@ -145,6 +160,16 @@
     </paper-card><!-- end .paper-card.menutools-container -->
 
     <div id="menuWrap" class="menu-content">
+      <div id="productsContainer" class="products-list-container">
+        <bloombox-product-list
+          section="[[section]]"
+          heading="[[heading]]"
+          products="[[products]]"
+          selected-items="{{_selected}}"
+          search="{{search}}"
+          multiselect="{{multiselect}}"></bloombox-product-list>
+      </div><!-- end div.products-list-container -->
+
       <iron-pages id="menuPages" selected="{{section}}" attr-for-selected="section">
         <div class="menu-page flowers-menu-page" section="flowers">
           <!-- Zero-State: Entry Creation -->
@@ -169,43 +194,39 @@
 
           <!-- Sample State: Current Entries -->
           <div class="menu-items-container">
-            <bloombox-product-list
-              section="flowers"
-              heading="Flowers"
-              products="{{products}}"
-              selected="{{selected}}"></bloombox-product-list>
-
             <div class="product-detail-pane">
-              <template is="dom-if" if="{{multiselect}}">
-                <b>Multiselecting...</b>
+              <template is="dom-if" if="[[multiselect]]" restamp>
+                <b>Selected flowers:</b>
+                <ul class="selected-items">
+                <template is="dom-repeat" items="{{selectedItems}}">
+                  <li>blab</li>
+                </template>
+                </ul>
               </template>
-              <template is="dom-if" if="{{!multiselect}}">
-                <b>{{selectedItem.value.name}}</b>
+              <template is="dom-if" if="[[!multiselect]]" restamp>
+                <template is="dom-if" if="[[selectedItem]]" restamp>
+                  <bloombox-strain
+                    key="[[selectedItem.key]]"
+                    partner="[[partner]]"
+                    environment="[[environment]]"
+                    name="[[selectedItem.value.name]]"
+                    pricing="[[formatPricelist(selectedItem.value.pricelist)]]"
+                    grow="[[_processGrowValue(selectedItem.value.grow)]]"
+                    species="[[_processSpeciesValue(selectedItem.value.species)]]"
+                    visible="[[_processVisible(selectedItem.value.flags.visible)]]"
+                    description$="[[selectedItem.value.description]]"
+                    tests$="[[_processTests(selectedItem.value.tests)]]"
+                    ancestry$="[[selectedItem.value.ancestry]]"
+                    sale$="[[selectedItem.value.flags.sale]]"
+                    bogo$="[[selectedItem.value.flags.bogo]]"
+                    premium$="[[selectedItem.value.flags.premium]]"
+                    pictures$="[[selectedItem.value.pictures]]"
+                    display-mode="[[_menuDisplayMode]]"
+                    hidden$="[[!selectedItem]]"
+                    disabled="[[loading]]"></bloombox-strain><!-- end bloombox-strain -->
+                </template>
               </template>
             </div><!-- end div.product-detail-pane -->
-
-              <!--<template is="dom-repeat" initial-count="5" items="[[_toArray(flowers)]]" as="strain">
-                <bloombox-strain
-                  key="[[strain.key]]"
-                  partner="[[partner]]"
-                  environment="[[environment]]"
-                  name="[[strain.value.name]]"
-                  pricing="[[formatPricelist(strain.value.pricelist)]]"
-                  grow="[[_processGrowValue(strain.value.grow)]]"
-                  species="[[_processSpeciesValue(strain.value.species)]]"
-                  visible="[[_processVisible(strain.value.flags.visible)]]"
-                  description$="[[strain.value.description]]"
-                  tests$="[[_processTests(strain.value.tests)]]"
-                  ancestry$="[[strain.value.ancestry]]"
-                  sale$="[[strain.value.flags.sale]]"
-                  bogo$="[[strain.value.flags.bogo]]"
-                  premium$="[[strain.value.flags.premium]]"
-                  pictures$="[[strain.value.pictures]]"
-                  hidden$="[[_shouldHideProduct(instock, strain)]]"
-                  display-mode="[[_menuDisplayMode]]"
-                  disabled="[[loading]]"></bloombox-strain><!-- end bloombox-strain --
-              </template>-->
-            </template>
           </div><!-- end div.menu-items-container -->
         </div><!-- end div.menu-page.flowers-menu-page -->
 
@@ -232,36 +253,36 @@
 
           <!-- Sample State: Current Entries -->
           <div class="menu-items-container">
-            <!-- No Strains/Not Loaded -->
-            <template is="dom-if" if="[[!edibles]]">
-              <b>Loading / No Content</b>
-            </template>
-
-            <template is="dom-if" if="[[edibles]]">
-              <template is="dom-repeat" initial-count="5" items="[[_toArray(edibles)]]" as="edible">
-                <bloombox-edible
-                  key="[[edible.key]]"
-                  partner="[[partner]]"
-                  environment="[[environment]]"
-                  name="[[edible.value.name]]"
-                  brand="[[edible.value.brand]]"
-                  type="[[edible.value.type]]"
-                  pricing="[[edible.value.pricing]]"
-                  visible="[[_processVisible(edible.value.flags.visible)]]"
-                  description$="[[edible.value.description]]"
-                  tests$="[[_processTests(edible.value.tests)]]"
-                  sale$="[[edible.value.flags.sale]]"
-                  bogo$="[[edible.value.flags.bogo]]"
-                  premium$="[[edible.value.flags.premium]]"
-                  vegan$="[[edible.value.flags.vegan]]"
-                  organic$="[[edible.value.flags.organic]]"
-                  glutenfree$="[[edible.value.flags.glutenfree]]"
-                  photos$="[[edible.value.photos]]"
-                  hidden$="[[_shouldHideProduct(instock, edible)]]"
-                  display-mode="[[_menuDisplayMode]]"
-                  disabled="[[loading]]"></bloombox-edible><!-- end bloombox-edible -->
+            <div class="product-detail-pane">
+              <template is="dom-if" if="[[multiselect]]" restamp>
+                <b>Multiselecting...</b>
               </template>
-            </template>
+              <template is="dom-if" if="[[!multiselect]]" restamp>
+                <template is="dom-if" if="[[selectedItem]]" restamp>
+                  <bloombox-edible
+                    key="[[selectedItem.key]]"
+                    partner="[[partner]]"
+                    environment="[[environment]]"
+                    name="[[selectedItem.value.name]]"
+                    brand="[[selectedItem.value.brand]]"
+                    type="[[selectedItem.value.type]]"
+                    pricing="[[selectedItem.value.pricing]]"
+                    visible="[[_processVisible(selectedItem.value.flags.visible)]]"
+                    description$="[[selectedItem.value.description]]"
+                    tests$="[[_processTests(selectedItem.value.tests)]]"
+                    sale$="[[selectedItem.value.flags.sale]]"
+                    bogo$="[[selectedItem.value.flags.bogo]]"
+                    premium$="[[selectedItem.value.flags.premium]]"
+                    vegan$="[[selectedItem.value.flags.vegan]]"
+                    organic$="[[selectedItem.value.flags.organic]]"
+                    glutenfree$="[[selectedItem.value.flags.glutenfree]]"
+                    photos$="[[selectedItem.value.photos]]"
+                    hidden$="[[!selectedItem]]"
+                    display-mode="[[_menuDisplayMode]]"
+                    disabled="[[loading]]"></bloombox-edible><!-- end bloombox-edible -->
+                </template>
+              </template>
+            </div><!-- end div.product-detail-pane -->
           </div><!-- end div.menu-items-container -->
         </div><!-- end div.menu-page.edibles-menu-page -->
 
@@ -534,6 +555,12 @@
           value: 'flowers'
         },
 
+        heading: {
+          type: String,
+          notify: true,
+          computed: '_computeSectionHeading(section)'
+        },
+
         locations: {
           type: Array,
           notify: true,
@@ -572,15 +599,25 @@
           notify: true
         },
 
-        selected: {
-          type: Array,
+        _selected: {
+          type: Object,
           notify: true
         },
 
         selectedItem: {
           type: Object,
+          notify: true
+        },
+
+        selectedItems: {
+          type: Object,
           notify: true,
-          computed: '_computeSelectedItem(multiselect, selected)'
+          computed: '_computeSelectedItems(multiselect, _selected)'
+        },
+
+        search: {
+          type: String,
+          nofity: true
         }
       },
 
@@ -597,14 +634,23 @@
         return endpoint + "/locations/" + location + "/menu";
       },
 
-      _computeSelectedItem: function(multiselect, selected) {
-        if (multiselect === true) {
-          return null;
+      _computeSectionHeading: function(section) {
+        // @TODO: better section heading definitions
+        return section.charAt(0).toUpperCase() + section.slice(1);
+      },
+
+      _computeSelectedItems: function(multiselect, selected) {
+        if (multiselect != true) {
+          if (Array.isArray(selected) && selected.length > 0) {
+            this.selectedItem = selected[0];
+            return selected;
+          }
+          if (selected !== null && typeof selected === "object" && typeof selected.key === "string") {
+            this.selectedItem = selected;
+            return [selected];
+          }
         }
-        if (selected.length > 0) {
-          return selected[0];
-        }
-        return null;
+        return [];
       },
 
       _locationsLoaded: function(locations) {
