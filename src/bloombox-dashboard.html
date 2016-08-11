@@ -131,6 +131,7 @@
       :host div.dashboard-page-heading h1 {
         color: #fefefe;
         font-size: 100%;
+        font-weight: 300;
         cursor: default;
         -webkit-margin-before: 0;
         -webkit-margin-after: 0;
@@ -366,7 +367,7 @@
     <!-- Toasts & Snackbars -->
     <div class="menu-toasts">
       <paper-toast id="successToast" always-on-top text="[[_toastMessage]]" class="fit-bottom notification-toast"></paper-toast>
-      <paper-toast id="errorToast" always-on-top text="[[_toastMessage]]" class="fit-bottom notification-toast"></paper-toast>
+      <paper-toast id="errorToast" with-backdrop always-on-top text="[[_toastMessage]]" class="fit-bottom notification-toast"></paper-toast>
       <paper-toast id="warningToast" always-on-top text="[[_toastMessage]]" class="fit-bottom notification-toast"></paper-toast>
       <paper-toast id="modalToast" always-on-top text="[[_toastMessage]]" class="fit-bottom notification-toast">
         <paper-button onclick="modalToast.toggle()" class="modal-close-button">OK</paper-button>
@@ -836,14 +837,6 @@
 
           if (partner != null && partner != undefined && partner.length > 1) {
             this._routeChanged(partner, this.page || 'home');
-          }
-
-          if (oldPartner !== null && oldPartner !== undefined && oldPartner.length > 1) {
-            // show loading spinner for short period
-            this.loading = true;
-            setTimeout(function() {
-              that.loading = false;
-            }, BloomboxDashboardConfig.spinner.navigationDelay);
           }
         }
       },

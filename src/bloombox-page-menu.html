@@ -103,14 +103,10 @@
       }
 
       :host div.product-detail-pane {
-        min-width: 500px;
         min-height: 400px;
+        position: relative;
         flex: 1 1 60%;
         padding: 20px;
-      }
-
-      :host .menu-items-container {
-        display: flex;
       }
 
       :host #menuWrap {
@@ -120,17 +116,36 @@
       }
 
       :host #productsContainer {
-        flex: 1 1 400px;
         position: relative;
       }
 
       :host #menuPages {
-        flex: 1 1 80%;
+        flex: 1 1 300px;
+        display: flex;
+        overflow-y: scroll;
       }
 
       :host .selected-products {
         flex: 1 1 80%;
         padding: 20px;
+      }
+
+      :host .selected-products h2 {
+        margin-left: 5px;
+      }
+
+      :host .bulk-actions {
+        position: absolute;
+        bottom: 40px;
+      }
+
+      :host .menu-page {
+        display: flex;
+        flex: 1 1 80%;
+      }
+
+      :host paper-tab[disabled] {
+        opacity: 0.7;
       }
     </style>
 
@@ -146,6 +161,7 @@
       <div class="menu-tools toolbar-content card-content">
         <bloombox-menutools
           instock="{{instock}}"
+          sale="{{onsale}}"
           display-mode="{{_menuDisplayMode}}"
           locations="[[locations]]"
           location="{{location}}"
@@ -156,11 +172,11 @@
       <div class="menu-nav">
         <paper-tabs selected="{{section}}" attr-for-selected="key" noink disabled="[[loading]]">
           <paper-tab key="flowers">Flowers</paper-tab>
-          <paper-tab key="edibles">Edibles</paper-tab>
-          <paper-tab key="concentrates">Concentrates</paper-tab>
-          <paper-tab key="prerolls">Pre-Rolls</paper-tab>
-          <paper-tab key="apothecary">Apothecary</paper-tab>
-          <paper-tab key="cartridges">Cartridges</paper-tab>
+          <paper-tab key="edibles" disabled>Edibles</paper-tab>
+          <paper-tab key="concentrates" disabled>Concentrates</paper-tab>
+          <paper-tab key="prerolls" disabled>Pre-Rolls</paper-tab>
+          <paper-tab key="apothecary" disabled>Apothecary</paper-tab>
+          <paper-tab key="cartridges" disabled>Cartridges</paper-tab>
         </paper-tabs>
       </div><!-- end div.menu-nav -->
     </paper-card><!-- end .paper-card.menutools-container -->
@@ -168,6 +184,7 @@
     <div id="menuWrap" class="menu-content layout fit">
       <div id="productsContainer" class="products-list-container layout fit vertical">
         <bloombox-product-list
+          id="productList"
           section="[[section]]"
           heading="[[heading]]"
           products="[[products]]"
@@ -201,29 +218,27 @@
       <iron-pages id="menuPages" selected="{{section}}" attr-for-selected="section" hidden$="[[multiselect]]">
         <div class="menu-page flowers-menu-page" section="flowers">
           <!-- Product Detail -->
-          <div class="menu-items-container">
-            <div class="product-detail-pane">
-              <bloombox-strain
-                key="[[selectedItem.key]]"
-                partner="[[partner]]"
-                environment="[[environment]]"
-                name="[[selectedItem.value.name]]"
-                pricing="[[formatPricelist(selectedItem.value.pricelist)]]"
-                grow="[[_processGrowValue(selectedItem.value.grow)]]"
-                species="[[_processSpeciesValue(selectedItem.value.species)]]"
-                visible="[[_processVisible(selectedItem.value.flags.visible)]]"
-                description$="[[selectedItem.value.description]]"
-                tests$="[[_processTests(selectedItem.value.tests)]]"
-                ancestry$="[[selectedItem.value.ancestry]]"
-                sale$="[[selectedItem.value.flags.sale]]"
-                bogo$="[[selectedItem.value.flags.bogo]]"
-                premium$="[[selectedItem.value.flags.premium]]"
-                pictures$="[[selectedItem.value.pictures]]"
-                display-mode="[[_menuDisplayMode]]"
-                hidden$="[[!selectedItem]]"
-                disabled="[[loading]]"></bloombox-strain><!-- end bloombox-strain -->
-            </div><!-- end div.product-detail-pane -->
-          </div><!-- end div.menu-items-container -->
+          <div class="product-detail-pane">
+            <bloombox-strain
+              key="[[selectedItem.key]]"
+              partner="[[partner]]"
+              environment="[[environment]]"
+              name="[[selectedItem.value.name]]"
+              pricing="[[formatPricelist(selectedItem.value.pricelist)]]"
+              grow="[[_processGrowValue(selectedItem.value.grow)]]"
+              species="[[_processSpeciesValue(selectedItem.value.species)]]"
+              visible="[[_processVisible(selectedItem.value.flags.visible)]]"
+              description$="[[selectedItem.value.description]]"
+              tests$="[[_processTests(selectedItem.value.tests)]]"
+              ancestry$="[[selectedItem.value.ancestry]]"
+              sale$="[[selectedItem.value.flags.sale]]"
+              bogo$="[[selectedItem.value.flags.bogo]]"
+              premium$="[[selectedItem.value.flags.premium]]"
+              pictures$="[[selectedItem.value.pictures]]"
+              display-mode="[[_menuDisplayMode]]"
+              hidden$="[[!selectedItem]]"
+              disabled="[[loading]]"></bloombox-strain><!-- end bloombox-strain -->
+          </div><!-- end div.product-detail-pane -->
         </div><!-- end div.menu-page.flowers-menu-page -->
 
         <div class="menu-page edibles-menu-page" section="edibles">
@@ -293,7 +308,7 @@
 
         products: {
           type: Object,
-          notify: true
+          notify: true,
         },
 
         section: {
@@ -325,7 +340,7 @@
 
         instock: {
           type: Boolean,
-          value: true,
+          value: false,
           notify: true
         },
 
@@ -339,11 +354,6 @@
           notify: true,
           reflectToAttribute: true,
           value: false
-        },
-
-        products: {
-          type: Object,
-          notify: true
         },
 
         _selected: {
@@ -410,7 +420,6 @@
       _selectedItemsDidChange: function() {
         var lists = Polymer.dom(this.root).querySelectorAll(".multiselect-list"),
             i;
-
         if (lists && lists.length > 0) {
           for (i in lists) {
             lists[i].render();
@@ -558,19 +567,15 @@
 
       saveNewObject: function(schema, entry, component, callback) {
         var debug = window["__debug"] || false,
-            collectionObj = this.$$("#" + schema + "Collection"),
-            newObjContainer = this.$$("." + schema + "-create-container"),
-            newObjEntry = this.$$("." + schema + "-create-container .newEntry"),
-            newObjButton = this.$$("." + schema + "-menu-page .addEntryButton"),
             that = this,
             newObjKey;
 
         // perform our object write
-        newObjKey = collectionObj.ref.push().key;
+        newObjKey = this.$.dataCollection.ref.child(schema).push().key;
         if (debug) {
           console.log("Provisioned key for new item: '" + newObjKey + "'.", entry);
         }
-        return collectionObj.ref
+        return this.$.dataCollection.ref
                             .child(newObjKey)
                             .update(entry)
                             .then(function() {
@@ -588,13 +593,11 @@
       },
 
       saveEditsForEntry: function(schema, key, previous, entry, callback) {
-        var debug = window["__debug"] || false,
-            collectionObj = this.$$("#" + schema + "Collection");
-
+        var debug = window["__debug"] || false;
         if (debug) {
           console.log("Saving edits for item of type '" + schema + "' at key: '" + key + "'.", entry);
         }
-        return collectionObj.ref
+        return this.$.dataCollection.ref
                             .child(key)
                             .update(entry)
                             .then(callback)
@@ -605,34 +608,71 @@
       },
 
       deleteEntryAtId: function(schema, key) {
-        var debug = window["__debug"] || false,
-            collectionObj = this.$$("#" + schema + "Collection");
+        var debug = window["__debug"] || false;
 
         if (debug) {
           console.log("Deleting item of type '" + schema + "' at key '" + key + "'.");
         }
-        return collectionObj.ref
+        return this.$.dataCollection.ref
                             .child(key)
                             .remove();
       },
 
-      _applyWritesToProducts: function(products, isDelete, callback) {
-        callback(true);
-        return;
+      _applyWritesToProducts: function(schema, products, isDelete, callback) {
+        var updates = {}, i, p, schema;
+        if (!Array.isArray(products) || products.length < 1) {
+          callback(false);
+          return;
+        }
+
+        // map writes into one bulk update
+        for (i in products) {
+          p = products[i];
+          updates[p.key] = isDelete ? null : p.value;
+        }
+
+        return this.$.dataCollection.ref
+                            .update(updates)
+                            .then(function() {
+                              callback(true);
+                            })
+                            .catch(function(error) {
+                              console.error("Encountered error persisting edits for object of type '" + schema + "'.", error);
+                              callback(false, error);
+                            });
       },
 
       _mapForEachProduct: function(products, callback) {
+        var i, p, processed = [], buffered = JSON.parse(JSON.stringify(products));
+        if (Array.isArray(buffered) && buffered.length > 0) {
+          for (i in buffered) {
+            p = buffered[i];
+            callback(p);
+            processed.push(p);
+          }
+          return processed;
+        }
         return [];
+      },
+
+      clearSelection: function() {
+        this.$.productList.clearSelection();
       },
 
       bulkMarkAsInStock: function(event) {
         var products = this.selectedItems,
             that = this,
-            writes;
+            section = this.section;
         event.preventDefault();
         event.stopPropagation();
         writes = this._mapForEachProduct(products, function(product) {
-          product.flags.visible = true;
+          if (product.value.flags !== undefined) {
+            product.value.flags.visible = true;
+          } else {
+            product.value.flags = {
+              visible: true
+            };
+          }
         });
         console.info("User requested bulk mark-as-in-stock:", products);
         bloom.app.confirmToast("Mark " +
@@ -641,12 +681,14 @@
                                (products.length > 1 ? "items" : "item") + " as in stock?", function(yes, toast) {
                                   if (yes) {
                                     console.log("User confirmed bulk operation. Executing...");
-                                    that._applyWritesToProducts(writes, false, function(success) {
+                                    that._applyWritesToProducts(section, writes, false, function(success) {
                                       if (success) {
                                         // okay everything worked
                                         console.log("Bulk operation finished.");
                                         toast.close();
                                         setTimeout(function() {
+                                          that.clearSelection();
+                                          that.multiselect = false;
                                           bloom.app.successToast("Successfully marked " + products.length + " " +
                                                                 (products.length > 1 ? "items" : "item") +
                                                                 " as in-stock.")
@@ -671,11 +713,16 @@
       bulkMarkAsOutOfStock: function(event) {
         var products = this.selectedItems,
             that = this,
+            section = this.section,
             writes;
         event.preventDefault();
         event.stopPropagation();
         writes = this._mapForEachProduct(products, function(product) {
-          product.flags.visible = false;
+          if (product.value.flags !== undefined) {
+            product.value.flags.visible = false;
+          } else {
+            product.value.flags = {visible: false};
+          }
         });
         console.info("User requested bulk mark-as-out-of-stock:", products);
         bloom.app.confirmToast("Mark " +
@@ -684,12 +731,14 @@
                                (products.length > 1 ? "items" : "item") + " as out-of-stock?", function(yes, toast) {
                                   if (yes) {
                                     console.log("User confirmed bulk operation. Executing...");
-                                    that._applyWritesToProducts(writes, false, function(success) {
+                                    that._applyWritesToProducts(section, writes, false, function(success) {
                                       if (success) {
                                         // okay everything worked
                                         console.log("Bulk operation finished.");
                                         toast.close();
                                         setTimeout(function() {
+                                          that.clearSelection();
+                                          that.multiselect = false;
                                           bloom.app.successToast("Successfully marked " + products.length + " " +
                                                                 (products.length > 1 ? "items" : "item") +
                                                                 " as out-of-stock.")
@@ -714,6 +763,7 @@
       bulkDelete: function(event) {
         var products = this.selectedItems,
             that = this,
+            section = this.section,
             writes;
         event.preventDefault();
         event.stopPropagation();
@@ -724,12 +774,14 @@
                                (products.length > 1 ? "items" : "item") + "?", function(yes, toast) {
                                   if (yes) {
                                     console.log("User confirmed bulk delete. Executing...");
-                                    that._applyWritesToProducts(writes, true, function(success) {
+                                    that._applyWritesToProducts(section, products, true, function(success) {
                                       if (success) {
                                         // okay everything worked
                                         console.log("Bulk delete operation finished.");
                                         toast.close();
                                         setTimeout(function() {
+                                          that.clearSelection();
+                                          that.multiselect = false;
                                           bloom.app.successToast("Successfully deleted " + products.length + " " +
                                                                 (products.length > 1 ? "items" : "item") + ".")
                                         }, 120);
