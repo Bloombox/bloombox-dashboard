@@ -20,6 +20,7 @@
 <link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
 
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
@@ -184,6 +185,31 @@
           outline: none;
           outline-width: 0;
       }
+
+      /** -- Toasts -- **/
+      #successToast {
+        --paper-toast-background-color: #4c9d2f;
+        --paper-toast-color: white;
+      }
+
+      #errorToast {
+        --paper-toast-background-color: red;
+        --paper-toast-color: white;
+      }
+
+      #warningToast {
+        --paper-toast-background-color: orange;
+        --paper-toast-color: white;
+      }
+
+      #modalToast, #confirmToast {
+        --paper-toast-background-color: #0288D1;
+        --paper-toast-color: white;
+      }
+
+      :host paper-toast .modal-close-button {}
+      :host paper-toast .modal-accept-button {}
+      :host paper-toast .modal-reject-button {}
     </style>
 
     <!-- App State -->
@@ -336,6 +362,20 @@
     <div id="loadingOverlay" class="loading-overlay spinner-container">
       <bloombox-loader></bloombox-loader>
     </div><!-- end div.loading-overlay -->
+
+    <!-- Toasts & Snackbars -->
+    <div class="menu-toasts">
+      <paper-toast id="successToast" always-on-top text="[[_toastMessage]]" class="fit-bottom notification-toast"></paper-toast>
+      <paper-toast id="errorToast" always-on-top text="[[_toastMessage]]" class="fit-bottom notification-toast"></paper-toast>
+      <paper-toast id="warningToast" always-on-top text="[[_toastMessage]]" class="fit-bottom notification-toast"></paper-toast>
+      <paper-toast id="modalToast" always-on-top text="[[_toastMessage]]" class="fit-bottom notification-toast">
+        <paper-button onclick="modalToast.toggle()" class="modal-close-button">OK</paper-button>
+      </paper-toast>
+      <paper-toast id="confirmToast" duration="0" always-on-top text="[[_toastMessage]]" class="fit-bottom notification-toast">
+        <paper-button on-tap="_confirmToast" class="modal-accept-button">OK</paper-button>
+        <paper-button on-tap="_rejectToast" class="modal-reject-button">Cancel</paper-button>
+      </paper-toast>
+    </div><!-- end div.menu-toasts -->
   </template>
 
   <script>
@@ -428,6 +468,15 @@
           type: String,
           notify: true,
           value: ""
+        },
+
+        /**
+         * Message displayed by the currently-active toast, if any.
+         */
+        _toastMessage: {
+          type: String,
+          notify: true,
+          value: "Success!"
         },
 
         /**
@@ -829,6 +878,59 @@
           console.log("Dashboard is ready for use.");
           that.loading = false;
         }, BloomboxDashboardConfig.spinner.delay);
+      },
+
+      successToast: function(message) {
+        this._toastMessage = message;
+        this.$.successToast.open();
+      },
+
+      warningToast: function(message) {
+        this._toastMessage = message;
+        this.$.warningToast.open();
+      },
+
+      errorToast: function(message) {
+        this._toastMessage = message;
+        this.$.errorToast.open();
+      },
+
+      modalToast: function(message) {
+        this._toastMessage = message;
+        this.$.modalToast.open();
+        return this.$.modalToast;
+      },
+
+      confirmToast: function(message, callback) {
+        this._toastMessage = message;
+        this._confirmCallback = callback;
+        this.$.confirmToast.open();
+      },
+
+      _confirmToast: function() {
+        var callbackHandlesClose = false,
+            that = this;
+        if (typeof this._confirmCallback === "function") {
+          callbackHandlesClose = this._confirmCallback(true, this.$.confirmToast);
+        }
+        if (!callbackHandlesClose) {
+          setTimeout(function() {
+            that.$.confirmToast.close();
+          }, 60);
+        }
+      },
+
+      _rejectToast: function() {
+        var callbackHandlesClose = false,
+            that = this;
+        if (typeof this._confirmCallback === "function") {
+          callbackHandlesClose = this._confirmCallback(false, this.$.confirmToast);
+        }
+        if (!callbackHandlesClose) {
+          setTimeout(function() {
+            that.$.confirmToast.close();
+          }, 60);
+        }
       },
 
       authorize: function(token, environment) {
