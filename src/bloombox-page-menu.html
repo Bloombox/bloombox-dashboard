@@ -35,7 +35,6 @@
     <style is="custom-style" include="bloombox-styles">
       :root {
         --bloombox-product-list-width: 420px;
-        --bloombox-product-list-height: 606px;
       }
 
       :host {
@@ -99,7 +98,7 @@
 
       :host bloombox-product-list {
         width: 420px;
-        height: 606px;
+        height: 100%;
         flex: 1 0 400px;
       }
 
@@ -117,14 +116,21 @@
       :host #menuWrap {
         display: flex;
         background-color: #fefefe;
+        margin: 210px 40px 20px 40px;
       }
 
       :host #productsContainer {
         flex: 1 1 400px;
+        position: relative;
       }
 
       :host #menuPages {
         flex: 1 1 80%;
+      }
+
+      :host .selected-products {
+        flex: 1 1 80%;
+        padding: 20px;
       }
     </style>
 
@@ -159,8 +165,8 @@
       </div><!-- end div.menu-nav -->
     </paper-card><!-- end .paper-card.menutools-container -->
 
-    <div id="menuWrap" class="menu-content">
-      <div id="productsContainer" class="products-list-container">
+    <div id="menuWrap" class="menu-content layout fit">
+      <div id="productsContainer" class="products-list-container layout fit vertical">
         <bloombox-product-list
           section="[[section]]"
           heading="[[heading]]"
@@ -170,334 +176,69 @@
           multiselect="{{multiselect}}"></bloombox-product-list>
       </div><!-- end div.products-list-container -->
 
-      <iron-pages id="menuPages" selected="{{section}}" attr-for-selected="section">
-        <div class="menu-page flowers-menu-page" section="flowers">
-          <!-- Zero-State: Entry Creation -->
-          <paper-button
-            toggles
-            class="addEntryButton"
-            on-tap="toggleAddEntry"
-            disabled="[[loading]]">
-            <iron-icon icon="create"></iron-icon>Add Flower</paper-button>
-
-          <div class="flowers-create-container newEntryContainer">
-            <template is="dom-if" if="zerostate" restamp>
-              <bloombox-strain
-                class="newEntry"
-                hidden
-                partner="[[partner]]"
-                environment="[[environment]]"
-                disabled="[[loading]]"
-                zerostate></bloombox-strain>
+      <template is="dom-if" if="[[multiselect]]">
+        <div class="selected-products">
+          <template is="dom-if" if="[[_hasSelectedItems]]">
+            <h2>Selected products:</h2>
+            <ul>
+            <template class="multiselect-list" is="dom-repeat" items="[[selectedItems]]">
+              <li>[[item.value.name]]</li>
             </template>
-          </div>
+            </ul>
+          </template>
+          <template is="dom-if" if="[[!_hasSelectedItems]]">
+            <h2>Select multiple products to perform bulk edits.</h2>
+          </template>
 
-          <!-- Sample State: Current Entries -->
+          <div class="bulk-actions">
+            <paper-button raised on-tap="bulkMarkAsInStock" disabled="[[!_hasSelectedItems]]"><iron-icon icon="done"></iron-icon>Mark as In-Stock</paper-button>
+            <paper-button raised on-tap="bulkMarkAsOutOfStock" disabled="[[!_hasSelectedItems]]"><iron-icon icon="clear"></iron-icon>Mark as Out of Stock</paper-button>
+            <paper-button raised on-tap="bulkDelete" disabled="[[!_hasSelectedItems]]"><iron-icon icon="delete"></iron-icon>Delete</paper-button>
+          </div><!-- end div.bulk-actions -->
+        </div><!-- end div.selected-products -->
+      </template>
+
+      <iron-pages id="menuPages" selected="{{section}}" attr-for-selected="section" hidden$="[[multiselect]]">
+        <div class="menu-page flowers-menu-page" section="flowers">
+          <!-- Product Detail -->
           <div class="menu-items-container">
             <div class="product-detail-pane">
-              <template is="dom-if" if="[[multiselect]]" restamp>
-                <b>Selected flowers:</b>
-                <ul class="selected-items">
-                <template is="dom-repeat" items="{{selectedItems}}">
-                  <li>blab</li>
-                </template>
-                </ul>
-              </template>
-              <template is="dom-if" if="[[!multiselect]]" restamp>
-                <template is="dom-if" if="[[selectedItem]]" restamp>
-                  <bloombox-strain
-                    key="[[selectedItem.key]]"
-                    partner="[[partner]]"
-                    environment="[[environment]]"
-                    name="[[selectedItem.value.name]]"
-                    pricing="[[formatPricelist(selectedItem.value.pricelist)]]"
-                    grow="[[_processGrowValue(selectedItem.value.grow)]]"
-                    species="[[_processSpeciesValue(selectedItem.value.species)]]"
-                    visible="[[_processVisible(selectedItem.value.flags.visible)]]"
-                    description$="[[selectedItem.value.description]]"
-                    tests$="[[_processTests(selectedItem.value.tests)]]"
-                    ancestry$="[[selectedItem.value.ancestry]]"
-                    sale$="[[selectedItem.value.flags.sale]]"
-                    bogo$="[[selectedItem.value.flags.bogo]]"
-                    premium$="[[selectedItem.value.flags.premium]]"
-                    pictures$="[[selectedItem.value.pictures]]"
-                    display-mode="[[_menuDisplayMode]]"
-                    hidden$="[[!selectedItem]]"
-                    disabled="[[loading]]"></bloombox-strain><!-- end bloombox-strain -->
-                </template>
-              </template>
+              <bloombox-strain
+                key="[[selectedItem.key]]"
+                partner="[[partner]]"
+                environment="[[environment]]"
+                name="[[selectedItem.value.name]]"
+                pricing="[[formatPricelist(selectedItem.value.pricelist)]]"
+                grow="[[_processGrowValue(selectedItem.value.grow)]]"
+                species="[[_processSpeciesValue(selectedItem.value.species)]]"
+                visible="[[_processVisible(selectedItem.value.flags.visible)]]"
+                description$="[[selectedItem.value.description]]"
+                tests$="[[_processTests(selectedItem.value.tests)]]"
+                ancestry$="[[selectedItem.value.ancestry]]"
+                sale$="[[selectedItem.value.flags.sale]]"
+                bogo$="[[selectedItem.value.flags.bogo]]"
+                premium$="[[selectedItem.value.flags.premium]]"
+                pictures$="[[selectedItem.value.pictures]]"
+                display-mode="[[_menuDisplayMode]]"
+                hidden$="[[!selectedItem]]"
+                disabled="[[loading]]"></bloombox-strain><!-- end bloombox-strain -->
             </div><!-- end div.product-detail-pane -->
           </div><!-- end div.menu-items-container -->
         </div><!-- end div.menu-page.flowers-menu-page -->
 
         <div class="menu-page edibles-menu-page" section="edibles">
-          <!-- Zero-State: Entry Creation -->
-          <paper-button
-            toggles
-            class="addEntryButton"
-            on-tap="toggleAddEntry"
-            disabled="[[loading]]">
-            <iron-icon icon="create"></iron-icon>Add Edible</paper-button>
-
-          <div class="edibles-create-container newEntryContainer">
-            <template is="dom-if" if="zerostate" restamp>
-              <bloombox-edible
-                class="newEntry"
-                hidden
-                partner="[[partner]]"
-                environment="[[environment]]"
-                zerostate
-                disabled="[[loading]]"></bloombox-edible>
-            </template>
-          </div>
-
-          <!-- Sample State: Current Entries -->
-          <div class="menu-items-container">
-            <div class="product-detail-pane">
-              <template is="dom-if" if="[[multiselect]]" restamp>
-                <b>Multiselecting...</b>
-              </template>
-              <template is="dom-if" if="[[!multiselect]]" restamp>
-                <template is="dom-if" if="[[selectedItem]]" restamp>
-                  <bloombox-edible
-                    key="[[selectedItem.key]]"
-                    partner="[[partner]]"
-                    environment="[[environment]]"
-                    name="[[selectedItem.value.name]]"
-                    brand="[[selectedItem.value.brand]]"
-                    type="[[selectedItem.value.type]]"
-                    pricing="[[selectedItem.value.pricing]]"
-                    visible="[[_processVisible(selectedItem.value.flags.visible)]]"
-                    description$="[[selectedItem.value.description]]"
-                    tests$="[[_processTests(selectedItem.value.tests)]]"
-                    sale$="[[selectedItem.value.flags.sale]]"
-                    bogo$="[[selectedItem.value.flags.bogo]]"
-                    premium$="[[selectedItem.value.flags.premium]]"
-                    vegan$="[[selectedItem.value.flags.vegan]]"
-                    organic$="[[selectedItem.value.flags.organic]]"
-                    glutenfree$="[[selectedItem.value.flags.glutenfree]]"
-                    photos$="[[selectedItem.value.photos]]"
-                    hidden$="[[!selectedItem]]"
-                    display-mode="[[_menuDisplayMode]]"
-                    disabled="[[loading]]"></bloombox-edible><!-- end bloombox-edible -->
-                </template>
-              </template>
-            </div><!-- end div.product-detail-pane -->
-          </div><!-- end div.menu-items-container -->
         </div><!-- end div.menu-page.edibles-menu-page -->
 
         <div class="menu-page concentrates-menu-page" section="concentrates">
-          <paper-button
-            toggles
-            class="addEntryButton"
-            on-tap="toggleAddEntry"
-            disabled="[[loading]]">
-            <iron-icon icon="create"></iron-icon>Add Item</paper-button>
-
-          <!-- Zero-State: Entry Creation -->
-          <div class="concentrates-create-container newEntryContainer">
-            <template is="dom-if" if="zerostate" restamp>
-              <bloombox-concentrate
-                class="newEntry"
-                hidden
-                partner="[[partner]]"
-                environment="[[environment]]"
-                zerostate
-                disabled="[[loading]]"></bloombox-concentrate>
-            </template>
-          </div>
-
-          <!-- Sample State: Current Entries -->
-          <div class="menu-items-container">
-            <!-- No Strains/Not Loaded -->
-            <template is="dom-if" if="[[!concentrates]]">
-              <b>Loading / No Content</b>
-            </template>
-
-            <template is="dom-if" if="[[concentrates]]">
-              <template is="dom-repeat" initial-count="5" items="[[_toArray(concentrates)]]" as="concentrate">
-                <bloombox-concentrate
-                  key="[[concentrate.key]]"
-                  partner="[[partner]]"
-                  environment="[[environment]]"
-                  name="[[concentrate.value.name]]"
-                  brand="[[concentrate.value.brand]]"
-                  type="[[concentrate.value.type]]"
-                  pricing="[[concentrate.value.pricing]]"
-                  visible="[[_processVisible(concentrate.value.flags.visible)]]"
-                  description$="[[concentrate.value.description]]"
-                  tests$="[[_processTests(concentrate.value.tests)]]"
-                  sale$="[[concentrate.value.flags.sale]]"
-                  bogo$="[[concentrate.value.flags.bogo]]"
-                  premium$="[[concentrate.value.flags.premium]]"
-                  photos$="[[concentrate.value.photos]]"
-                  hidden$="[[_shouldHideProduct(instock, concentrate)]]"
-                  display-mode="[[_menuDisplayMode]]"
-                  disabled="[[loading]]"></bloombox-concentrate><!-- end bloombox-concentrate -->
-              </template>
-            </template>
-          </div><!-- end div.menu-items-container -->
         </div><!-- end div.menu-page.concentrates-menu-page -->
 
         <div class="menu-page prerolls-menu-page" section="prerolls">
-          <!-- Zero-State: Entry Creation -->
-          <paper-button
-            toggles
-            class="addEntryButton"
-            on-tap="toggleAddEntry"
-            disabled="[[loading]]">
-            <iron-icon icon="create"></iron-icon>Add Preroll</paper-button>
-
-          <div class="prerolls-create-container newEntryContainer">
-            <template is="dom-if" if="zerostate" restamp>
-              <bloombox-preroll
-                class="newEntry"
-                hidden
-                partner="[[partner]]"
-                environment="[[environment]]"
-                zerostate
-                disabled="[[loading]]"></bloombox-preroll>
-            </template>
-          </div>
-
-          <!-- Sample State: Current Entries -->
-          <div class="menu-items-container">
-            <!-- No Strains/Not Loaded -->
-            <template is="dom-if" if="[[!prerolls]]">
-              <b>Loading / No Content</b>
-            </template>
-
-            <template is="dom-if" if="[[prerolls]]">
-              <template is="dom-repeat" initial-count="5" items="[[_toArray(prerolls)]]" as="preroll">
-                <bloombox-preroll
-                  key="[[preroll.key]]"
-                  partner="[[partner]]"
-                  environment="[[environment]]"
-                  name="[[preroll.value.name]]"
-                  brand="[[preroll.value.brand]]"
-                  type="[[preroll.value.type]]"
-                  pricing="[[preroll.value.pricing]]"
-                  species="[[_processSpeciesValue(preroll.value.species)]]"
-                  grow="[[_processGrowValue(preroll.value.grow)]]"
-                  visible="[[_processVisible(preroll.value.flags.visible)]]"
-                  description$="[[preroll.value.description]]"
-                  tests$="[[_processTests(preroll.value.tests)]]"
-                  sale$="[[preroll.value.flags.sale]]"
-                  bogo$="[[preroll.value.flags.bogo]]"
-                  premium$="[[preroll.value.flags.premium]]"
-                  photos$="[[preroll.value.photos]]"
-                  hidden$="[[_shouldHideProduct(instock, preroll)]]"
-                  display-mode="[[_menuDisplayMode]]"
-                  disabled="[[loading]]"></bloombox-preroll><!-- end bloombox-preroll -->
-              </template>
-            </template>
-          </div><!-- end div.menu-items-container -->
         </div><!-- end div.menu-page.prerolls-menu-page -->
 
         <div class="menu-page apothecary-menu-page" section="apothecary">
-          <!-- Zero-State: Entry Creation -->
-          <paper-button
-            toggles
-            class="addEntryButton"
-            on-tap="toggleAddEntry"
-            disabled="[[loading]]">
-            <iron-icon icon="create"></iron-icon>Add Item</paper-button>
-
-          <div class="apothecary-create-container newEntryContainer">
-            <template is="dom-if" if="zerostate" restamp>
-              <bloombox-apothecary
-                class="newEntry"
-                hidden
-                partner="[[partner]]"
-                environment="[[environment]]"
-                zerostate
-                disabled="[[loading]]"></bloombox-apothecary>
-            </template>
-          </div>
-
-          <!-- Sample State: Current Entries -->
-          <div class="menu-items-container">
-            <!-- No Strains/Not Loaded -->
-            <template is="dom-if" if="[[!apothecary]]">
-              <b>Loading / No Content</b>
-            </template>
-
-            <template is="dom-if" if="[[apothecary]]">
-              <template is="dom-repeat" initial-count="5" items="[[_toArray(apothecary)]]" as="apothecary">
-                <bloombox-apothecary
-                  key="[[apothecary.key]]"
-                  partner="[[partner]]"
-                  environment="[[environment]]"
-                  name="[[apothecary.value.name]]"
-                  brand="[[apothecary.value.brand]]"
-                  type="[[apothecary.value.type]]"
-                  pricing="[[apothecary.value.pricing]]"
-                  visible="[[_processVisible(apothecary.value.flags.visible)]]"
-                  description$="[[apothecary.value.description]]"
-                  tests$="[[_processTests(apothecary.value.tests)]]"
-                  sale$="[[apothecary.value.flags.sale]]"
-                  bogo$="[[apothecary.value.flags.bogo]]"
-                  premium$="[[apothecary.value.flags.premium]]"
-                  photos$="[[apothecary.value.photos]]"
-                  hidden$="[[_shouldHideProduct(instock, apothecary)]]"
-                  display-mode="[[_menuDisplayMode]]"
-                  disabled="[[loading]]"></bloombox-apothecary><!-- end bloombox-apothecary -->
-              </template>
-            </template>
-          </div><!-- end div.menu-items-container -->
         </div><!-- end div.menu-page.apothecary-menu-page -->
 
         <div class="menu-page cartridges-menu-page" section="cartridges">
-          <!-- Zero-State: Entry Creation -->
-          <paper-button
-            toggles
-            class="addEntryButton"
-            on-tap="toggleAddEntry"
-            disabled="[[loading]]">
-            <iron-icon icon="create"></iron-icon>Add Cartridge</paper-button>
-
-          <div class="cartridges-create-container newEntryContainer">
-            <template is="dom-if" if="zerostate" restamp>
-              <bloombox-cartridge
-                class="newEntry"
-                hidden
-                partner="[[partner]]"
-                environment="[[environment]]"
-                disabled="[[loading]]"
-                zerostate></bloombox-cartridge>
-            </template>
-          </div>
-
-          <!-- Sample State: Current Entries -->
-          <div class="menu-items-container">
-            <!-- No Strains/Not Loaded -->
-            <template is="dom-if" if="[[!cartridges]]">
-              <b>Loading / No Content</b>
-            </template>
-
-            <template is="dom-if" if="[[cartridges]]">
-              <template is="dom-repeat" initial-count="5" items="[[_toArray(cartridges)]]" as="cartridge">
-                <bloombox-cartridge
-                  key="[[cartridge.key]]"
-                  partner="[[partner]]"
-                  environment="[[environment]]"
-                  name="[[cartridge.value.name]]"
-                  brand="[[cartridge.value.brand]]"
-                  type="[[cartridge.value.type]]"
-                  pricing="[[cartridge.value.pricing]]"
-                  visible="[[_processVisible(cartridge.value.flags.visible)]]"
-                  description$="[[cartridge.value.description]]"
-                  tests$="[[_processTests(cartridge.value.tests)]]"
-                  sale$="[[cartridge.value.flags.sale]]"
-                  bogo$="[[cartridge.value.flags.bogo]]"
-                  premium$="[[cartridge.value.flags.premium]]"
-                  photos$="[[cartridge.value.photos]]"
-                  hidden$="[[_shouldHideProduct(instock, cartridge)]]"
-                  display-mode="[[_menuDisplayMode]]"
-                  disabled="[[loading]]"></bloombox-cartridge><!-- end bloombox-cartridge -->
-              </template>
-            </template>
-          </div><!-- end div.menu-items-container -->
         </div><!-- end div.menu-page.cartridges-menu-page -->
       </iron-pages><!-- end iron-pages#menuPages -->
     </div><!-- end div#menuWrap.menu-content -->
@@ -513,6 +254,12 @@
           type: String,
           notify: true,
           computed: '_computeMenuEndpoint(endpoint, location)'
+        },
+
+        _hasSelectedItems: {
+          type: Boolean,
+          notify: true,
+          computed: '_computeHasSelectedItems(multiselect, selectedItems)'
         },
 
         debug: {
@@ -600,7 +347,7 @@
         },
 
         _selected: {
-          type: Object,
+          type: Array,
           notify: true
         },
 
@@ -610,9 +357,9 @@
         },
 
         selectedItems: {
-          type: Object,
+          type: Array,
           notify: true,
-          computed: '_computeSelectedItems(multiselect, _selected)'
+          computed: '_computeSelectedItems(multiselect, _selected.*)'
         },
 
         search: {
@@ -641,16 +388,34 @@
 
       _computeSelectedItems: function(multiselect, selected) {
         if (multiselect != true) {
-          if (Array.isArray(selected) && selected.length > 0) {
-            this.selectedItem = selected[0];
-            return selected;
+          if (Array.isArray(selected.base) && selected.base.length > 0) {
+            this.selectedItem = selected.base[0];
+            return selected.base;
           }
-          if (selected !== null && typeof selected === "object" && typeof selected.key === "string") {
-            this.selectedItem = selected;
-            return [selected];
+          if (selected.value !== null && typeof selected.value === "object" && typeof selected.value.key === "string") {
+            this.selectedItem = selected.value;
+            return [selected.value];
+          }
+        } else {
+          if (Array.isArray(selected.base) && selected.base.length > 0) {
+            this.selectedItem = null;
+            this._selectedItemsDidChange();
+            return selected.base;
           }
         }
+        this.selectedItem = null;
         return [];
+      },
+
+      _selectedItemsDidChange: function() {
+        var lists = Polymer.dom(this.root).querySelectorAll(".multiselect-list"),
+            i;
+
+        if (lists && lists.length > 0) {
+          for (i in lists) {
+            lists[i].render();
+          }
+        }
       },
 
       _locationsLoaded: function(locations) {
@@ -711,7 +476,14 @@
         return false;
       },
 
+      _computeHasSelectedItems: function(multiselect, selectedItems) {
+        return (multiselect == true && Array.isArray(selectedItems) && selectedItems.length > 0);
+      },
+
       formatPricelist: function(pricelist) {
+        if (pricelist == null) {
+          return [];
+        }
         return [
           {"label": "1g", "available": pricelist["gram"]["available"], "price": pricelist["gram"]["price"]},
           {"label": "3.5g", "available": pricelist["eighth"]["available"], "price": pricelist["eighth"]["price"]},
@@ -844,10 +616,148 @@
                             .remove();
       },
 
+      _applyWritesToProducts: function(products, isDelete, callback) {
+        callback(true);
+        return;
+      },
+
+      _mapForEachProduct: function(products, callback) {
+        return [];
+      },
+
+      bulkMarkAsInStock: function(event) {
+        var products = this.selectedItems,
+            that = this,
+            writes;
+        event.preventDefault();
+        event.stopPropagation();
+        writes = this._mapForEachProduct(products, function(product) {
+          product.flags.visible = true;
+        });
+        console.info("User requested bulk mark-as-in-stock:", products);
+        bloom.app.confirmToast("Mark " +
+                               (products.length > 1 ? products.length + " " : "") +
+                               "selected " +
+                               (products.length > 1 ? "items" : "item") + " as in stock?", function(yes, toast) {
+                                  if (yes) {
+                                    console.log("User confirmed bulk operation. Executing...");
+                                    that._applyWritesToProducts(writes, false, function(success) {
+                                      if (success) {
+                                        // okay everything worked
+                                        console.log("Bulk operation finished.");
+                                        toast.close();
+                                        setTimeout(function() {
+                                          bloom.app.successToast("Successfully marked " + products.length + " " +
+                                                                (products.length > 1 ? "items" : "item") +
+                                                                " as in-stock.")
+                                        }, 120);
+                                      } else {
+                                        // something broke
+                                        console.error("Failed to apply bulk operation.");
+                                        toast.close();
+                                        setTimeout(function() {
+                                          bloom.app.errorToast("Bulk edit operation failed. Please try again.");
+                                        });
+                                      }
+                                    });
+                                    return true;  // we will handle closing it
+                                  } else {
+                                    console.log("User rejected bulk operation. Cancelling.");
+                                  }
+                                  return false;  // close the dialog for us plz
+                               });
+      },
+
+      bulkMarkAsOutOfStock: function(event) {
+        var products = this.selectedItems,
+            that = this,
+            writes;
+        event.preventDefault();
+        event.stopPropagation();
+        writes = this._mapForEachProduct(products, function(product) {
+          product.flags.visible = false;
+        });
+        console.info("User requested bulk mark-as-out-of-stock:", products);
+        bloom.app.confirmToast("Mark " +
+                               (products.length > 1 ? products.length + " " : "") +
+                               "selected " +
+                               (products.length > 1 ? "items" : "item") + " as out-of-stock?", function(yes, toast) {
+                                  if (yes) {
+                                    console.log("User confirmed bulk operation. Executing...");
+                                    that._applyWritesToProducts(writes, false, function(success) {
+                                      if (success) {
+                                        // okay everything worked
+                                        console.log("Bulk operation finished.");
+                                        toast.close();
+                                        setTimeout(function() {
+                                          bloom.app.successToast("Successfully marked " + products.length + " " +
+                                                                (products.length > 1 ? "items" : "item") +
+                                                                " as out-of-stock.")
+                                        }, 120);
+                                      } else {
+                                        // something broke
+                                        console.error("Failed to apply bulk operation.");
+                                        toast.close();
+                                        setTimeout(function() {
+                                          bloom.app.errorToast("Bulk edit operation failed. Please try again.");
+                                        });
+                                      }
+                                    });
+                                    return true;  // we will handle closing it
+                                  } else {
+                                    console.log("User rejected bulk operation. Cancelling.");
+                                  }
+                                  return false;  // close the dialog for us plz
+                               });
+      },
+
+      bulkDelete: function(event) {
+        var products = this.selectedItems,
+            that = this,
+            writes;
+        event.preventDefault();
+        event.stopPropagation();
+        console.info("User requested bulk delete:", products);
+        bloom.app.confirmToast("Delete " +
+                               (products.length > 1 ? products.length + " " : "") +
+                               "selected " +
+                               (products.length > 1 ? "items" : "item") + "?", function(yes, toast) {
+                                  if (yes) {
+                                    console.log("User confirmed bulk delete. Executing...");
+                                    that._applyWritesToProducts(writes, true, function(success) {
+                                      if (success) {
+                                        // okay everything worked
+                                        console.log("Bulk delete operation finished.");
+                                        toast.close();
+                                        setTimeout(function() {
+                                          bloom.app.successToast("Successfully deleted " + products.length + " " +
+                                                                (products.length > 1 ? "items" : "item") + ".")
+                                        }, 120);
+                                      } else {
+                                        // something broke
+                                        console.error("Failed to execute bulk delete operation.");
+                                        toast.close();
+                                        setTimeout(function() {
+                                          bloom.app.errorToast("Bulk delete failed. Please try again.");
+                                        });
+                                      }
+                                    });
+                                    return true;  // we will handle closing it
+                                  } else {
+                                    console.log("User rejected bulk delete. Cancelling.");
+                                  }
+                                  return false;  // close the dialog for us plz
+                               });
+      },
+
       ready: function() {
         var bloom = window["bloom"];
         if (bloom !== undefined && bloom != null) {
           bloom.menu = this;  // provide menu engine to JS context
+        } else {
+          window["bloom"] = {
+            menu: this
+          };
         }
       }
     });

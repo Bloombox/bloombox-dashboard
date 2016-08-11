@@ -244,7 +244,7 @@
 
     <!-- Layout / UI -->
     <main>
-      <app-drawer-layout fullbleed responsive-width="850px" narrow="{{_narrow}}">
+      <app-drawer-layout fullbleed responsive-width="960px" narrow="{{_narrow}}">
         <!-- Drawer content -->
         <app-drawer>
           <app-toolbar>
@@ -966,6 +966,10 @@
 
         if (bloom !== undefined && bloom != null) {
           bloom.app = this;  // provide app to JS context
+        } else {
+          window["bloom"] = {
+            app: this
+          };
         }
       }
     });
