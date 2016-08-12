@@ -6,6 +6,7 @@
 <link rel="import" href="../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
 <link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../bower_components/paper-card/paper-card.html">
@@ -35,6 +36,7 @@
     <style is="custom-style" include="bloombox-styles">
       :root {
         --bloombox-product-list-width: 420px;
+        --paper-fab-background: #4c9d2f;
       }
 
       :host {
@@ -147,6 +149,14 @@
       :host paper-tab[disabled] {
         opacity: 0.7;
       }
+
+      :host #addObjectButton {
+        position: absolute;
+        bottom: 50px;
+        right: 60px;
+        height: 70px;
+        width: 70px;
+      }
     </style>
 
     <!-- Firebase Collections -->
@@ -219,25 +229,30 @@
         <div class="menu-page flowers-menu-page" section="flowers">
           <!-- Product Detail -->
           <div class="product-detail-pane">
-            <bloombox-strain
-              key="[[selectedItem.key]]"
-              partner="[[partner]]"
-              environment="[[environment]]"
-              name="[[selectedItem.value.name]]"
-              pricing="[[formatPricelist(selectedItem.value.pricelist)]]"
-              grow="[[_processGrowValue(selectedItem.value.grow)]]"
-              species="[[_processSpeciesValue(selectedItem.value.species)]]"
-              visible="[[_processVisible(selectedItem.value.flags.visible)]]"
-              description$="[[selectedItem.value.description]]"
-              tests$="[[_processTests(selectedItem.value.tests)]]"
-              ancestry$="[[selectedItem.value.ancestry]]"
-              sale$="[[selectedItem.value.flags.sale]]"
-              bogo$="[[selectedItem.value.flags.bogo]]"
-              premium$="[[selectedItem.value.flags.premium]]"
-              pictures$="[[selectedItem.value.pictures]]"
-              display-mode="[[_menuDisplayMode]]"
-              hidden$="[[!selectedItem]]"
-              disabled="[[loading]]"></bloombox-strain><!-- end bloombox-strain -->
+            <template is="dom-if" if="[[!zerostate]]">
+              <bloombox-strain
+                key="[[selectedItem.key]]"
+                partner="[[partner]]"
+                environment="[[environment]]"
+                name="[[selectedItem.value.name]]"
+                pricing="[[formatPricelist(selectedItem.value.pricelist)]]"
+                grow="[[_processGrowValue(selectedItem.value.grow)]]"
+                species="[[_processSpeciesValue(selectedItem.value.species)]]"
+                visible="[[_processVisible(selectedItem.value.flags.visible)]]"
+                description$="[[selectedItem.value.description]]"
+                tests$="[[_processTests(selectedItem.value.tests)]]"
+                ancestry$="[[selectedItem.value.ancestry]]"
+                sale$="[[selectedItem.value.flags.sale]]"
+                bogo$="[[selectedItem.value.flags.bogo]]"
+                premium$="[[selectedItem.value.flags.premium]]"
+                pictures$="[[selectedItem.value.pictures]]"
+                display-mode="[[_menuDisplayMode]]"
+                hidden$="[[!selectedItem]]"
+                disabled="[[loading]]"></bloombox-strain><!-- end bloombox-strain -->
+            </template>
+            <template is="dom-if" if="[[zerostate]]" restamp>
+              <bloombox-strain zerostate></bloombox-strain>
+            </template>
           </div><!-- end div.product-detail-pane -->
         </div><!-- end div.menu-page.flowers-menu-page -->
 
@@ -256,6 +271,9 @@
         <div class="menu-page cartridges-menu-page" section="cartridges">
         </div><!-- end div.menu-page.cartridges-menu-page -->
       </iron-pages><!-- end iron-pages#menuPages -->
+
+      <paper-fab id="addObjectButton" on-tap="_toggleZerostate" icon="add"></paper-fab>
+
     </div><!-- end div#menuWrap.menu-content -->
   </template>
 
@@ -487,6 +505,12 @@
 
       _computeHasSelectedItems: function(multiselect, selectedItems) {
         return (multiselect == true && Array.isArray(selectedItems) && selectedItems.length > 0);
+      },
+
+      _toggleZerostate: function() {
+        this.clearSelection();
+        this.multiselect = false;
+        this.zerostate = !this.zerostate;
       },
 
       formatPricelist: function(pricelist) {
