@@ -205,6 +205,7 @@
           display-mode="{{_menuDisplayMode}}"
           locations="[[locations]]"
           location="{{location}}"
+          has-tests="{{hasTests}}"
           disabled="[[loading]]"></bloombox-menutools>
       </div><!-- end div.toolbar-content.card-content -->
 
@@ -230,6 +231,9 @@
           products="[[products]]"
           selected-items="{{_selected}}"
           search="{{search}}"
+          instock-only="[[instock]]"
+          sale-only="[[onsale]]"
+          has-tests-only="[[hasTests]]"
           multiselect="{{multiselect}}"></bloombox-product-list>
       </div><!-- end div.products-list-container -->
 
@@ -383,7 +387,13 @@
 
         instock: {
           type: Boolean,
-          value: false,
+          value: true,
+          notify: true
+        },
+
+        hasTests: {
+          type: String,
+          value: "all",
           notify: true
         },
 
