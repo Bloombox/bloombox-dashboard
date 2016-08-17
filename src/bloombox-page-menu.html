@@ -37,7 +37,7 @@
 
 
 <dom-module id="bloombox-page-menu">
-  <template>
+  <template strip-whitespace>
     <style is="custom-style" include="bloombox-styles">
       :root {
         --bloombox-product-list-width: 420px;
@@ -237,17 +237,17 @@
           multiselect="{{multiselect}}"></bloombox-product-list>
       </div><!-- end div.products-list-container -->
 
-      <template is="dom-if" if="[[multiselect]]">
+      <template is="dom-if" if="[[multiselect]]" strip-whitespace>
         <div class="selected-products">
-          <template is="dom-if" if="[[_hasSelectedItems]]">
+          <template is="dom-if" if="[[_hasSelectedItems]]" strip-whitespace>
             <h2>Selected products:</h2>
             <ul>
-            <template class="multiselect-list" is="dom-repeat" items="[[selectedItems]]">
+            <template class="multiselect-list" is="dom-repeat" items="[[selectedItems]]" strip-whitespace>
               <li>[[item.value.name]]</li>
             </template>
             </ul>
           </template>
-          <template is="dom-if" if="[[!_hasSelectedItems]]">
+          <template is="dom-if" if="[[!_hasSelectedItems]]" strip-whitespace>
             <h2>Select multiple products to perform bulk edits.</h2>
           </template>
 

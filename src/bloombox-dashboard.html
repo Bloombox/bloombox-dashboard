@@ -35,7 +35,7 @@
 
 
 <dom-module id="bloombox-dashboard">
-  <template>
+  <template strip-whitespace>
     <style is="custom-style" include="bloombox-styles">
       :host {
         display: block;
@@ -280,7 +280,7 @@
               <div class="toolbar-utils">
                 <paper-dropdown-menu id="partnerSelection" hidden$="[[!_multiplePartners]]" noink disabled$="[[loading]]">
                   <paper-listbox id="dispensaryMenuItems" class="dropdown-content" selected="{{partner}}" attr-for-selected="key">
-                    <template is="dom-repeat" items="[[partners]]">
+                    <template strip-whitespace is="dom-repeat" items="[[partners]]">
                       <paper-item key="[[item.key]]">[[item.label]]</paper-item>
                     </template>
                   </paper-listbox>
@@ -296,7 +296,7 @@
           </app-header>
 
           <iron-pages role="main" selected="[[page]]" attr-for-selected="name">
-            <template is="dom-if" if="[[_booted]]" restamp>
+            <template strip-whitespace is="dom-if" if="[[_booted]]" restamp>
               <bloombox-page-home
                 name="home"
                 endpoint="[[endpoint]]"
