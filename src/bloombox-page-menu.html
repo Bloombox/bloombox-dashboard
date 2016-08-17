@@ -644,7 +644,7 @@
           uploadTask.on("state_changed", function(snapshot) {
             // Handle progress events
             var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            console.log("Media upload completion: ", progress);
+            console.info("Media upload completion: ", progress);
             mediaElement.setProgress(progress);
           }, function(error) {
             // Handle unsuccessful uploads
@@ -653,7 +653,7 @@
           }, function() {
             // Handle completion
             var downloadURL = uploadTask.snapshot.downloadURL;
-            console.log("New asset is available at download URL: ", downloadURL);
+            console.info("New asset is available at download URL: ", downloadURL);
             callback(targetName, undefined);
           });
         }
@@ -674,7 +674,7 @@
         // perform our object write
         newObjKey = this.$.dataCollection.ref.child(schema).push().key;
         if (debug) {
-          console.log("Provisioned key for new item: '" + newObjKey + "'.", entry);
+          console.info("Provisioned key for new item: '" + newObjKey + "'.", entry);
         }
         return this.$.dataCollection.ref
                             .child(newObjKey)
@@ -696,7 +696,7 @@
       saveEditsForEntry: function(schema, key, previous, entry, callback) {
         var debug = window["__debug"] || false;
         if (debug) {
-          console.log("Saving edits for item of type '" + schema + "' at key: '" + key + "'.", entry);
+          console.info("Saving edits for item of type '" + schema + "' at key: '" + key + "'.", entry);
         }
         return this.$.dataCollection.ref
                             .child(key)
@@ -781,11 +781,11 @@
                                "selected " +
                                (products.length > 1 ? "items" : "item") + " as in stock?", function(yes, toast) {
                                   if (yes) {
-                                    console.log("User confirmed bulk operation. Executing...");
+                                    console.info("User confirmed bulk operation. Executing...");
                                     that._applyWritesToProducts(section, writes, false, function(success) {
                                       if (success) {
                                         // okay everything worked
-                                        console.log("Bulk operation finished.");
+                                        console.info("Bulk operation finished.");
                                         toast.close();
                                         setTimeout(function() {
                                           that.clearSelection();
@@ -805,7 +805,7 @@
                                     });
                                     return true;  // we will handle closing it
                                   } else {
-                                    console.log("User rejected bulk operation. Cancelling.");
+                                    console.info("User rejected bulk operation. Cancelling.");
                                   }
                                   return false;  // close the dialog for us plz
                                });
@@ -831,11 +831,11 @@
                                "selected " +
                                (products.length > 1 ? "items" : "item") + " as out-of-stock?", function(yes, toast) {
                                   if (yes) {
-                                    console.log("User confirmed bulk operation. Executing...");
+                                    console.info("User confirmed bulk operation. Executing...");
                                     that._applyWritesToProducts(section, writes, false, function(success) {
                                       if (success) {
                                         // okay everything worked
-                                        console.log("Bulk operation finished.");
+                                        console.info("Bulk operation finished.");
                                         toast.close();
                                         setTimeout(function() {
                                           that.clearSelection();
@@ -855,7 +855,7 @@
                                     });
                                     return true;  // we will handle closing it
                                   } else {
-                                    console.log("User rejected bulk operation. Cancelling.");
+                                    console.info("User rejected bulk operation. Cancelling.");
                                   }
                                   return false;  // close the dialog for us plz
                                });
@@ -874,11 +874,11 @@
                                "selected " +
                                (products.length > 1 ? "items" : "item") + "?", function(yes, toast) {
                                   if (yes) {
-                                    console.log("User confirmed bulk delete. Executing...");
+                                    console.info("User confirmed bulk delete. Executing...");
                                     that._applyWritesToProducts(section, products, true, function(success) {
                                       if (success) {
                                         // okay everything worked
-                                        console.log("Bulk delete operation finished.");
+                                        console.info("Bulk delete operation finished.");
                                         toast.close();
                                         setTimeout(function() {
                                           that.clearSelection();
@@ -897,7 +897,7 @@
                                     });
                                     return true;  // we will handle closing it
                                   } else {
-                                    console.log("User rejected bulk delete. Cancelling.");
+                                    console.info("User rejected bulk delete. Cancelling.");
                                   }
                                   return false;  // close the dialog for us plz
                                });
