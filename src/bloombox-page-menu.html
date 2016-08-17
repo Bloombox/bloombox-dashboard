@@ -553,6 +553,43 @@
         dialog.open();
       },
 
+      _applyWritesToProducts: function(schema, products, isDelete, callback) {
+        var updates = {}, i, p, schema;
+        if (!Array.isArray(products) || products.length < 1) {
+          callback(false);
+          return;
+        }
+
+        // map writes into one bulk update
+        for (i in products) {
+          p = products[i];
+          updates[p.key] = isDelete ? null : p.value;
+        }
+
+        return this.$.dataCollection.ref
+                            .update(updates)
+                            .then(function() {
+                              callback(true);
+                            })
+                            .catch(function(error) {
+                              console.error("Encountered error persisting edits for object of type '" + schema + "'.", error);
+                              callback(false, error);
+                            });
+      },
+
+      _mapForEachProduct: function(products, callback) {
+        var i, p, processed = [], buffered = JSON.parse(JSON.stringify(products));
+        if (Array.isArray(buffered) && buffered.length > 0) {
+          for (i in buffered) {
+            p = buffered[i];
+            callback(p);
+            processed.push(p);
+          }
+          return processed;
+        }
+        return [];
+      },
+
       formatPricelist: function(pricelist) {
         if (pricelist == null) {
           return [];
