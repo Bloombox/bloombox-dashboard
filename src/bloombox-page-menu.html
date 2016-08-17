@@ -180,8 +180,10 @@
       <paper-dialog id="flowersCreateDialog" always-on-top modal class="product-zero-state zero-state-dialog">
         <h2>Create a Flower</h2>
         <paper-dialog-scrollable>
-          <div class="product-zero-state-content">
+          <div hidden class="hidden zerostate-template" strip-whitespace>
             <bloombox-strain zerostate class="zerostate-component"></bloombox-strain>
+          </div>
+          <div class="product-zero-state-content">
           </div><!-- end div.product-zero-state-content -->
         </paper-dialog-scrollable>
         <div class="buttons">
@@ -540,16 +542,18 @@
       _showZerostate: function() {
         var dialog = this.$[this.section + "CreateDialog"],
             body = document.querySelector('body'),
-            discard = Polymer.dom(dialog).node.querySelector(".discardButton"),
-            confirm = Polymer.dom(dialog).node.querySelector(".confirmButton"),
-            component = Polymer.dom(dialog).node.querySelector(".zerostate-component");
+            node = Polymer.dom(dialog).node,
+            discard = node.querySelector(".discardButton"),
+            confirm = node.querySelector(".confirmButton"),
+            template = node.querySelector(".zerostate-template"),
+            content = node.querySelector(".product-zero-state-content");
+        Polymer.dom(content).innerHTML = template.innerHTML;  // forcibly re-render zerostate component
         body.appendChild(dialog);  // @TODO(sgammon): fix positioning when using a backdrop
         dialog.style.marginBottom = "150px";
         dialog.style.marginTop = "150px";
         discard.style.position = "absolute";
         discard.style.left = "10px";
         confirm.style.fontWeight = "bold";
-        component.reset();
         dialog.open();
       },
 
