@@ -708,56 +708,117 @@
                             });
       },
 
-      deleteEntryAtId: function(schema, key) {
-        var debug = window["__debug"] || false;
-
-        if (debug) {
-          console.log("Deleting item of type '" + schema + "' at key '" + key + "'.");
-        }
-        return this.$.dataCollection.ref
-                            .child(key)
-                            .remove();
-      },
-
-      _applyWritesToProducts: function(schema, products, isDelete, callback) {
-        var updates = {}, i, p, schema;
-        if (!Array.isArray(products) || products.length < 1) {
-          callback(false);
-          return;
-        }
-
-        // map writes into one bulk update
-        for (i in products) {
-          p = products[i];
-          updates[p.key] = isDelete ? null : p.value;
-        }
-
-        return this.$.dataCollection.ref
-                            .update(updates)
-                            .then(function() {
-                              callback(true);
-                            })
-                            .catch(function(error) {
-                              console.error("Encountered error persisting edits for object of type '" + schema + "'.", error);
-                              callback(false, error);
-                            });
-      },
-
-      _mapForEachProduct: function(products, callback) {
-        var i, p, processed = [], buffered = JSON.parse(JSON.stringify(products));
-        if (Array.isArray(buffered) && buffered.length > 0) {
-          for (i in buffered) {
-            p = buffered[i];
-            callback(p);
-            processed.push(p);
+      deleteEntryAtId: function(schema, key, name) {
+        var that = this;
+        bloom.app.confirmToast("Are you sure you want to delete " + name + "?", function(yes, toast) {
+          if (yes) {
+            console.info("Deleting item of type '" + schema + "' at key '" + key + "'.");
+            that.$.dataCollection.ref
+                                .child(key)
+                                .remove()
+                                .then(function() {
+                                  console.info("Delete operation succeeded.");
+                                  toast.close();
+                                  setTimeout(function() {
+                                    bloom.app.successToast("Deleted " + name + ".");
+                                  }, 120);
+                                }).catch(function(error) {
+                                  console.error("Failed to delete item.", error);
+                                  toast.close();
+                                  setTimeout(function() {
+                                    bloom.app.errorToast("Failed to delete the item in question. Please refresh the page and try again.");
+                                  }, 120);
+                                });
+            return true;  // we will close the dialog
+          } else {
+            console.info("User cancelled delete operation.");
           }
-          return processed;
-        }
-        return [];
+          return false;  // close the dialog for us
+        });
       },
 
       clearSelection: function() {
         this.$.productList.clearSelection();
+      },
+
+      markAsInStock: function(item) {
+        var that = this,
+            schema = item._schema,
+            key = item.key,
+            obj = item.readObjectData(),
+            writes = this._mapForEachProduct([{key: key, value: obj}], function(product) {
+          if (product.value.flags !== undefined) {
+            product.value.flags.visible = true;
+          } else {
+            product.value.flags = {
+              visible: true
+            };
+          }
+        });
+        bloom.app.confirmToast("Mark " + obj.name + " as in-stock?", function(yes, toast) {
+          if (yes) {
+            console.info("User confirmed mark-as-in-stock operation. Executing...");
+            that._applyWritesToProducts(schema, writes, false, function(success) {
+              if (success) {
+                console.info("Operation finished.");
+                toast.close();
+                setTimeout(function() {
+                  bloom.app.successToast("Successfully marked " + obj.name + " as in-stock.");
+                }, 120);
+              } else {
+                console.error("Failed to apply changes to item.");
+                toast.close();
+                setTimeout(function() {
+                  bloom.app.errorToast("Failed to mark item as in-stock. Please refresh the page and try again.");
+                });
+              }
+            });
+            return true;
+          } else {
+            console.info("User rejected operation. Cancelling.");
+          }
+          return false;
+        });
+      },
+
+      markAsOutOfStock: function(item) {
+        var that = this,
+            schema = item._schema,
+            key = item.key,
+            obj = item.readObjectData(),
+            writes = this._mapForEachProduct([{key: key, value: obj}], function(product) {
+          if (product.value.flags !== undefined) {
+            product.value.flags.visible = false;
+          } else {
+            product.value.flags = {
+              visible: false
+            };
+          }
+        });
+        bloom.app.confirmToast("Mark " + obj.name + " as out-of-stock?", function(yes, toast) {
+          if (yes) {
+            console.info("User confirmed mark-as-out-of-stock operation. Executing...");
+            that._applyWritesToProducts(schema, writes, false, function(success) {
+              if (success) {
+                console.info("Operation finished.");
+                toast.close();
+                setTimeout(function() {
+                  bloom.app.successToast("Successfully marked " + obj.name + " as out-of-stock.");
+                }, 120);
+              } else {
+                console.error("Failed to apply changes to item.");
+                toast.close();
+                setTimeout(function() {
+                  bloom.app.errorToast("Failed to mark item as out-of-stock. Please refresh the page and try again.");
+                });
+              }
+            });
+            return true;
+          } else {
+            console.info("User rejected operation. Cancelling.");
+          }
+          return false;
+        });
       },
 
       bulkMarkAsInStock: function(event) {
