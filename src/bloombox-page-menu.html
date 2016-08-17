@@ -166,11 +166,6 @@
         height: 70px;
         width: 70px;
       }
-
-      :host paper-dialog paper-dialog-scrollable {
-        max-height: 600px;
-        overflow-x: scroll;
-      }
     </style>
 
     <!-- Firebase Collections -->
@@ -182,16 +177,16 @@
 
     <div class="zerostate-dialogs">
       <!-- Product Zerostate -->
-      <paper-dialog id="flowersCreateDialog" always-on-top modal class="product-zero-state">
+      <paper-dialog id="flowersCreateDialog" always-on-top modal class="product-zero-state zero-state-dialog">
         <h2>Create a Flower</h2>
         <paper-dialog-scrollable>
           <div class="product-zero-state-content">
-            <bloombox-strain zerostate></bloombox-strain>
+            <bloombox-strain zerostate class="zerostate-component"></bloombox-strain>
           </div><!-- end div.product-zero-state-content -->
         </paper-dialog-scrollable>
         <div class="buttons">
-          <paper-button dialog-dismiss>Discard</paper-button>
-          <paper-button dialog-confirm autofocus>Create</paper-button>
+          <paper-button class="discardButton" dialog-dismiss>Discard</paper-button>
+          <paper-button class="confirmButton" dialog-confirm autofocus>Create</paper-button>
         </div>
       </paper-dialog>
     </div><!-- end div.zerostate-dialogs -->
@@ -544,8 +539,17 @@
 
       _showZerostate: function() {
         var dialog = this.$[this.section + "CreateDialog"],
-            body = document.querySelector('body');
-        body.appendChild(dialog);
+            body = document.querySelector('body'),
+            discard = Polymer.dom(dialog).node.querySelector(".discardButton"),
+            confirm = Polymer.dom(dialog).node.querySelector(".confirmButton"),
+            component = Polymer.dom(dialog).node.querySelector(".zerostate-component");
+        body.appendChild(dialog);  // @TODO(sgammon): fix positioning when using a backdrop
+        dialog.style.marginBottom = "150px";
+        dialog.style.marginTop = "150px";
+        discard.style.position = "absolute";
+        discard.style.left = "10px";
+        confirm.style.fontWeight = "bold";
+        component.reset();
         dialog.open();
       },
 
