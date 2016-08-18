@@ -166,6 +166,10 @@
         height: 70px;
         width: 70px;
       }
+
+      :host paper-dialog paper-toast.validation-toast {
+        margin-left: 15px;
+      }
     </style>
 
     <!-- Firebase Collections -->
@@ -190,6 +194,8 @@
           <paper-button class="discardButton" dialog-dismiss>Discard</paper-button>
           <paper-button class="confirmButton" autofocus on-tap="_saveZerostate">Create</paper-button>
         </div>
+
+        <paper-toast always-on-top text="Please fill in all required fields." class="validation-toast bottom notification-toast"></paper-toast>
       </paper-dialog>
     </div><!-- end div.zerostate-dialogs -->
 
@@ -560,8 +566,31 @@
       _saveZerostate: function() {
         var dialog = this.$[this.section + "CreateDialog"],
             node = Polymer.dom(dialog).node,
-            content = node.querySelector(".product-zero-state-content").children[0];
-        content.persist();
+            content = node.querySelector(".product-zero-state-content").children[0],
+            actionsContainer = node.querySelector(".buttons")
+            errorToast = node.querySelector(".validation-toast");
+        errorToast.fitInto = actionsContainer;
+        errorToast.style.backgroundColor = "#FFC107";
+        errorToast.style.color = "#333";
+        errorToast.style.lineHeight = "48px";
+        errorToast.style.marginLeft = "0";
+        errorToast.style.marginBottom = "-75px";
+        content.persist(function(error) {
+          var that = this;
+          if (error) {
+            if (typeof error === "string") {
+              errorToast.text = error;
+            }
+            errorToast.open();
+          } else {
+            // we created the object successfully
+            dialog.close();
+            setTimeout(function() {
+              debugger;
+              bloom.app.successToast("Successfully created " + (that.readZeroStateForm().name || "a new product") + ".");
+            }, 120);
+          }
+        });
       },
 
       _applyWritesToProducts: function(schema, products, isDelete, callback) {
@@ -685,22 +714,22 @@
         // perform our object write
         newObjKey = this.$.dataCollection.ref.child(schema).push().key;
         if (debug) {
-          console.info("Provisioned key for new item: '" + newObjKey + "'.", entry);
+          console.info("Provisioned key: '" + newObjKey + "'.", entry);
         }
         return this.$.dataCollection.ref
                             .child(newObjKey)
                             .update(entry)
                             .then(function() {
-                              // we are no longer in zerostate
-                              that.zerostate = false;
+                              console.info("Object was created successfully.");
                               if (callback !== undefined && typeof callback === "function") {
                                 callback();
                               }
                             })
                             .catch(function(error) {
                               console.error("Encountered error persisting new object of type '" + schema + "'.", error);
-                              that.toggleAddEntry(schema);
-                              callback(error);
+                              if (callback !== undefined && typeof callback === "function") {
+                                callback(error);
+                              }
                             });
       },
 

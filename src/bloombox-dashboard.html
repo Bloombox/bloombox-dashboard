@@ -214,8 +214,8 @@
       }
 
       #warningToast {
-        --paper-toast-background-color: orange;
-        --paper-toast-color: white;
+        --paper-toast-background-color: #FFC107;
+        --paper-toast-color: #333;
       }
 
       #modalToast, #confirmToast {
@@ -396,9 +396,9 @@
 
     <!-- Toasts & Snackbars -->
     <div class="menu-toasts">
-      <paper-toast id="successToast" always-on-top text="[[_toastMessage]]" class="fit-bottom notification-toast"></paper-toast>
+      <paper-toast id="successToast" always-on-top text="[[_toastMessage]]" class="bottom notification-toast"></paper-toast>
       <paper-toast id="errorToast" always-on-top text="[[_toastMessage]]" class="fit-bottom notification-toast"></paper-toast>
-      <paper-toast id="warningToast" always-on-top text="[[_toastMessage]]" class="fit-bottom notification-toast"></paper-toast>
+      <paper-toast id="warningToast" always-on-top text="[[_toastMessage]]" class="bottom notification-toast"></paper-toast>
       <paper-toast id="modalToast" always-on-top text="[[_toastMessage]]" class="fit-bottom notification-toast">
         <paper-button onclick="modalToast.toggle()" class="modal-close-button">OK</paper-button>
       </paper-toast>
