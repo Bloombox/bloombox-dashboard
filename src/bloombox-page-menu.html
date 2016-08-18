@@ -188,7 +188,7 @@
         </paper-dialog-scrollable>
         <div class="buttons">
           <paper-button class="discardButton" dialog-dismiss>Discard</paper-button>
-          <paper-button class="confirmButton" dialog-confirm autofocus>Create</paper-button>
+          <paper-button class="confirmButton" autofocus on-tap="_saveZerostate">Create</paper-button>
         </div>
       </paper-dialog>
     </div><!-- end div.zerostate-dialogs -->
@@ -555,6 +555,13 @@
         discard.style.left = "10px";
         confirm.style.fontWeight = "bold";
         dialog.open();
+      },
+
+      _saveZerostate: function() {
+        var dialog = this.$[this.section + "CreateDialog"],
+            node = Polymer.dom(dialog).node,
+            content = node.querySelector(".product-zero-state-content").children[0];
+        content.persist();
       },
 
       _applyWritesToProducts: function(schema, products, isDelete, callback) {
