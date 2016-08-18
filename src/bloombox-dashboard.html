@@ -992,7 +992,8 @@
 
       navigate: function(event) {
         var partner = this.partner,
-            page = event.target.getAttribute("name");
+            link = !event.target.hasAttribute("name") ? event.target.parentElement : event.target,
+            page = link.getAttribute("name");
         this.partner = partner;
         this.page = page;
       },
