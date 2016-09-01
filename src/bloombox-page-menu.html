@@ -180,7 +180,7 @@
       data="{{products}}"></firebase-document>
 
     <div class="zerostate-dialogs">
-      <!-- Product Zerostate -->
+      <!-- Flower Zerostate -->
       <paper-dialog id="flowersCreateDialog" always-on-top modal class="product-zero-state zero-state-dialog">
         <h2>Create a Flower</h2>
         <paper-dialog-scrollable>
@@ -194,7 +194,23 @@
           <paper-button class="discardButton" dialog-dismiss>Discard</paper-button>
           <paper-button class="confirmButton" autofocus on-tap="_saveZerostate">Create</paper-button>
         </div>
+        <paper-toast always-on-top text="Please fill in all required fields." class="validation-toast bottom notification-toast"></paper-toast>
+      </paper-dialog>
 
+      <!-- Edible Zerostate -->
+      <paper-dialog id="ediblesCreateDialog" always-on-top modal class="product-zero-state zero-state-dialog">
+        <h2>Create an Edible</h2>
+        <paper-dialog-scrollable>
+          <div hidden class="hidden zerostate-template" strip-whitespace>
+            <bloombox-edible zerostate class="zerostate-component"></bloombox-edible>
+          </div>
+          <div class="product-zero-state-content">
+          </div><!-- end div.product-zero-state-content -->
+        </paper-dialog-scrollable>
+        <div class="buttons">
+          <paper-button class="discardButton" dialog-dismiss>Discard</paper-button>
+          <paper-button class="confirmButton" autofocus on-tap="_saveZerostate">Create</paper-button>
+        </div>
         <paper-toast always-on-top text="Please fill in all required fields." class="validation-toast bottom notification-toast"></paper-toast>
       </paper-dialog>
     </div><!-- end div.zerostate-dialogs -->
@@ -282,13 +298,36 @@
               bogo$="[[selectedItem.value.flags.bogo]]"
               premium$="[[selectedItem.value.flags.premium]]"
               pictures$="[[selectedItem.value.pictures]]"
-              display-mode="[[_menuDisplayMode]]"
               hidden$="[[!selectedItem]]"
               disabled="[[loading]]"></bloombox-strain><!-- end bloombox-strain -->
           </div><!-- end div.product-detail-pane -->
         </div><!-- end div.menu-page.flowers-menu-page -->
 
         <div class="menu-page edibles-menu-page" section="edibles">
+          <!-- Product Detail -->
+          <div class="product-detail-pane">
+            <bloombox-edible
+              key="[[selectedItem.key]]"
+              partner="[[partner]]"
+              environment="[[environment]]"
+              name="[[selectedItem.value.name]]"
+              brand="[[selectedItem.value.brand]]"
+              type="[[selectedItem.value.type]]"
+              pricing="[[selectedItem.value.pricing]]"
+              visible="[[_processVisible(selectedItem.value.flags.visible)]]"
+              description$="[[selectedItem.value.description]]"
+              tests$="[[_processTests(selectedItem.value.tests)]]"
+              sale$="[[selectedItem.value.flags.sale]]"
+              bogo$="[[selectedItem.value.flags.bogo]]"
+              premium$="[[selectedItem.value.flags.premium]]"
+              vegan$="[[selectedItem.value.flags.vegan]]"
+              organic$="[[selectedItem.value.flags.organic]]"
+              glutenfree$="[[selectedItem.value.flags.glutenfree]]"
+              sugarfree$="[[selectedItem.value.flags.sugarfree]]"
+              photos$="[[selectedItem.value.photos]]"
+              hidden$="[[!selectedItem]]"
+              disabled="[[loading]]"></bloombox-edible><!-- end bloombox-edible -->
+            </div><!-- end div.product-detail-pane -->
         </div><!-- end div.menu-page.edibles-menu-page -->
 
         <div class="menu-page concentrates-menu-page" section="concentrates">
