@@ -479,7 +479,8 @@
         _adminOnly: {
           type: String,
           notify: true,
-          computed: '_computeAdminOnly(user.admin)'
+          computed: '_computeAdminOnly(user.admin)',
+          value: 'admin-only hidden'
         },
 
         /**
