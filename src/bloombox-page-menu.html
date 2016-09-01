@@ -170,6 +170,10 @@
       :host paper-dialog paper-toast.validation-toast {
         margin-left: 15px;
       }
+
+      .zero-state-dialog paper-dialog-scrollable .zerostate-component {
+        min-width: 600px;
+      }
     </style>
 
     <!-- Firebase Collections -->
@@ -183,7 +187,7 @@
       <!-- Flower Zerostate -->
       <paper-dialog id="flowersCreateDialog" always-on-top modal class="product-zero-state zero-state-dialog">
         <h2>Create a Flower</h2>
-        <paper-dialog-scrollable>
+        <paper-dialog-scrollable style="min-width: 600px;">
           <div hidden class="hidden zerostate-template" strip-whitespace>
             <bloombox-strain zerostate class="zerostate-component"></bloombox-strain>
           </div>
@@ -200,7 +204,7 @@
       <!-- Edible Zerostate -->
       <paper-dialog id="ediblesCreateDialog" always-on-top modal class="product-zero-state zero-state-dialog">
         <h2>Create an Edible</h2>
-        <paper-dialog-scrollable>
+        <paper-dialog-scrollable style="min-width: 600px;">
           <div hidden class="hidden zerostate-template" strip-whitespace>
             <bloombox-edible zerostate class="zerostate-component"></bloombox-edible>
           </div>
