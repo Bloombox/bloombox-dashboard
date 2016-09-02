@@ -251,6 +251,23 @@
         </div>
         <paper-toast always-on-top text="Please fill in all required fields." class="validation-toast bottom notification-toast"></paper-toast>
       </paper-dialog>
+
+      <!-- Apothecary Zerostate -->
+      <paper-dialog id="apothecaryCreateDialog" always-on-top modal class="product-zero-state zero-state-dialog">
+        <h2>Create an Apothecary item</h2>
+        <paper-dialog-scrollable style="min-width: 600px;">
+          <div hidden class="hidden zerostate-template" strip-whitespace>
+            <bloombox-apothecary zerostate class="zerostate-component"></bloombox-apothecary>
+          </div>
+          <div class="product-zero-state-content">
+          </div><!-- end div.product-zero-state-content -->
+        </paper-dialog-scrollable>
+        <div class="buttons">
+          <paper-button class="discardButton" dialog-dismiss>Discard</paper-button>
+          <paper-button class="confirmButton" autofocus on-tap="_saveZerostate">Create</paper-button>
+        </div>
+        <paper-toast always-on-top text="Please fill in all required fields." class="validation-toast bottom notification-toast"></paper-toast>
+      </paper-dialog>
     </div><!-- end div.zerostate-dialogs -->
 
     <!-- Card UI -->
@@ -273,7 +290,7 @@
           <paper-tab key="edibles">Edibles</paper-tab>
           <paper-tab key="concentrates">Concentrates</paper-tab>
           <paper-tab key="prerolls">Pre-Rolls</paper-tab>
-          <paper-tab key="apothecary" disabled>Apothecary</paper-tab>
+          <paper-tab key="apothecary">Apothecary</paper-tab>
           <paper-tab key="cartridges" disabled>Cartridges</paper-tab>
         </paper-tabs>
       </div><!-- end div.menu-nav -->
@@ -415,6 +432,25 @@
         </div><!-- end div.menu-page.prerolls-menu-page -->
 
         <div class="menu-page apothecary-menu-page" section="apothecary">
+          <div class="product-detail-pane">
+            <bloombox-apothecary
+              key="[[selectedItem.key]]"
+              partner="[[partner]]"
+              environment="[[environment]]"
+              name="[[selectedItem.value.name]]"
+              brand="[[selectedItem.value.brand]]"
+              type="[[selectedItem.value.type]]"
+              pricing="[[selectedItem.value.pricing]]"
+              visible="[[_processVisible(selectedItem.value.flags.visible)]]"
+              description$="[[selectedItem.value.description]]"
+              tests$="[[_processTests(selectedItem.value.tests)]]"
+              sale$="[[selectedItem.value.flags.sale]]"
+              bogo$="[[selectedItem.value.flags.bogo]]"
+              premium$="[[selectedItem.value.flags.premium]]"
+              photos$="[[selectedItem.value.photos]]"
+              hidden$="[[!selectedItem]]"
+              disabled="[[loading]]"></bloombox-apothecary><!-- end bloombox-apothecary -->
+          </div><!-- end div.product-detail-pane -->
         </div><!-- end div.menu-page.apothecary-menu-page -->
 
         <div class="menu-page cartridges-menu-page" section="cartridges">
