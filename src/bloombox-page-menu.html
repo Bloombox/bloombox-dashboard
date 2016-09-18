@@ -740,7 +740,7 @@
       },
 
       _toArray: function(obj) {
-        return Object.keys(obj).map(function(key) {
+        return Array.isArray(obj) ? obj : Object.keys(obj).map(function(key) {
           return {
             key: key,
             value: obj[key]
