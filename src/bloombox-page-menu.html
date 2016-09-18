@@ -966,10 +966,74 @@
         return [];
       },
 
-      formatPricelist: function(pricelist) {
-        if (pricelist == null) {
-          return [];
+      _buildPrinterFrame: function(settings, manifest) {
+        var frame = document.createElement("iframe"),
+            frag = document.createDocumentFragment(),
+            polymerImport = document.createElement("link"),
+            productListImport = document.createElement("link"),
+            mainContainer = document.createElement("main"),
+            polymerImpl = this.resolveUrl("../bower_components/polymer/polymer.html"),
+            productListImpl = this.resolveUrl("../bower_components/bloombox-product-list/bloombox-printed-product-list.html"),
+            sections = Object.keys(manifest),
+            that = this,
+            pageEl,
+            s,
+            renderedDocument,
+            innerBody;
+
+        console.groupCollapsed("Beginning render operation for print...");
+
+        // insert sections
+        for (s in sections) {
+          console.log("Rendering product section '" + sections[s] + "'...", manifest[sections[s]]);
+          pageEl = document.createElement("section");
+          pageEl.setAttribute("name", sections[s]);
+          pageEl.appendChild(manifest[sections[s]].element);
+          mainContainer.appendChild(pageEl);
         }
+
+        // mount main countainer in print frame body fragment
+        console.log("Mounting main container...", mainContainer);
+        mainContainer.class = "print-frame fit fullbleed";
+        frag.appendChild(mainContainer);
+
+        console.log("Bootstrapping print frame...");
+        renderedDocument = "<!doctype HTML><html lang=\"en\"><head>" +
+                           "<meta charset=\"utf-8\">" +
+                           "<style>@page{size:auto;margin:20px;color:white;size:" + settings.orientation + "}" +
+                           "section{page-break-after:always;page-break-before:always;}html /deep/ bloombox-product-entry{page-break-inside:avoid;}</style>" +
+                           "<script>window.Polymer={lazyRegister:true,dom:'shadow'};" +
+                             "(function(){if(!('registerElement' in document) || !('import' in document.createElement('link')))" +
+                             "{var e=document.createElement('script');e.src='/bower_components/webcomponentsjs/webcomponents-lite.min.js';" +
+                             "document.head.appendChild(e);}})();<\/script>" +
+                             "<link rel=\"import\" href=\"" + polymerImpl + "\">" +
+                             "<link rel=\"import\" href=\"" + productListImpl + "\">" +
+                             "</head><body></body></html>";
+
+        frame.onload = function(ev) {
+          innerBody = (frame.contentDocument || frame.contentWindow.document).body;
+          console.log("Mounting print content...", {body: innerBody, content: frag});
+          innerBody.appendChild(frag);
+          console.log("Content mounted. Waiting to trigger print dialog...", frame);
+          setTimeout(function() {
+            that.loading = false;  // okay we're done, no need for the loading spinner anymore
+            frame.contentWindow.print();
+          }, 300);
+        };
+
+        console.log("Mounting print frame...", {frame: frame, rendered: renderedDocument});
+        frame.name = "printFrame";
+        frame.id = "embeddedPrintFrame";
+        frame.srcdoc = renderedDocument;
+        console.log("Mounting frame to main DOM...");
+
+        document.body.appendChild(frame);
+        console.groupEnd();
+      },
+
+      formatPricelist: function(pricelist) {
+        if (pricelist == null)
+          return [];
         return [
           {"label": "1g", "available": pricelist["gram"]["available"], "price": pricelist["gram"]["price"]},
           {"label": "3.5g", "available": pricelist["eighth"]["available"], "price": pricelist["eighth"]["price"]},
@@ -1338,6 +1402,133 @@
                                   }
                                   return false;  // close the dialog for us plz
                                });
+      },
+
+      print: function(settings, callback) {
+        var sectionsToPrint = [],
+            pageElements = {},
+            that = this,
+            instock = this.instock,
+            onsale = this.onsale,
+            hasTests = this.hasTests,
+            respectFilters = settings.filterMode === "respect",
+            k, s, el;
+
+        if (settings.sectionMode === "some") {
+          // need to iterate through keys
+          Object.keys(settings).map(function (key) {
+            if (settings[key] === "on")
+              sectionsToPrint.push(key);
+            return key;
+          });
+        } else if (settings.sectionMode === "all") {
+          // print all sections
+          sectionsToPrint = [
+            "flowers",
+            "edibles",
+            "concentrates",
+            "prerolls",
+            "apothecary",
+            "cartridges"
+          ];
+        } else if (settings.sectionMode === "selected") {
+          // print only the active section
+          sectionsToPrint.push(this.section);
+        }
+
+        // okay, we need some sections at least
+        if (sectionsToPrint.length < 1) {
+          console.error("Unable to print: 0 sections selected.");
+          bloom.app.errorToast("Unable to print 0 sections");
+          callback(false);
+        } else {
+          bloom.app.loading = true;
+          function _checkDone() {
+            if (Object.keys(pageElements).length === sectionsToPrint.length) {
+              console.groupEnd();
+              console.info("Done building pages for print job.", pageElements);
+              that._buildPrinterFrame(settings, pageElements);
+            }
+          }
+
+          function _fetchData(section) {
+            that.$.dataCollection.ref.parent.child(section).once("value").then(function (snapshot) {
+              var products = that._toArray(snapshot.val()),
+                  filteredProducts,
+                  el;
+
+              el = document.createElement("bloombox-printed-product-list");
+              el.partner = that.partner;
+              el.environment = that.environment;
+              el.section = section;
+              el.heading = that._computeSectionHeading(section);
+
+              console.log("Computing section '" + section + "' for print job...");
+              if (respectFilters) {
+                filteredProducts = products.filter(function(product) {
+                  return that.$.productList._enforceFilters(that.instock,
+                                                            that.onsale,
+                                                            that.hasTests,
+                                                            product);
+                });
+
+                if (filteredProducts.length != products.length) {
+                  console.log("Filtered out " + (products.length - filteredProducts.length) + " products for print job...", {original: products, filtered: filteredProducts});
+                } else {
+                  console.log("Filter application removed no items for print job.");
+                }
+              } else {
+                console.log("Product filtering disabled for menu print operation.");
+                filteredProducts = products;
+              }
+
+              if (filteredProducts.length < 1) {
+                console.error("No products to print for print job.");
+              } else {
+                console.log("Attached " + filteredProducts.length + " products for print job.");
+                el.products = filteredProducts;
+
+                pageElements[section] = {
+                  name: section,
+                  element: el,
+                  data: {
+                    original: respectFilters ? products : filteredProducts,
+                    filtered: respectFilters ? filteredProducts : null
+                  }
+                };
+              }
+            }).then(_checkDone);
+          }
+
+          console.groupCollapsed("Computing data for print job...");
+          for (s in sectionsToPrint) {
+            if (sectionsToPrint[s] === this.section) {
+              el = document.createElement("bloombox-printed-product-list");
+              el.partner = this.partner;
+              el.environment = this.environment;
+              el.section = sectionsToPrint[s];
+              el.heading = this._computeSectionHeading(sectionsToPrint[s]);
+
+              // we're examining the current section: we can use the filtered products
+              // from our current, in-UI product list
+              console.log("Attached " + (respectFilters ? this.$.productList._visibleProducts : this.$._productsArray).length +
+                          " products from current section for print job.");
+              el.products = respectFilters ? this.$.productList._visibleProducts : this.$.productList._productsArray;
+              pageElements[sectionsToPrint[s]] = {
+                name: sectionsToPrint[s],
+                element: el,
+                data: {
+                  original: respectFilters ? null : this.$.productList._productsArray,
+                  filtered: respectFilters ? this.$.productList._visibleProducts : null
+                }
+              };
+              _checkDone();
+            } else {
+              // fetch menu data
+              _fetchData(sectionsToPrint[s]);
+            }
+          }
+        }
       },
 
       ready: function() {
