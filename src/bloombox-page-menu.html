@@ -4,6 +4,7 @@
 
 <link rel="import" href="../bower_components/iron-list/iron-list.html">
 <link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../bower_components/iron-form/iron-form.html">
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 
 <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
@@ -12,12 +13,12 @@
 <link rel="import" href="../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
 
 <link rel="import" href="../bower_components/neon-animation/animations/scale-up-animation.html">
 <link rel="import" href="../bower_components/neon-animation/animations/fade-out-animation.html">
 
-<link rel="import" href="../bower_components/polymerfire/firebase-query.html">
 <link rel="import" href="../bower_components/polymerfire/firebase-document.html">
 
 <!-- Bloombox Commons -->
@@ -26,6 +27,7 @@
 
 <!-- Product Listings -->
 <link rel="import" href="../bower_components/bloombox-product-list/bloombox-product-list.html">
+<link rel="import" href="../bower_components/bloombox-product-list/bloombox-printed-product-list.html">
 
 <!-- Product Cards -->
 <link rel="import" href="../bower_components/bloombox-strain/bloombox-strain.html">
@@ -174,6 +176,28 @@
       .zero-state-dialog paper-dialog-scrollable .zerostate-component {
         min-width: 600px;
       }
+
+      :host .menu-action-dialog .selection-radio-group {
+        border: 1px solid #ddd;
+        min-width: 250px;
+        white-space: nowrap;
+        overflow: visible;
+        margin-bottom: 7px;
+      }
+
+      :host .menu-action-dialog .selection-radio-group:last-child {
+        margin-bottom: 20px;
+      }
+
+      :host .menu-action-dialog .selection-radio-group .sections-to-print-selection {
+        margin-left: 15px;
+        padding-bottom: 15px;
+      }
+
+      :host .menu-action-dialog .selection-radio-group .sections-to-print-selection paper-checkbox {
+        display: block;
+        margin-bottom: 5px;
+      }
     </style>
 
     <!-- Firebase Collections -->
@@ -182,6 +206,70 @@
       log$="[[debug]]"
       path="[[_menuEndpoint]]/[[section]]"
       data="{{products}}"></firebase-document>
+
+    <div class="action-dialogs">
+      <!-- Print Menu Dialog -->
+      <paper-dialog id="printMenuActionDialog" always-on-top class="menu-action-dialog">
+        <h2>Print Menu: Settings</h2>
+        <paper-dialog-scrollable style="min-width: 600px; min-height: 300px; display: flex; justify-content: center;">
+          <form is="iron-form" id="printMenuSettingsForm" content-type="application/json">
+            <iron-label id="printFiltersLabel"><h3>Products to Print</h3></iron-label>
+            <div class="selection-radio-group">
+              <paper-radio-group
+                id="printFiltersMode"
+                selected="{{_printSettings.filterMode}}"
+                attr-for-selected="state"
+                name="filterMode"
+                aria-labelledby="printFiltersLabel"
+                style="overflow: visible; display: block;">
+                <paper-radio-button state="respect">Use current filters</paper-radio-button>
+                <paper-radio-button state="ignore">Print all products</paper-radio-button>
+            </div><!-- end div.selection-radio-group -->
+
+            <iron-label id="selectedPagesLabel"><h3>Sections to Print</h3></iron-label>
+            <div class="selection-radio-group">
+              <paper-radio-group
+                id="selectedPages"
+                selected="{{_printSettings.sectionMode}}"
+                attr-for-selected="mode"
+                name="sectionMode"
+                aria-labelledby="selectedPagesLabel"
+                style="overflow: visible; display: block;">
+                <paper-radio-button mode="selected">Current Section ([[heading]])</paper-radio-button>
+                <paper-radio-button mode="some">Some Sections</paper-radio-button>
+                <paper-radio-button mode="all">All Sections</paper-radio-button>
+              </paper-radio-group>
+              <div class="sections-to-print-selection" hidden$="[[!_somePagesPrintSectionMode]]">
+                <paper-checkbox name="flowers">Flowers</paper-checkbox>
+                <paper-checkbox name="edibles">Edibles</paper-checkbox>
+                <paper-checkbox name="concentrates">Concentrates</paper-checkbox>
+                <paper-checkbox name="prerolls">Prerolls</paper-checkbox>
+                <paper-checkbox name="apothecary">Apothecary</paper-checkbox>
+                <paper-checkbox name="cartridges">Cartridges</paper-checkbox>
+              </div><!-- end div.sections-to-print-selection -->
+            </div><!-- end div.selection-radio-group -->
+
+            <iron-label id="orientationLabel"><h3>Orientation</h3></iron-label>
+            <div class="selection-radio-group">
+              <paper-radio-group
+                id="printOrientation"
+                selected="{{_printSettings.orientation}}"
+                attr-for-selected="mode"
+                name="orientation"
+                aria-labelledby="orientationLabel"
+                style="overflow: visible; display: block;">
+                <paper-radio-button mode="portrait">Portrait</paper-radio-button>
+                <paper-radio-button mode="landscape">Landscape</paper-radio-button>
+              </paper-radio-group>
+            </div><!-- end div.selection-radio-group -->
+          </form>
+        </paper-dialog-scrollable>
+        <div class="buttons">
+          <paper-button class="cancelButton" dialog-dismiss on-tap="_cancelAction">Cancel</paper-button>
+          <paper-button class="proceedButton" autofocus on-tap="_proceedWithAction">Print Preview</paper-button>
+        </div>
+      </paper-dialog>
+    </div><!-- end div.action-dialogs -->
 
     <div class="zerostate-dialogs">
       <!-- Flower Zerostate -->
@@ -495,7 +583,6 @@
       </iron-pages><!-- end iron-pages#menuPages -->
 
       <paper-fab id="addObjectButton" on-tap="_showZerostate" icon="add"></paper-fab>
-
     </div><!-- end div#menuWrap.menu-content -->
   </template>
 
@@ -515,6 +602,29 @@
           type: Boolean,
           notify: true,
           computed: '_computeHasSelectedItems(multiselect, selectedItems)'
+        },
+
+        _printSettings: {
+          type: Object,
+          notify: true,
+          value: function() {
+            return {
+              sectionMode: "selected",
+              orientation: "portrait",
+              filterMode: "respect"
+            }
+          }
+        },
+
+        _somePagesPrintSectionMode: {
+          type: Boolean,
+          notify: true,
+          computed: '_computeSomePagesPrintSectionMode(_printSettings.sectionMode)'
+        },
+
+        _actionCallback: {
+          type: Object,
+          notify: true
         },
 
         debug: {
@@ -663,6 +773,10 @@
         return [];
       },
 
+      _computeSomePagesPrintSectionMode: function(sectionMode) {
+        return sectionMode === "some";
+      },
+
       _selectedItemsDidChange: function() {
         var lists = Polymer.dom(this.root).querySelectorAll(".multiselect-list"),
             i;
@@ -733,6 +847,34 @@
 
       _computeHasSelectedItems: function(multiselect, selectedItems) {
         return (multiselect == true && Array.isArray(selectedItems) && selectedItems.length > 0);
+      },
+
+      _showActionDialog: function(action, actionCallback) {
+        var dialog = this.$[action + 'ActionDialog'],
+            body = document.querySelector('body'),
+            node = Polymer.dom(dialog).node,
+            proceedButton = node.querySelector(".proceedButton"),
+            cancelButton = node.querySelector(".cancelButton");
+        //body.appendChild(dialog);  // @TODO(sgammon): see TODO below for backdrop fix info
+        dialog.style.marginBottom = "150px";
+        dialog.style.marginTop = "150px";
+        cancelButton.style.position = "absolute";
+        cancelButton.style.left = "10px";
+        proceedButton.style.fontWeight = "bold";
+        this._actionCallback = (function(state) {
+          actionCallback(action, state, dialog);
+        });
+        dialog.open();
+      },
+
+      _proceedWithAction: function() {
+        this._actionCallback(true);
+        this._actionCallback = null;
+      },
+
+      _cancelAction: function() {
+        this._actionCallback(false);
+        this._actionCallback = null;
       },
 
       _showZerostate: function() {
