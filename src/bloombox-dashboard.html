@@ -799,7 +799,9 @@
       },
 
       _locationsLoaded: function(locations) {
-        this.location = locations[0].key;
+        if (!this.location) {
+          this.location = locations[0].key;
+        }
       },
 
       _computeEndpoint: function(environment, partner) {

@@ -124,8 +124,10 @@
         locations: {
           type: Array,
           notify: true,
-          readOnly: true,
-          observer: '_locationsLoaded'
+          observer: '_locationsLoaded',
+          value: function() {
+            return window["bloom"] ? bloom.app.locations : [];
+          }
         },
 
         location: {
@@ -160,7 +162,6 @@
         for (_li in locations) {
           BloomboxProfileLocations[locations[_li].key] = locations[_li];
         }
-
         console.info("Locations loaded.", locations, BloomboxProfileLocations);
         this.location = locations[0].key;
       },
