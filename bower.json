@@ -10,6 +10,7 @@
     "polymer": "polymer/polymer#^1.5.0",
     "polymerfire": "firebase/polymerfire#^0.9.3",
     "iron-elements": "PolymerElements/iron-elements#^1.0.10",
+    "paper-radio-group": "momentum/paper-radio-group#master",
     "paper-elements": "PolymerElements/paper-elements#^1.0.7",
     "neon-elements": "PolymerElements/neon-elements#^1.0.0",
     "gold-elements": "PolymerElements/gold-elements#^1.0.1",
