@@ -584,6 +584,12 @@
 
       <paper-fab id="addObjectButton" on-tap="_showZerostate" icon="add"></paper-fab>
     </div><!-- end div#menuWrap.menu-content -->
+
+    <div hidden>
+      <div id="printFrameTemplate" type="text/bloombox-template">
+PCFkb2N0eXBlIEhUTUw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+CjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4KPHN0eWxlPgpAcGFnZSB7CiAgc2l6ZTogYXV0bzsKICBtYXJnaW46IC4yZW07CiAgY29sb3I6IHdoaXRlOwogIHNpemU6IF9fT1JJRU5UQVRJT05fXzsKfQoKc2VjdGlvbiB7CiAgcGFnZS1icmVhay1hZnRlcjogYWx3YXlzOwogIHBhZ2UtYnJlYWstYmVmb3JlOiBhbHdheXM7CiAgbWFyZ2luOiAwIDIwcHg7Cn0KPC9zdHlsZT4KPHNjcmlwdD4Kd2luZG93LlBvbHltZXIgPSB7CiAgbGF6eVJlZ2lzdGVyOiB0cnVlLAogIGRvbTogInNoYWRvdyIKfTsKCihmdW5jdGlvbigpe2lmKCEoInJlZ2lzdGVyRWxlbWVudCIgaW4gZG9jdW1lbnQpIHx8ICEoImltcG9ydCIgaW4gZG9jdW1lbnQuY3JlYXRlRWxlbWVudCgibGluayIpKSkgewogIHZhciBlPWRvY3VtZW50LmNyZWF0ZUVsZW1lbnQoInNjcmlwdCIpOwogIC8vIEBUT0RPOiBkb24ndCBoYXJkLWNvZGUgdGhpcwogIGUuc3JjPXdpbmRvdy5sb2NhdGlvbi5wb3J0ID09PSA4MDgwID8gIi9ib3dlcl9jb21wb25lbnRzL3dlYmNvbXBvbmVudHNqcy93ZWJjb21wb25lbnRzLWxpdGUubWluLmpzIiA6CiAgICAgICAgIi9hc3NldHMvYXBwL3YxL3VuYnVuZGxlZC9ib3dlcl9jb21wb25lbnRzL3dlYmNvbXBvbmVudHNqcy93ZWJjb21wb25lbnRzLWxpdGUubWluLmpzIjsKICBkb2N1bWVudC5oZWFkLmFwcGVuZENoaWxkKGUpOwp9fSkoKTsKPC9zY3JpcHQ+Cl9fTElOS1NfXwo8L2hlYWQ+Cjxib2R5PjwvYm9keT4KPC9odG1sPg==
+      </div>
+    </div>
   </template>
 
   <script>
@@ -979,6 +985,7 @@
             pageEl,
             s,
             renderedDocument,
+            docTemplate,
             innerBody;
 
         console.groupCollapsed("Beginning render operation for print...");
@@ -998,17 +1005,9 @@
         frag.appendChild(mainContainer);
 
         console.log("Bootstrapping print frame...");
-        renderedDocument = "<!doctype HTML><html lang='en'><head>" +
-                           "<meta charset='utf-8'>" +
-                           "<style>@page{size:auto;margin:.2em;color:white;size:" + settings.orientation + ";}" +
-                           "section{page-break-after:always;page-break-before:always;margin:0 20px;}</style>" +
-                           "<script>window.Polymer={lazyRegister:true,dom:'shadow'};" +
-                             "(function(){if(!('registerElement' in document) || !('import' in document.createElement('link')))" +
-                             "{var e=document.createElement('script');e.src='/bower_components/webcomponentsjs/webcomponents-lite.min.js';" +
-                             "document.head.appendChild(e);}})();<\/script>" +
-                             "<link rel='import' href='" + polymerImpl + "'>" +
-                             "<link rel='import' href='" + productListImpl + "'>" +
-                             "</head><body></body></html>";
+        docTemplate = atob(this.$.printFrameTemplate.innerText.replace("// <![CDATA[", "").replace("// ]]>", "").replace("\n", ""));
+        renderedDocument = docTemplate.replace("__ORIENTATION__", settings.orientation).replace("__LINKS__",
+                            "<link rel='import' href='" + polymerImpl + "'>\n<link rel='import' href='" + productListImpl + "'>");
 
         frame.onload = function(ev) {
           innerBody = (frame.contentDocument || frame.contentWindow.document).body;
