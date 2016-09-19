@@ -20,7 +20,8 @@
     "google-apis": "GoogleWebComponents/google-apis#^1.1.5",
     "google-map": "GoogleWebComponents/google-map#^1.1.10",
     "google-chart": "GoogleWebComponents/google-chart#^1.0.6",
-    "iron-form": "PolymerElements/iron-form#^1.1.4"
+    "iron-form": "PolymerElements/iron-form#^1.1.4",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^v0.7.22"
   },
   "devDependencies": {
     "web-component-tester": "^4.0.0"
