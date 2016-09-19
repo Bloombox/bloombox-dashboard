@@ -1517,6 +1517,10 @@
               console.log("Attached " + (respectFilters ? this.$.productList._visibleProducts : this.$._productsArray).length +
                           " products from current section for print job.");
               el.products = respectFilters ? this.$.productList._visibleProducts : this.$.productList._productsArray;
+
+              if (settings.orientation === "landscape" &&
+                 !(sectionsToPrint[s] === "flowers"))
+                el.twoColumn = true;
               pageElements[sectionsToPrint[s]] = {
                 name: sectionsToPrint[s],
                 element: el,
