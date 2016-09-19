@@ -998,16 +998,16 @@
         frag.appendChild(mainContainer);
 
         console.log("Bootstrapping print frame...");
-        renderedDocument = "<!doctype HTML><html lang=\"en\"><head>" +
-                           "<meta charset=\"utf-8\">" +
+        renderedDocument = "<!doctype HTML><html lang='en'><head>" +
+                           "<meta charset='utf-8'>" +
                            "<style>@page{size:auto;margin:.2em;color:white;size:" + settings.orientation + ";}" +
                            "section{page-break-after:always;page-break-before:always;margin:0 20px;}</style>" +
                            "<script>window.Polymer={lazyRegister:true,dom:'shadow'};" +
                              "(function(){if(!('registerElement' in document) || !('import' in document.createElement('link')))" +
                              "{var e=document.createElement('script');e.src='/bower_components/webcomponentsjs/webcomponents-lite.min.js';" +
                              "document.head.appendChild(e);}})();<\/script>" +
-                             "<link rel=\"import\" href=\"" + polymerImpl + "\">" +
-                             "<link rel=\"import\" href=\"" + productListImpl + "\">" +
+                             "<link rel='import' href='" + polymerImpl + "'>" +
+                             "<link rel='import' href='" + productListImpl + "'>" +
                              "</head><body></body></html>";
 
         frame.onload = function(ev) {
