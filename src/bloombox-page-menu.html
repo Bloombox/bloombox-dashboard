@@ -1099,7 +1099,8 @@ PCFkb2N0eXBlIEhUTUw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+CjxtZXRhIGNoYXJzZXQ9InV0Zi04
       },
 
       generateAssetURL: function(targetName) {
-        var prefix = this.get("storage");
+        var prefix = this.get("storage"),
+            that = this;
         if (!prefix)
           console.warn("Unable to resolve storage prefix. Uploads may break.");
         return prefix + "/" + targetName;
@@ -1121,6 +1122,9 @@ PCFkb2N0eXBlIEhUTUw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+CjxtZXRhIGNoYXJzZXQ9InV0Zi04
                             .then(function() {
                               console.info("Object was created successfully.");
                               if (callback !== undefined && typeof callback === "function") {
+                                that.async(function() {
+                                  that.$.productList.selectKey(newObjKey);
+                                });
                                 callback();
                               }
                             })
