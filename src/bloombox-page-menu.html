@@ -283,7 +283,7 @@
           </div><!-- end div.product-zero-state-content -->
         </paper-dialog-scrollable>
         <div class="buttons">
-          <paper-button class="discardButton" dialog-dismiss>Discard</paper-button>
+          <paper-button class="discardButton" dialog-dismiss on-tap="_zerostateDismiss">Discard</paper-button>
           <paper-button class="confirmButton" autofocus on-tap="_saveZerostate">Create</paper-button>
         </div>
         <paper-toast always-on-top text="Please fill in all required fields." class="validation-toast bottom notification-toast"></paper-toast>
@@ -300,7 +300,7 @@
           </div><!-- end div.product-zero-state-content -->
         </paper-dialog-scrollable>
         <div class="buttons">
-          <paper-button class="discardButton" dialog-dismiss>Discard</paper-button>
+          <paper-button class="discardButton" dialog-dismiss on-tap="_zerostateDismiss">Discard</paper-button>
           <paper-button class="confirmButton" autofocus on-tap="_saveZerostate">Create</paper-button>
         </div>
         <paper-toast always-on-top text="Please fill in all required fields." class="validation-toast bottom notification-toast"></paper-toast>
@@ -317,7 +317,7 @@
           </div><!-- end div.product-zero-state-content -->
         </paper-dialog-scrollable>
         <div class="buttons">
-          <paper-button class="discardButton" dialog-dismiss>Discard</paper-button>
+          <paper-button class="discardButton" dialog-dismiss on-tap="_zerostateDismiss">Discard</paper-button>
           <paper-button class="confirmButton" autofocus on-tap="_saveZerostate">Create</paper-button>
         </div>
         <paper-toast always-on-top text="Please fill in all required fields." class="validation-toast bottom notification-toast"></paper-toast>
@@ -334,7 +334,7 @@
           </div><!-- end div.product-zero-state-content -->
         </paper-dialog-scrollable>
         <div class="buttons">
-          <paper-button class="discardButton" dialog-dismiss>Discard</paper-button>
+          <paper-button class="discardButton" dialog-dismiss on-tap="_zerostateDismiss">Discard</paper-button>
           <paper-button class="confirmButton" autofocus on-tap="_saveZerostate">Create</paper-button>
         </div>
         <paper-toast always-on-top text="Please fill in all required fields." class="validation-toast bottom notification-toast"></paper-toast>
@@ -351,7 +351,7 @@
           </div><!-- end div.product-zero-state-content -->
         </paper-dialog-scrollable>
         <div class="buttons">
-          <paper-button class="discardButton" dialog-dismiss>Discard</paper-button>
+          <paper-button class="discardButton" dialog-dismiss on-tap="_zerostateDismiss">Discard</paper-button>
           <paper-button class="confirmButton" autofocus on-tap="_saveZerostate">Create</paper-button>
         </div>
         <paper-toast always-on-top text="Please fill in all required fields." class="validation-toast bottom notification-toast"></paper-toast>
@@ -368,7 +368,7 @@
           </div><!-- end div.product-zero-state-content -->
         </paper-dialog-scrollable>
         <div class="buttons">
-          <paper-button class="discardButton" dialog-dismiss>Discard</paper-button>
+          <paper-button class="discardButton" dialog-dismiss on-tap="_zerostateDismiss">Discard</paper-button>
           <paper-button class="confirmButton" autofocus on-tap="_saveZerostate">Create</paper-button>
         </div>
         <paper-toast always-on-top text="Please fill in all required fields." class="validation-toast bottom notification-toast"></paper-toast>
@@ -890,20 +890,29 @@ PCFkb2N0eXBlIEhUTUw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+CjxtZXRhIGNoYXJzZXQ9InV0Zi04
 
       _showZerostate: function() {
         var dialog = this.$[this.section + "CreateDialog"],
-            body = document.querySelector('body'),
             node = Polymer.dom(dialog).node,
             discard = node.querySelector(".discardButton"),
             confirm = node.querySelector(".confirmButton"),
             template = node.querySelector(".zerostate-template"),
-            content = node.querySelector(".product-zero-state-content");
+            content = node.querySelector(".product-zero-state-content"),
+            that = this,
+            innerComponent;
         Polymer.dom(content).innerHTML = template.innerHTML;  // forcibly re-render zerostate component
-        body.appendChild(dialog);  // @TODO(sgammon): fix positioning when using a backdrop
+        document.body.appendChild(dialog);  // @TODO(sgammon): fix positioning when using a backdrop
         dialog.style.marginBottom = "150px";
         dialog.style.marginTop = "150px";
         discard.style.position = "absolute";
         discard.style.left = "10px";
         confirm.style.fontWeight = "bold";
         dialog.open();
+        this.async(function() {
+          innerComponent = dialog.querySelector("paper-dialog-scrollable .zerostate-component");
+          innerComponent.focusFirstField();
+        });
+      },
+
+      _zerostateDismiss: function(event) {
+        // no-op
       },
 
       _saveZerostate: function() {
