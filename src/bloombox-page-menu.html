@@ -730,13 +730,19 @@ PCFkb2N0eXBlIEhUTUw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+CjxtZXRhIGNoYXJzZXQ9InV0Zi04
 
         selectedItem: {
           type: Object,
-          notify: true
+          notify: true,
+          observer: "_selectedItemDidChange"
         },
 
         selectedItems: {
           type: Array,
           notify: true,
           computed: '_computeSelectedItems(multiselect, _selected.*)'
+        },
+
+        lastSelectedItem: {
+          type: Object,
+          notify: true
         },
 
         search: {
@@ -786,6 +792,14 @@ PCFkb2N0eXBlIEhUTUw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+CjxtZXRhIGNoYXJzZXQ9InV0Zi04
 
       _computeSomePagesPrintSectionMode: function(sectionMode) {
         return sectionMode === "some";
+      },
+
+      _selectedItemDidChange: function(selectedItem, oldSelectedItem) {
+        if (!this.lastSelectedItem) {
+          this.lastSelectedItem = selectedItem;
+        } else if (oldSelectedItem) {
+          this.lastSelectedItem = oldSelectedItem;
+        }
       },
 
       _selectedItemsDidChange: function() {
@@ -1130,10 +1144,10 @@ PCFkb2N0eXBlIEhUTUw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+CjxtZXRhIGNoYXJzZXQ9InV0Zi04
                             .update(entry)
                             .then(function() {
                               console.info("Object was created successfully.");
+                              that.async(function() {
+                                that.$.productList.selectKey(newObjKey);
+                              });
                               if (callback !== undefined && typeof callback === "function") {
-                                that.async(function() {
-                                  that.$.productList.selectKey(newObjKey);
-                                });
                                 callback();
                               }
                             })
@@ -1146,13 +1160,20 @@ PCFkb2N0eXBlIEhUTUw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+CjxtZXRhIGNoYXJzZXQ9InV0Zi04
       },
 
       saveEditsForEntry: function(schema, key, previous, entry, callback) {
-        var debug = window["__debug"] || false;
+        var debug = window["__debug"] || false,
+            that = this;
         if (debug) {
           console.info("Saving edits for item of type '" + schema + "' at key: '" + key + "'.", entry);
         }
         return this.$.dataCollection.ref
                             .child(key)
                             .update(entry)
+                            .then(function() {
+                              // select last-selected-item
+                              that.async(function() {
+                                that.$.productList.selectKey(key);
+                              });
+                            })
                             .then(callback)
                             .catch(function(error) {
                               console.error("Encountered error persisting edits for object of type '" + schema + "'.", error);
