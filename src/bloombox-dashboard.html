@@ -358,6 +358,7 @@
                 storage="[[storage]]"
                 loading="{{loading}}"
                 environment="[[environment]]"
+                supervisor="[[_adminOrSupervisor]]"
                 api-key="[[api.key]]"></bloombox-page-profile>
               <bloombox-page-account
                 name="account"
@@ -547,6 +548,16 @@
           type: String,
           notify: true,
           computed: '_computeDisplayMode(_narrow)'
+        },
+
+        /**
+         * Computes whether the current user has at least supervisor-level
+         * rights, and may change account/partner-level stuff.
+         */
+        _adminOrSupervisor: {
+          type: Boolean,
+          notify: true,
+          computed: '_computeAdminOrSupervisor(user, user.*)'
         },
 
         /**
@@ -828,6 +839,10 @@
           return "admin-only";
         }
         return "admin-only hidden";
+      },
+
+      _computeAdminOrSupervisor: function(user, data) {
+        return (user.admin === true || user.supervisor === true);
       },
 
       _routePageChanged: function(page) {

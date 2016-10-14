@@ -8,11 +8,14 @@
 
 <link rel="import" href="../bower_components/google-map/google-map.html">
 
+<link rel="import" href="../bower_components/polymerfire/firebase-document.html">
+
+<link rel="import" href="../bower_components/bloombox-media/bloombox-media.html">
 <link rel="import" href="../bower_components/bloombox-styles/bloombox-styles.html">
 
 
 <dom-module id="bloombox-page-profile">
-  <template>
+  <template strip-whitespace>
     <style is="custom-style" include="bloombox-styles">
       :host {
         display: block;
@@ -23,6 +26,13 @@
         margin: 16px 0;
         color: #212121;
         display: inline-block;
+      }
+      #partnerBrandMedia {
+        --bloombox-media-height: 140px;
+        --bloombox-media-width: 400px;
+        --bloombox-media-max-width: 95%;
+        --bloombox-media-max-height: 90%;
+        --bloombox-media-background-color: white;
       }
       :host paper-card {
         background-color: white;
@@ -53,6 +63,9 @@
       :host paper-card .card-content .location-info-block {
         margin-top: 20px;
       }
+      :host div.partner-brand {
+        margin-bottom: 20px;
+      }
       :host div.location-selector {
         display: inline-block;
         margin-left: 30px;
@@ -65,10 +78,17 @@
       }
     </style>
 
+    <!-- Firebase Collections -->
+    <firebase-document
+      id="profileCollection"
+      log$="[[debug]]"
+      path="[[_profileEndpoint]]"
+      data="{{profile}}"></firebase-document>
+
     <div class="location-selector">
       <paper-dropdown-menu noink>
         <paper-listbox selected="{{location}}" attr-for-selected="key" class="dropdown-content">
-          <template is="dom-repeat" items="[[locations]]">
+          <template is="dom-repeat" items="[[locations]]" strip-whitespace>
             <paper-item key="[[item.key]]">[[item.label]]</paper-item>
           </template>
         </paper-listbox>
@@ -92,6 +112,17 @@
           </google-map>
         </div><!-- end div.location-map -->
         <div class="card-content">
+          <div class="partner-brand">
+            <bloombox-media
+              id="partnerBrandMedia"
+              disabled$="[[!supervisor]]"
+              editable$="[[supervisor]]"
+              partner="[[partner]]"
+              environment="[[environment]]"
+              asset="[[profile.brand]]"
+              on-asset-ready="handleAssetChange"
+              on-asset-clear="handleAssetClear"></bloombox-media>
+          </div><!-- end div.partner-brand -->
           <h4>[[_locationData.address.address]] [[_locationData.address.city]], [[_locationData.address.state]] [[_locationData.address.zip]]</h4>
 
           <div class="location-info-block">
@@ -110,17 +141,67 @@
       is: 'bloombox-page-profile',
 
       properties: {
+        /**
+         * Provides a Firebase endpoint for location-level profile
+         * information.
+         */
+        _profileEndpoint: {
+          type: String,
+          notify: true,
+          computed: '_computeProfileEndpoint(endpoint, location)'
+        },
+
+        /**
+         * Holds data for the current partner location.
+         */
         _locationData: {
           type: Object,
           notify: true
         },
 
+        /**
+         * Computes whether we should hide the current location profile
+         * due to a lack of data or access.
+         */
         _hideProfile: {
           type: Boolean,
           notify: true,
           computed: '_computeHideProfile(location)'
         },
 
+        /**
+         * Main endpoint prefix to use to calculate endpoints further
+         * downstream.
+         */
+        endpoint: {
+          type: String,
+          notify: true
+        },
+
+        /**
+         * Holds a globally-valid storage path, where we should upload
+         * and consume assets for this page.
+         */
+        storage: {
+          type: String,
+          notify: true
+        },
+
+        /**
+         * Indicates whether the current user is privileged enough to
+         * edit information on this page.
+         */
+        supervisor: {
+          type: Boolean,
+          notify: true,
+          reflectToAttribute: true,
+          value: false
+        },
+
+        /**
+         * Provides the list of locations for the current partner so the
+         * user may select their desired one for editing.
+         */
         locations: {
           type: Array,
           notify: true,
@@ -130,32 +211,73 @@
           }
         },
 
+        /**
+         * Holds the currently-active partner location, and dispatches
+         * an observer when it changes.
+         */
         location: {
           type: String,
           notify: true,
           observer: '_locationChanged'
         },
 
+        /**
+         * Holds the currently-active partner account.
+         */
         partner: {
           type: String,
           notify: true
         },
 
+        /**
+         * Holds the currently-active data environment.
+         */
         environment: {
           type: String,
           notify: true
         },
 
+        /**
+         * Holds an API key for the current partner.
+         */
         apiKey: {
           type: String,
           notify: true
+        },
+
+        /**
+         * Holds partner-level profile information from
+         * Firebase.
+         */
+        profile: {
+          type: Object,
+          notify: true,
+          value: function() {
+            return {};
+          }
         }
       },
 
+      /**
+       * Compute a Firebase endpoint for partner location
+       * profile data.
+       */
+      _computeProfileEndpoint: function(endpoint, location) {
+        return endpoint + "/locations/" + location + "/profile";
+      },
+
+      /**
+       * Computes whether we should hide the current location
+       * profile based on a lack of data or access.
+       */
       _computeHideProfile: function(location) {
         return location == null || location == undefined;
       },
 
+      /**
+       * Observer, called when the partner location list is
+       * loaded or changed.
+       */
       _locationsLoaded: function(locations) {
         var location = this.location, initial, li;
 
@@ -166,10 +288,85 @@
         this.location = locations[0].key;
       },
 
+      /**
+       * Observer, called when the actively-selected partner
+       * location is changed.
+       */
       _locationChanged: function(location) {
         var locationData = BloomboxProfileLocations[location];
         this._locationData = locationData;
         console.info("Switching to location '" + location + "'.", locationData);
+      },
+
+      /**
+       * Generate a partner-level asset URL.
+       */
+      generatePartnerAssetURL: function(targetName) {
+        var prefix = this.get("storage"),
+            that = this;
+        if (!prefix)
+          console.warn("Unable to resolve storage prefix. Uploads may break.");
+        return prefix + "/" + targetName;
+      },
+
+      /**
+       * Handles the successful upload/attachment of a new
+       * main brand asset for this location/partner.
+       */
+      handleAssetChange: function(event) {
+        // callback(uuid, error);
+        var mediaElement = event.detail,
+            targetName = mediaElement.getNewFileName(),
+            fileObject = mediaElement.getFile(),
+            resolvedPath = this.generatePartnerAssetURL(targetName),
+            firebase = window["firebase"] || this["firebase"] || null,
+            that = this,
+            uploadTask,
+            callback;
+        // prepare callback handler
+        callback = (function(uuid, error) {
+          debugger;
+          if (error) {
+            console.error("Failed to upload partner-level media item:", this, error);
+            alert("Failed to attach image.");
+          } else {
+            console.log("Partner-level media item uploaded successfully.", uuid);
+            that.set("profile.brand", uuid);
+            event.detail.adoptNewAsset();
+          }
+        });
+
+        debugger;
+
+        if (firebase === null) {
+          console.error("Unable to resolve Firebase library. Failing asset attachment call.");
+          callback(null, "DATABASE_ERROR");
+        } else {
+          uploadTask = firebase.storage().ref().child(resolvedPath).put(fileObject.file);
+          uploadTask.on("state_changed", function(snapshot) {
+            // Handle progress events
+            var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            console.info("Media upload completion: ", progress);
+            mediaElement.setProgress(progress);
+          }, function(error) {
+            // Handle unsuccessful uploads
+            console.error("Error occurred during media upload:", error);
+            callback(null, error);
+          }, function() {
+            // Handle completion
+            var downloadURL = uploadTask.snapshot.downloadURL;
+            console.info("New asset is available at download URL: ", downloadURL);
+            callback(targetName, undefined);
+          });
+        }
+      },
+
+      /**
+       * Handles the successful clearing of the currently
+       * active brand asset for this location/partner.
+       */
+      handleAssetClear: function(event) {
+        console.log("User cleared the current partner brand asset.", event.detail);
       }
     });
   </script>
