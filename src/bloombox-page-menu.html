@@ -1102,7 +1102,7 @@ PCFkb2N0eXBlIEhUTUw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+CjxtZXRhIGNoYXJzZXQ9InV0Zi04
           console.error("Unable to resolve Firebase library. Failing asset attachment call.");
           callback(null, "DATABASE_ERROR");
         } else {
-          uploadTask = firebase.storage().ref.child(resolvedPath).put(fileObject.file);
+          uploadTask = firebase.storage().ref().child(resolvedPath).put(fileObject.file);
           uploadTask.on("state_changed", function(snapshot) {
             // Handle progress events
             var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
