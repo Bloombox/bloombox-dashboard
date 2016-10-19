@@ -1,0 +1,85 @@
+^.^{
+  "partners": [
+    {
+      "analytics": {
+        "readKey": "61E373162454B3053AC28EC67E795AD2DCB7049FEEC6DB03BC641BED0EAC8D7073C7AEEDAC4B403E520F05F5193FDA202ECD91C697F6A7B57448A9D9C53409828740FC143687F9D3CBE385FAA67A3B320D0AB5AD7DCC2DC2F853653B91DF8A70"
+      },
+      "privileges": {
+        "sandbox": true,
+        "beta": true
+      },
+      "locations": [
+        {
+          "website": "momentum.io",
+          "address": {
+            "zip": "95814",
+            "address": "112 J Street",
+            "city": "Sacramento",
+            "latitude": "38.5832793533125",
+            "state": "CA",
+            "longitude": "-121.504918122079"
+          },
+          "phone": "+18662520640",
+          "label": "Sacramento",
+          "key": "sacramento"
+        }
+      ],
+      "label": "momentum",
+      "key": "mm"
+    }
+  ],
+  "transport": {
+    "base": "bloombox-io",
+    "environment": "v1",
+    "access": [
+      {
+        "code": "v1",
+        "label": "Production"
+      },
+      {
+        "code": "v2",
+        "label": "Beta"
+      },
+      {
+        "code": "sandbox",
+        "label": "Sandbox"
+      }
+    ],
+    "token": "eyJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJodHRwczovL2lkZW50aXR5dG9vbGtpdC5nb29nbGVhcGlzLmNvbS9nb29nbGUuaWRlbnRpdHkuaWRlbnRpdHl0b29sa2l0LnYxLklkZW50aXR5VG9vbGtpdCIsImNsYWltcyI6eyJlbnZpcm9ubWVudCI6InYxIiwiZW52aXJvbm1lbnRzIjpbInYxIiwidjIiLCJzYW5kYm94Il0sInBhcnRuZXJzIjp7Im1tIjp0cnVlfSwiYWRtaW4iOnRydWUsImtleSI6ImFndGliRzl2YldKdmVDMXBiM0pOQ3hJSFFXTmpiM1Z1ZENKQU9EQmtObUptTkdVNE9EQTNPRGhoWXpsaU5EVXhaV1ppWm1ObVpqYzRaVFk0TWpSak4yUTBZak5sWm1GbU5qQTJPR00yTXpBeVptWmlZVGRoWWpkbFpReWlBUTl3Y21sMllYUmxMV0psZEdFdGRqRSIsImVtYWlsIjoic2FtQG1vbWVudHVtLmlvIn0sImV4cCI6MTQ3Njg4OTY2OSwiaWF0IjoxNDc2ODg2MDY5LCJpc3MiOiJwbGF0Zm9ybUBibG9vbWJveC1pby5pYW0uZ3NlcnZpY2VhY2NvdW50LmNvbSIsInN1YiI6InBsYXRmb3JtQGJsb29tYm94LWlvLmlhbS5nc2VydmljZWFjY291bnQuY29tIiwidWlkIjoiNzg5NTYxMzFjYmFlMjA0NzlkNDczMWQ0MjFmODAyN2FiMTIxYTc1NTcwNjAyZTI5OTlkZDU3YTU3NzJmMjY1ZCJ9.gSi08Soy0WMBgAWTfIJNUVX88AD7cIiIQqtRrv-5iEosXJ8hgqnB__sQqCJhnnUlqvhFU_G8ILgZnPv_IiK_BBeiqj6nntAXIDOCOBf9lL320PbGYL6QhYag3vm-YMt1UQTm-FfocD7OFjCIVZTlIe18y7SK7oyOiKw9uWqIphnXKirFY6ITx1sF2QsDzLXiAHlOFwUgVo0BGPTQyqG2si0x1v30EJS3lAJ53YOXOrmkGGsa8WFN87CWnlizn9TwSsTtE4IdXlLk2RailZABdHy6QGsIgsDRjL9RcXrghtTEbNZmIt-m0Z1iy9Y--qOZt-fW8_5ZWAU8uaGYq9j45Q",
+    "key": "AIzaSyCQx80_10nt75jjovZqb1n8EJJb6bJu6hc"
+  },
+  "user": {
+    "email": "sam@momentum.io",
+    "id": "131371922002208822149",
+    "image": "https:\/\/lh5.googleusercontent.com\/-hdqCivz5y4I\/AAAAAAAAAAI\/AAAAAAAAAZ8\/orvrIMNGHmU\/photo.jpg",
+    "domain": "gmail.com",
+    "admin": true,
+    "fullname": "Sam Gammon",
+    "firstname": "Sam",
+    "lastname": "Gammon"
+  },
+  "api": {
+    "load": [
+      [
+        "accounts",
+        "v1"
+      ],
+      [
+        "analytics",
+        "v1"
+      ],
+      [
+        "partner",
+        "v1"
+      ]
+    ],
+    "key": "AIzaSyCQx80_10nt75jjovZqb1n8EJJb6bJu6hc",
+    "endpoint": "http:\/\/localhost:8080\/_ah\/api"
+  },
+  "credentials": {
+    "id": "690823427095-h9n5cdoa6jnlittcpi7j8i2cq4isugob.apps.googleusercontent.com",
+    "access": "ya29.CjCBA7t4UWl-vXTuVF10peqYyk6rEkmnPQwoIDCzSWeyLAJtcOrkERVfsTtw7ZRORJY",
+    "scope": "https:\/\/www.googleapis.com\/auth\/plus.me,https:\/\/www.googleapis.com\/auth\/userinfo.email,https:\/\/www.googleapis.com\/auth\/user.birthday.read",
+    "expiration": "1476888910619"
+  }
+}

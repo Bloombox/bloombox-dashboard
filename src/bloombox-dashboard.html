@@ -258,7 +258,7 @@
     <!-- JavaScript Context -->
     <iron-ajax
       id="appContext"
-      url="/api/context.json"
+      url="[[_contextEndpoint]]"
       verbose$="[[_debug]]"
       auto
       json-prefix="^.^"
@@ -558,6 +558,19 @@
           type: Boolean,
           notify: true,
           computed: '_computeAdminOrSupervisor(user, user.*)'
+        },
+
+        /**
+         * Computes an endpoint that retrieves server-injected context via
+         * JSON/JSONp.
+         */
+        _contextEndpoint: {
+          type: String,
+          notify: true,
+          value: function() {
+            var debug = window["debug"] || debug;
+            return debug === true ? "/_local/api/context.json" : "/api/context.json";
+          }
         },
 
         /**
