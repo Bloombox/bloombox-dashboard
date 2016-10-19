@@ -2,28 +2,24 @@
   "name": "Bloombox Dashboard",
   "short_name": "Bloombox",
     "icons": [{
-      "src": "/assets/img/app-icon-32.png",
+      "src": "/assets/img/touch/favicon-32x32.png",
       "type": "image/png",
       "sizes": "32x32"
     }, {
-      "src": "/assets/img/app-icon.svg",
-      "sizes": "128x128",
-      "type": "image/svg"
+      "src": "/assets/img/touch/favicon-96x96.png",
+      "type": "image/png",
+      "sizes": "96x96"
     }, {
-      "src": "/assets/img/app-icon-144.png",
+      "src": "/assets/img/touch/favicon-144x144.png",
       "sizes": "144x144",
       "type": "image/png"
     }, {
-      "src": "/assets/img/app-icon.svg",
+      "src": "/assets/img/touch/favicon-192x192.png",
       "sizes": "192x192",
-      "type": "image/svg"
-    },{
-      "src": "/assets/img/app-icon.svg",
-      "sizes": "384x384",
-      "type": "image/svg"
+      "type": "image/png"
     }],
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#4c9d2f",
-  "theme_color": "#4c9d2f"
+  "background_color": "#68b345",
+  "theme_color": "#68b345"
 }
