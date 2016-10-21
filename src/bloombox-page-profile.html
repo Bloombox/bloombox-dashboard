@@ -234,6 +234,7 @@
         }
         console.info("Locations loaded.", locations, BloomboxProfileLocations);
         this.location = locations[0].key;
+        this._locationChanged(this.location);
       },
 
       /**
@@ -242,8 +243,10 @@
        */
       _locationChanged: function(location) {
         var locationData = BloomboxProfileLocations[location];
-        this._locationData = locationData;
-        console.info("Switching to location '" + location + "'.", locationData);
+        if (locationData) {
+          this.set("_locationData", locationData);
+          console.info("Switching to location '" + location + "'.", locationData);
+        }
       },
 
       /**
