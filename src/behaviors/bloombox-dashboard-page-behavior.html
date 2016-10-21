@@ -35,7 +35,8 @@
        */
       partner: {
         type: String,
-        notify: true
+        notify: true,
+        observer: '_partnerChanged'
       },
 
       /**
@@ -132,6 +133,13 @@
      * Observer on the `location` property.
      */
     _locationChanged: function(newLocation, oldLocation) {
+      // no-op, overridden downstream
+    },
+
+    /**
+     * Observer on the `partner` property.
+     */
+    _partnerChanged: function(newPartner, oldPartner) {
       // no-op, overridden downstream
     }
   };
