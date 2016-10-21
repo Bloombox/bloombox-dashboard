@@ -88,7 +88,7 @@
       data="{{profile}}"></firebase-document>
 
     <div class="location-selector">
-      <paper-dropdown-menu noink>
+      <paper-dropdown-menu noink hidden$="[[!_hasMultipleLocations]]">
         <paper-listbox selected="{{location}}" attr-for-selected="key" class="dropdown-content">
           <template is="dom-repeat" items="[[locations]]" strip-whitespace>
             <paper-item key="[[item.key]]">[[item.label]]</paper-item>
