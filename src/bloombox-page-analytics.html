@@ -1,22 +1,453 @@
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
 
+<link rel="import" href="../bower_components/bloombox-styles/bloombox-styles.html">
+<link rel="import" href="../bower_components/bloombox-analytics-chart/bloombox-analytics-chart.html">
+
+<link rel="import" href="../bower_components/iron-label/iron-label.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+
+<link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../bower_components/paper-toolbar/paper-toolbar.html">
+<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+
+<link rel="import" href="../bower_components/google-analytics/google-analytics-date-selector.html">
+
+<link rel="import" href="./behaviors/bloombox-dashboard-page-behavior.html">
+
+
 <dom-module id="bloombox-page-analytics">
   <template strip-whitespace>
-    <style>
+    <style is="custom-style" include="bloombox-styles">
       :host {
         display: block;
+        border-left: 1px solid #ddd;
+
+        --selector-control: {
+        };
+
+        --selector-label: {
+          margin-right: 5px;
+          margin-left: 10px;
+        };
+
+        --selector-field: {
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          box-sizing: border-box;
+          padding: 6px 12px;
+          transition: border-color .2s;
+        };
+
+        --selector-field-focus: {
+          border-color: #4d90fe;
+          outline: 0;
+        };
+      }
+
+      /** -- Controls, Header, Toolbar -- **/
+      header paper-toolbar {
+        padding: 5px;
+      }
+
+      paper-tabs {
+        background-color: #fefefe;
+      }
+
+      paper-toolbar {
+        background: transparent;
+      }
+
+      paper-toolbar,
+      paper-tabs,
+      paper-tab,
+      paper-dropdown-menu {
+        color: #222;
+      }
+
+      paper-toolbar h1 {
+        margin-right: 20px;
+        font-size: 20pt;
+        user-select: none;
+        cursor: default;
+      }
+
+      paper-tabs.nav-tabs {
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+        --paper-tabs-selection-bar-color: var(--bloombox-green-primary);
+      }
+
+      paper-tab.iron-selected {
+        color: black !important;
+        font-weight: bold !important;
+      }
+
+      google-analytics-date-selector {
+        margin-left: 10px;
+        --google-analytics-date-selector-control: var(--selector-control);
+        --google-analytics-date-selector-label: var(--selector-label);
+        --google-analytics-date-selector-input: var(--selector-field);
+        --google-analytics-date-selector-input-focus: var(--selector-field-focus);
+      }
+
+      /** -- Main Content -- **/
+      main iron-pages {
+        margin: 25px;
+      }
+
+      iron-pages section h2.column-title {
+        font-weight: normal;
+        display: block;
+        clear: both;
+      }
+
+      iron-pages section .chart-columns {
+        display: flex;
+      }
+
+      iron-pages section .chart-column {
+        flex: 1 0 auto;
+      }
+
+      iron-pages section .column-spacer {
+        display: inline-block;
+        width: 20px;
+      }
+
+      /** -- Charts -- **/
+      bloombox-analytics-chart {
+        margin-bottom: 20px;
+        --bloombox-chart-background-color: #fefefe;
+      }
+
+      /** -- Summary Section -- **/
+      iron-pages section.summary-page .sparkline-toplevel {
+        max-width: 200px;
+      }
+
+      iron-pages section.summary-page .sparkline-toplevel bloombox-analytics-chart {
+        --bloombox-chart-background-color: transparent;
+        --bloombox-chart-border: none;
       }
     </style>
 
-    <main></main>
+    <header>
+      <paper-tabs
+        id="analyticsSectionTabs"
+        attr-for-selected="key"
+        fallback-selection="summary"
+        selected="{{tab}}"
+        class="nav-tabs"
+        disabled$="[[loading]]"
+        hidden>
+        <paper-tab key="summary">Summary</paper-tab>
+        <paper-tab key="sections">Sections</paper-tab>
+        <paper-tab key="products">Products</paper-tab>
+      </paper-tabs><!-- end paper-tabs#analyticsSectionTabs -->
+      <paper-toolbar id="mainToolbar">
+        <h1>[[heading]]</h1>
+        <paper-dropdown-menu
+          id="locationDropdown"
+          label="Location"
+          noink
+          no-label-float
+          hidden$="[[!_hasMultipleLocations]]"
+          disabled$="[[loading]]">
+          <paper-listbox
+            class="dropdown-content"
+            selected="{{location}}"
+            attr-for-selected="key">
+            <template is="dom-repeat" items="[[locations]]">
+              <paper-item key="[[item.key]]">[[item.label]]</paper-item>
+            </template>
+          </paper-listbox>
+        </paper-dropdown-menu><!-- end paper-dropdown-menu#locationDropdown -->
+
+        <span class="flex spacer"></span><!-- end span.flex.spacer -->
+
+        <google-analytics-date-selector
+          start-date="30daysAgo"
+          end-date="today"
+          hidden$="[[_isSummarySection]]"></google-analytics-date-selector>
+      </paper-toolbar>
+    </header>
+    <main>
+      <iron-pages
+        id="mainPages"
+        selected="[[tab]]"
+        attr-for-selected="key"
+        class="main-pages">
+        <section key="summary" class="summary-page">
+          <h2 class="column-title">30-day trends</h2>
+          <div class="chart-columns">
+            <div class="chart-column sparkline-toplevel">
+              <bloombox-analytics-chart
+                heading="Section views"
+                environment="[[environment]]"
+                partner="[[partner]]"
+                location="[[location]]"
+                collection="screens"
+                chart-type="sparkline"
+                analysis-type="count"
+                data-type="sections"
+                timeframe="1_month"
+                interval="daily"
+                project-id="[[_projectId]]"
+                read-key="[[readKey]]"></bloombox-analytics-chart>
+              <bloombox-analytics-chart
+                heading="Product clicks"
+                environment="[[environment]]"
+                partner="[[partner]]"
+                location="[[location]]"
+                collection="products"
+                chart-type="sparkline"
+                analysis-type="count"
+                data-type="products"
+                timeframe="1_month"
+                interval="daily"
+                project-id="[[_projectId]]"
+                colors='["coral"]'
+                read-key="[[readKey]]"></bloombox-analytics-chart>
+              <bloombox-analytics-chart
+                environment="[[environment]]"
+                partner="[[partner]]"
+                location="[[location]]"
+                collection="screens"
+                chart-type="pie"
+                analysis-type="count"
+                data-type="sections"
+                timeframe="1_month"
+                group-by="name"
+                project-id="[[_projectId]]"
+                read-key="[[readKey]]"></bloombox-analytics-chart>
+            </div><!-- end div.chart-column.sparkline-toplevel -->
+            <div class="column-spacer"></div><!-- end div.column-spacer -->
+            <div class="chart-column">
+              <bloombox-analytics-chart
+                heading="Daily screens by section"
+                environment="[[environment]]"
+                partner="[[partner]]"
+                location="[[location]]"
+                collection="screens"
+                chart-type="multiline"
+                analysis-type="count"
+                data-type="sections"
+                timeframe="1_month"
+                interval="daily"
+                group-by="name"
+                project-id="[[_projectId]]"
+                read-key="[[readKey]]"></bloombox-analytics-chart>
+              <bloombox-analytics-chart
+                heading="Daily clicks by species"
+                environment="[[environment]]"
+                partner="[[partner]]"
+                location="[[location]]"
+                collection="products"
+                chart-type="multiline"
+                analysis-type="count"
+                data-type="products"
+                timeframe="1_month"
+                interval="daily"
+                group-by="species"
+                project-id="[[_projectId]]"
+                read-key="[[readKey]]"></bloombox-analytics-chart>
+            </div><!-- end div.chart-column -->
+          </div><!-- end div.chart-columns -->
+        </section><!-- end section.summary-page -->
+
+        <section key="sections" class="sections-page">
+          <b>sections</b>
+        </section><!-- end section.sections-page -->
+
+        <section key="products" class="products-page">
+          <b>products</b>
+        </section><!-- end section.products-page -->
+      </iron-pages><!-- end iron-pages.main-pages -->
+    </main>
   </template>
 
   <script>
-    var BloomboxPageAnalytics = Polymer.BloomboxPageAnalytics = Polymer({
+    var __DEFAULT_PROJECT_ID__ = "57a940b0c9e1631bb251f04e",
+        BloomboxPageAnalytics = Polymer.BloomboxPageAnalytics = Polymer({
+      
       is: "bloombox-page-analytics",
 
-      properties: {}
+      behaviors: [
+        Polymer.BloomboxDashboardPageBehavior
+      ],
+
+      observers: [
+        "_refreshControls(location, dateRange.start, dateRange.end)"
+      ],
+
+      listeners: {
+        "analytics-dashboard-control-change": "_dateRangeDidChange"
+      },
+
+      properties: {
+        /**
+         * Retains a timer sentinel for the "live refresh" feature,
+         * so we can easily start and cancel the tick process.
+         */
+        _timer: {
+          type: Object,
+          notify: false,
+          readOnly: true,
+          reflectToAttribute: false,
+          value: null
+        },
+
+        /**
+         * Holds a Keen project ID to fetch analytics data from.
+         */
+        _projectId: {
+          type: String,
+          notify: true,
+          readOnly: true,
+          value: __DEFAULT_PROJECT_ID__
+        },
+
+        /**
+         * Computed function that indicates whether we are currently
+         * in the summary tab.
+         */
+        _isSummarySection: {
+          type: Boolean,
+          notify: true,
+          computed: "_computeIsSummarySection(tab)"
+        },
+
+        /**
+         * Compute a title for the currently-selected tab.
+         */
+        heading: {
+          type: String,
+          notify: true,
+          computed: "_computeHeading(tab)"
+        },
+
+        /**
+         * Toggles "live mode," where charts automatically refresh
+         * and re-render at a predefined interval.
+         */
+        live: {
+          type: Boolean,
+          notify: true,
+          reflectToAttribute: true,
+          value: false
+        },
+
+        /**
+         * Scoped and encrypted Keen read key, so we can read data
+         * to generate charts.
+         */
+        readKey: {
+          type: String,
+          notify: true,
+          reflectToAttribute: true
+        },
+
+        /**
+         * Name of the current analytics dashboard tab we're
+         * looking at.
+         */
+        tab: {
+          type: String,
+          notify: true,
+          reflectToAttribute: true,
+          value: "summary"
+        },
+
+        /**
+         * Date range that the user has selected (or the UI has
+         * defaulted) to use for calculating analytics data.
+         */
+        dateRange: {
+          type: Object,
+          notify: true,
+          readOnly: true,
+          reflectToAttribute: true
+        }
+      },
+
+      /**
+       * Compute whether we are currently on 
+       */
+      _computeIsSummarySection: function(tab) {
+        return tab === "summary";
+      },
+
+      /**
+       * Compute a friendly heading for the page, according to
+       * the current tab.
+       */
+      _computeHeading: function(tab) {
+        if (tab === "summary")
+          return "Analytics Summary";
+        if (tab === "sections")
+          return "Stats by Section";
+        if (tab === "products")
+          return "Product Analytics";
+        return "";
+      },
+
+      /**
+       * Event responder, dispatched when date controls are
+       * adjusted to a new start or end value.
+       */
+      _dateRangeDidChange: function(event) {
+        var startDate = event.detail.startDate,
+            endDate = event.detail.endDate;
+        if (startDate) {
+          if (!this.dateRange || this.dateRange.start != startDate) {
+            // start date has been adjusted
+            this.set("dateRange.start", startDate);
+          }
+        } else if (endDate) {
+          if (!this.dateRange || this.dateRange.end != endDate) {
+            // end date has been adjusted
+            this.set("dateRange.end", endDate);
+          }
+        } else {
+          console.warn("Stray date range event could not be evaluated.", event);
+        }
+      },
+
+      /**
+       * Compound observer on all chart-scope-related controls,
+       * refreshes the UI as controls are changed.
+       */
+      _refreshControls: function(location, start, end) {
+        console.info("Control-based refresh: ", location, start, end);
+      },
+
+      /**
+       * Called when starting "live mode," to begin a repeating
+       * microtask to refresh chart data at a regular interval.
+       */
+      _startTicking: function() {
+        // start a timer
+      },
+
+      /**
+       * Handle a chart-tick-refresh event. Dispatched every so
+       * often according to "live mode" and interval controls.
+       */
+      _handleTick: function() {
+        // propagate a refresh
+      },
+
+      /**
+       * Cancel "live mode" and disable the ticking mechanism
+       * that live-refreshes the local set of charts.
+       */
+      _stopTicking: function() {
+        // cancel timer
+      }
     });
   </script>
 </dom-module>
