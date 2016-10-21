@@ -22,32 +22,68 @@
           "phone": "+18662520640",
           "label": "Sacramento",
           "key": "sacramento"
+        },
+        {
+          "website": "momentum.io",
+          "address": {
+            "zip": "94102",
+            "address": "277 Golden Gate Ave",
+            "city": "San Francisco",
+            "latitude": "37.781565",
+            "state": "CA",
+            "longitude": "-122.415043"
+          },
+          "phone": "+18662520640",
+          "label": "San Francisco",
+          "key": "sanfrancisco"
         }
       ],
       "label": "momentum",
       "key": "mm"
+    },
+    {
+      "analytics": {
+        "readKey": "cca030306a28118534013d0ab0a47d7d4631076872d7e6542fd63f7e765fc4c6b8475c235b103fb3255af3623cdb64fbeadf783d6b3bfe25989fa6d078de8ef96b0f7e7b88c6a6204b9176ddf1a5be0feff6569598b9789515435bf03703cb38"
+      },
+      "privileges": {
+        "sandbox": true,
+        "beta": true
+      },
+      "locations": [
+        {
+          "website": "momentum.io",
+          "address": {
+            "zip": "95814",
+            "address": "112 J Street",
+            "city": "Sacramento",
+            "latitude": "38.5832793533125",
+            "state": "CA",
+            "longitude": "-121.504918122079"
+          },
+          "phone": "+18662520640",
+          "label": "Sacramento",
+          "key": "sacramento"
+        },
+        {
+          "website": "momentum.io",
+          "address": {
+            "zip": "94102",
+            "address": "277 Golden Gate Ave",
+            "city": "San Francisco",
+            "latitude": "37.781565",
+            "state": "CA",
+            "longitude": "-122.415043"
+          },
+          "phone": "+18662520640",
+          "label": "San Francisco",
+          "key": "sanfrancisco"
+        }
+      ],
+      "label": "Abatin Wellness",
+      "key": "abatin"
     }
   ],
-  "transport": {
-    "base": "bloombox-io",
-    "environment": "v1",
-    "access": [
-      {
-        "code": "v1",
-        "label": "Production"
-      },
-      {
-        "code": "v2",
-        "label": "Beta"
-      },
-      {
-        "code": "sandbox",
-        "label": "Sandbox"
-      }
-    ],
-    "token": "eyJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJodHRwczovL2lkZW50aXR5dG9vbGtpdC5nb29nbGVhcGlzLmNvbS9nb29nbGUuaWRlbnRpdHkuaWRlbnRpdHl0b29sa2l0LnYxLklkZW50aXR5VG9vbGtpdCIsImNsYWltcyI6eyJlbnZpcm9ubWVudCI6InYxIiwiZW52aXJvbm1lbnRzIjpbInYxIiwidjIiLCJzYW5kYm94Il0sInBhcnRuZXJzIjp7Im1tIjp0cnVlfSwiYWRtaW4iOnRydWUsImtleSI6ImFndGliRzl2YldKdmVDMXBiM0pOQ3hJSFFXTmpiM1Z1ZENKQU9EQmtObUptTkdVNE9EQTNPRGhoWXpsaU5EVXhaV1ppWm1ObVpqYzRaVFk0TWpSak4yUTBZak5sWm1GbU5qQTJPR00yTXpBeVptWmlZVGRoWWpkbFpReWlBUTl3Y21sMllYUmxMV0psZEdFdGRqRSIsImVtYWlsIjoic2FtQG1vbWVudHVtLmlvIn0sImV4cCI6MTQ3Njg4OTY2OSwiaWF0IjoxNDc2ODg2MDY5LCJpc3MiOiJwbGF0Zm9ybUBibG9vbWJveC1pby5pYW0uZ3NlcnZpY2VhY2NvdW50LmNvbSIsInN1YiI6InBsYXRmb3JtQGJsb29tYm94LWlvLmlhbS5nc2VydmljZWFjY291bnQuY29tIiwidWlkIjoiNzg5NTYxMzFjYmFlMjA0NzlkNDczMWQ0MjFmODAyN2FiMTIxYTc1NTcwNjAyZTI5OTlkZDU3YTU3NzJmMjY1ZCJ9.gSi08Soy0WMBgAWTfIJNUVX88AD7cIiIQqtRrv-5iEosXJ8hgqnB__sQqCJhnnUlqvhFU_G8ILgZnPv_IiK_BBeiqj6nntAXIDOCOBf9lL320PbGYL6QhYag3vm-YMt1UQTm-FfocD7OFjCIVZTlIe18y7SK7oyOiKw9uWqIphnXKirFY6ITx1sF2QsDzLXiAHlOFwUgVo0BGPTQyqG2si0x1v30EJS3lAJ53YOXOrmkGGsa8WFN87CWnlizn9TwSsTtE4IdXlLk2RailZABdHy6QGsIgsDRjL9RcXrghtTEbNZmIt-m0Z1iy9Y--qOZt-fW8_5ZWAU8uaGYq9j45Q",
-    "key": "AIzaSyCQx80_10nt75jjovZqb1n8EJJb6bJu6hc"
-  },
+  "transport":{"base":"bloombox-io","environment":"v1","access":[{"label":"Production","code":"v1"},{"label":"Beta","code":"v2"},{"label":"Sandbox","code":"sandbox"}],"token":"eyJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJodHRwczovL2lkZW50aXR5dG9vbGtpdC5nb29nbGVhcGlzLmNvbS9nb29nbGUuaWRlbnRpdHkuaWRlbnRpdHl0b29sa2l0LnYxLklkZW50aXR5VG9vbGtpdCIsImNsYWltcyI6eyJlbnZpcm9ubWVudCI6InYxIiwicGFydG5lcnMiOnsibW0iOnRydWUsImFiYXRpbiI6dHJ1ZX0sImVtYWlsIjoic2FtQG1vbWVudHVtLmlvIiwiYWRtaW4iOnRydWUsImVudmlyb25tZW50cyI6WyJ2MSIsInYyIiwic2FuZGJveCJdLCJrZXkiOiJhZzF6Zm1Kc2IyOXRZbTk0TFdsdmNrMExFZ2RCWTJOdmRXNTBJa0E0TUdRMlltWTBaVGc0TURjNE9HRmpPV0kwTlRGbFptSm1ZMlptTnpobE5qZ3lOR00zWkRSaU0yVm1ZV1kyTURZNFl6WXpNREptWm1KaE4yRmlOMlZsREtJQkQzQnlhWFpoZEdVdFltVjBZUzEyTVEifSwiZXhwIjoxNDc3MDA5OTI0LCJpYXQiOjE0NzcwMDYzMjQsImlzcyI6InBsYXRmb3JtQGJsb29tYm94LWlvLmlhbS5nc2VydmljZWFjY291bnQuY29tIiwic3ViIjoicGxhdGZvcm1AYmxvb21ib3gtaW8uaWFtLmdzZXJ2aWNlYWNjb3VudC5jb20iLCJ1aWQiOiJhNDY5ZThiNzZjOWIzMDAwNWVhNTFmMTk1MjA5MmQ5NzhmNWUwZGJlNGIzY2VlOWU4ZjRhYzczZTUxNDM5YjgxIn0.NtQK0034_t-7x12KNiJ7VeRcUFpNBQCMeO6-x2TS3U6oiDzCgM3d5hLvV-xG-k2NPy79kOgneGvajXnGARtIQZT48BKBQtzfuS_95OulHH4tlYgGN7KGe_ZUfqwdnHdo9lVrjfpB-hMbIeLAjN_HKzK7A-idWcBJ8SBWAcVwPZlMe2o1b8d4kKBaXvYfSFDIS2aoI4OfN2BEO46cQDr8is2WruSKucvM9GupaeB5U6jkSwahyfD3VoS6-zkYjdwrOarG9D-oyQ8rKVI8H8eMzf2GbBbRnYGiZLocHBJofmEPpz9zTvfmwJAXJ6I41Y2wPLAL-vVdFWyCP6M22Z1MDw","key":"AIzaSyCQx80_10nt75jjovZqb1n8EJJb6bJu6hc"},
   "user": {
     "email": "sam@momentum.io",
     "id": "131371922002208822149",
