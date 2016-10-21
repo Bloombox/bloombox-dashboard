@@ -13,6 +13,8 @@
 <link rel="import" href="../bower_components/bloombox-media/bloombox-media.html">
 <link rel="import" href="../bower_components/bloombox-styles/bloombox-styles.html">
 
+<link rel="import" href="./behaviors/bloombox-dashboard-page-behavior.html">
+
 
 <dom-module id="bloombox-page-profile">
   <template strip-whitespace>
@@ -135,10 +137,13 @@
   </template>
 
   <script>
-    var BloomboxProfileLocations = {};
+    var BloomboxProfileLocations = {},
+        BloomboxPageProfile = Polymer.BloomboxPageProfile = Polymer({
+      is: "bloombox-page-profile",
 
-    Polymer.BloomboxPageProfile = Polymer({
-      is: 'bloombox-page-profile',
+      behaviors: [
+        Polymer.BloomboxDashboardPageBehavior
+      ],
 
       properties: {
         /**
@@ -170,24 +175,6 @@
         },
 
         /**
-         * Main endpoint prefix to use to calculate endpoints further
-         * downstream.
-         */
-        endpoint: {
-          type: String,
-          notify: true
-        },
-
-        /**
-         * Holds a globally-valid storage path, where we should upload
-         * and consume assets for this page.
-         */
-        storage: {
-          type: String,
-          notify: true
-        },
-
-        /**
          * Indicates whether the current user is privileged enough to
          * edit information on this page.
          */
@@ -196,45 +183,6 @@
           notify: true,
           reflectToAttribute: true,
           value: false
-        },
-
-        /**
-         * Provides the list of locations for the current partner so the
-         * user may select their desired one for editing.
-         */
-        locations: {
-          type: Array,
-          notify: true,
-          observer: '_locationsLoaded',
-          value: function() {
-            return window["bloom"] ? bloom.app.locations : [];
-          }
-        },
-
-        /**
-         * Holds the currently-active partner location, and dispatches
-         * an observer when it changes.
-         */
-        location: {
-          type: String,
-          notify: true,
-          observer: '_locationChanged'
-        },
-
-        /**
-         * Holds the currently-active partner account.
-         */
-        partner: {
-          type: String,
-          notify: true
-        },
-
-        /**
-         * Holds the currently-active data environment.
-         */
-        environment: {
-          type: String,
-          notify: true
         },
 
         /**
@@ -325,7 +273,6 @@
             callback;
         // prepare callback handler
         callback = (function(uuid, error) {
-          debugger;
           if (error) {
             console.error("Failed to upload partner-level media item:", this, error);
             alert("Failed to attach image.");
@@ -335,8 +282,6 @@
             event.detail.adoptNewAsset();
           }
         });
-
-        debugger;
 
         if (firebase === null) {
           console.error("Unable to resolve Firebase library. Failing asset attachment call.");

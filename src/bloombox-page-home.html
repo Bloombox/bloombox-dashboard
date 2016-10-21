@@ -5,6 +5,8 @@
 <link rel="import" href="../bower_components/bloombox-device/bloombox-device.html">
 <link rel="import" href="../bower_components/bloombox-styles/bloombox-styles.html">
 
+<link rel="import" href="./behaviors/bloombox-dashboard-page-behavior.html">
+
 
 <dom-module id="bloombox-page-home">
   <template>
@@ -50,42 +52,29 @@
   </template>
 
   <script>
-    Polymer.BloomboxPageHome = Polymer({
-      is: 'bloombox-page-home',
+    var BloomboxPageHome = Polymer.BloomboxPageHome = Polymer({
+      is: "bloombox-page-home",
+
+      behaviors: [
+        Polymer.BloomboxDashboardPageBehavior
+      ],
 
       properties: {
-        _debug: {
-          type: Boolean,
-          value: function() {
-            return window["__debug"] || false;
-          }
-        },
-
-        partner: {
-          type: String,
-          notify: true
-        },
-
-        endpoint: {
-          type: String,
-          notify: true
-        },
-
+        /**
+         * Holds device data so it can be displayed in the UI,
+         * keyed by device ID.
+         */
         devices: {
-          type: String,
+          type: Object,
           notify: true
         }
       },
 
-      _toArray: function(obj) {
-        return Object.keys(obj).map(function(key) {
-          return {
-            key: key,
-            value: obj[key]
-          };
-        });
-      },
-
+      /**
+       * Render a suitable label for a given device, using
+       * either the user-provided device "label" or the device
+       * name, in that order.
+       */
       _defaultDeviceLabel: function(device) {
         return device.label || device.name;
       }

@@ -1,0 +1,138 @@
+
+<script>
+  /**
+   * `Polymer.BloomboxDashboardPageBehavior` provides properties
+   * and logic that are common to all dashboard page elements.
+   *
+   * @polymerBehavior
+   */
+  var BloomboxDashboardPageBehavior = Polymer.BloomboxDashboardPageBehavior = {
+    properties: {
+      /**
+       * Observes the length of `locations` and reports whether
+       * there are more than 1, so we may show and hide the
+       * location selection UI.
+       */
+      _hasMultipleLocations: {
+        type: Boolean,
+        notify: true,
+        computed: '_computeHasMultipleLocations(locations.length)'
+      },
+
+      /**
+       * Global flag, indicates whether debug mode is active.
+       */
+      debug: {
+        type: Boolean,
+        notify: true,
+        value: function() {
+          return (window && window["__debug"]) || false;
+        }
+      },
+
+      /**
+       * Currently-active partner ID.
+       */
+      partner: {
+        type: String,
+        notify: true
+      },
+
+      /**
+       * Currently-active data environment.
+       */
+      environment: {
+        type: String,
+        notify: true
+      },
+
+      /**
+       * Global property, mapped into top-level dashboard.
+       * Propagating or directly setting a value of `true`
+       * triggers the global loading overlay and spinner.
+       */
+      loading: {
+        type: Boolean,
+        notify: true
+      },
+
+      /**
+       * Global Firebase endpoint prefix.
+       */
+      endpoint: {
+        type: String,
+        notify: true
+      },
+
+      /**
+       * Global storage prefix, to be used when uploading
+       * media and documents.
+       */
+      storage: {
+        type: String,
+        notify: true
+      },
+
+      /**
+       * Keeps track of partner locations for the currently
+       * active partner.
+       */
+      locations: {
+        type: Array,
+        notify: true,
+        observer: '_locationsLoaded',
+        value: function() {
+          return window["bloom"] ? bloom.app.locations : [];
+        }
+      },
+
+      /**
+       * Holds the ID of the currently-active partner
+       * location. Defaults to the first location in the
+       * list of active-partner locations.
+       */
+      location: {
+        type: String,
+        notify: true,
+        observer: '_locationChanged'
+      }
+    },
+
+    /**
+     * Utility method: convert an object of `key=>value`
+     * properties into an array in the format
+     * `[{key: k, value: v}]`. Passes objects that are
+     * already arrays through unmodified.
+     */
+    _toArray: function(obj) {
+      return Array.isArray(obj) ? obj : Object.keys(obj).map(function(key) {
+        return {
+          key: key,
+          value: obj[key]
+        };
+      });
+    },
+
+    /**
+     * Computes whether we should show or hide the
+     * location selection UI.
+     */
+    _computeHasMultipleLocations: function(count) {
+      return count > 1;
+    },
+
+    /**
+     * Observer on the `locations` property.
+     */
+    _locationsLoaded: function(newLocations, oldLocations) {
+      // no-op, overridden downstream
+    },
+
+    /**
+     * Observer on the `location` property.
+     */
+    _locationChanged: function(newLocation, oldLocation) {
+      // no-op, overridden downstream
+    }
+  };
+</script>

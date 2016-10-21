@@ -1,11 +1,12 @@
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/bloombox-styles/bloombox-styles.html">
+<link rel="import" href="./behaviors/bloombox-dashboard-page-behavior.html">
+
 
 <dom-module id="bloombox-page-admin">
-
-  <template>
-
-    <style>
+  <template strip-whitespace>
+    <style is="custom-style" include="bloombox-styles">
       :host {
         display: block;
         padding: 10px;
@@ -45,13 +46,14 @@
   </template>
 
   <script>
+    var BloomboxPageAdmin = Bloombox.BloomboxPageAdmin = Polymer({
 
-    Polymer({
+      is: "bloombox-page-admin",
 
-      is: 'bloombox-page-admin'
+      behaviors: [
+        Polymer.BloomboxDashboardPageBehavior
+      ]
 
     });
-
   </script>
-
 </dom-module>

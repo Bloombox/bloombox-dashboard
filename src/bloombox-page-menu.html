@@ -37,6 +37,9 @@
 <link rel="import" href="../bower_components/bloombox-apothecary/bloombox-apothecary.html">
 <link rel="import" href="../bower_components/bloombox-concentrate/bloombox-concentrate.html">
 
+<!-- Local Imports -->
+<link rel="import" href="./behaviors/bloombox-dashboard-page-behavior.html">
+
 
 <dom-module id="bloombox-page-menu">
   <template strip-whitespace>
@@ -593,10 +596,15 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
   </template>
 
   <script>
-    var BloomboxLocationCache = {};
+    var BloomboxLocationCache = {},
+        BloomboxPageMenu = Polymer.BloomboxPageMenu = Polymer({
 
-    Polymer.BloomboxPageMenu = Polymer({
       is: 'bloombox-page-menu',
+
+      behaviors: [
+        Polymer.BloomboxDashboardPageBehavior
+      ],
+
       properties: {
         _menuEndpoint: {
           type: String,
@@ -633,38 +641,10 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
           notify: true
         },
 
-        debug: {
-          type: Boolean,
-          notify: true,
-          value: function() {
-            return window && window["__debug"] || false;
-          }
-        },
-
         zerostate: {
           type: Boolean,
           notify: true,
           value: false
-        },
-
-        loading: {
-          type: Boolean,
-          notify: true
-        },
-
-        storage: {
-          type: String,
-          notify: true
-        },
-
-        partner: {
-          type: String,
-          notify: true
-        },
-
-        environment: {
-          type: String,
-          notify: true
         },
 
         products: {
@@ -684,21 +664,6 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
           computed: '_computeSectionHeading(section)'
         },
 
-        locations: {
-          type: Array,
-          notify: true,
-          observer: '_locationsLoaded',
-          value: function() {
-            return window["bloom"] ? bloom.app.locations : [];
-          }
-        },
-
-        location: {
-          type: String,
-          notify: true,
-          observer: '_locationChanged'
-        },
-
         instock: {
           type: Boolean,
           value: true,
@@ -708,11 +673,6 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
         hasTests: {
           type: String,
           value: "all",
-          notify: true
-        },
-
-        endpoint: {
-          type: String,
           notify: true
         },
 
@@ -749,15 +709,6 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
           type: String,
           nofity: true
         }
-      },
-
-      _toArray: function(obj) {
-        return Array.isArray(obj) ? obj : Object.keys(obj).map(function(key) {
-          return {
-            key: key,
-            value: obj[key]
-          };
-        });
       },
 
       _computeMenuEndpoint: function(endpoint, location) {
