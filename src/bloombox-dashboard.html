@@ -6,6 +6,7 @@
 <link rel="import" href="../bower_components/iron-iconset/iron-iconset.html">
 <link rel="import" href="../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/iron-label/iron-label.html">
 <link rel="import" href="../bower_components/iron-icons/editor-icons.html">
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
@@ -68,11 +69,33 @@
         border-bottom: none;
         color: #fefefe;
       }
+
+      app-drawer app-toolbar div[title] {
+        display: flex;
+      }
+
       app-drawer app-toolbar bloombox-logo {
         font-size: 16pt;
         width: 150px;
         margin-top: 5px;
         margin-left: -10px;
+      }
+
+      app-drawer app-toolbar div.beta-label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      app-drawer app-toolbar div.beta-label iron-label {
+        background: var(--bloombox-yellow-accent);
+        color: #333;
+        text-transform: uppercase;
+        font-size: 8pt;
+        padding: 3px;
+        border-radius: 3px;
+        margin-left: 7px;
       }
 
       app-header-layout app-toolbar {
@@ -274,6 +297,9 @@
           <app-toolbar>
             <div title>
               <bloombox-logo mode="icon" logotext></bloombox-logo>
+              <div class="beta-label">
+                <iron-label class="beta-label">Beta</iron-label>
+              </div><!-- end .beta-label -->
             </div><!-- end div[title] -->
           </app-toolbar>
           <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
