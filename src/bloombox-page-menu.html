@@ -212,7 +212,7 @@
 
     <div class="action-dialogs">
       <!-- Print Menu Dialog -->
-      <paper-dialog id="printMenuActionDialog" always-on-top class="menu-action-dialog">
+      <paper-dialog id="printMenuActionDialog" always-on-top modal class="menu-action-dialog">
         <h2>Print Menu: Settings</h2>
         <paper-dialog-scrollable style="min-width: 600px; min-height: 300px; display: flex; justify-content: center;">
           <form is="iron-form" id="printMenuSettingsForm" content-type="application/json">
@@ -831,7 +831,7 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
             node = Polymer.dom(dialog).node,
             proceedButton = node.querySelector(".proceedButton"),
             cancelButton = node.querySelector(".cancelButton");
-        //body.appendChild(dialog);  // @TODO(sgammon): see TODO below for backdrop fix info
+        body.appendChild(dialog);  // @TODO(sgammon): see TODO below for backdrop fix info
         dialog.style.marginBottom = "150px";
         dialog.style.marginTop = "150px";
         cancelButton.style.position = "absolute";
