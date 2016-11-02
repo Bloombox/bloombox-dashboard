@@ -463,7 +463,8 @@
               premium$="[[selectedItem.value.flags.premium]]"
               photos$="[[selectedItem.value.pictures]]"
               hidden$="[[!selectedItem]]"
-              disabled="[[loading]]"></bloombox-strain><!-- end bloombox-strain -->
+              disabled="[[loading]]"
+              editing="{{editing}}"></bloombox-strain><!-- end bloombox-strain -->
           </div><!-- end div.product-detail-pane -->
         </div><!-- end div.menu-page.flowers-menu-page -->
 
@@ -490,7 +491,8 @@
               sugarfree$="[[selectedItem.value.flags.sugarfree]]"
               photos$="[[selectedItem.value.photos]]"
               hidden$="[[!selectedItem]]"
-              disabled="[[loading]]"></bloombox-edible><!-- end bloombox-edible -->
+              disabled="[[loading]]"
+              editing="{{editing}}"></bloombox-edible><!-- end bloombox-edible -->
             </div><!-- end div.product-detail-pane -->
         </div><!-- end div.menu-page.edibles-menu-page -->
 
@@ -512,7 +514,8 @@
               premium$="[[selectedItem.value.flags.premium]]"
               photos$="[[selectedItem.value.photos]]"
               hidden$="[[!selectedItem]]"
-              disabled="[[loading]]"></bloombox-concentrate><!-- end bloombox-concentrate -->
+              disabled="[[loading]]"
+              editing="{{editing}}"></bloombox-concentrate><!-- end bloombox-concentrate -->
           </div><!-- end div.product-detail-pane -->
         </div><!-- end div.menu-page.concentrates-menu-page -->
 
@@ -536,7 +539,8 @@
               premium$="[[selectedItem.value.flags.premium]]"
               photos$="[[selectedItem.value.photos]]"
               hidden$="[[!selectedItem]]"
-              disabled="[[loading]]"></bloombox-preroll><!-- end bloombox-preroll -->
+              disabled="[[loading]]"
+              editing="{{editing}}"></bloombox-preroll><!-- end bloombox-preroll -->
           </div>
         </div><!-- end div.menu-page.prerolls-menu-page -->
 
@@ -558,7 +562,8 @@
               premium$="[[selectedItem.value.flags.premium]]"
               photos$="[[selectedItem.value.photos]]"
               hidden$="[[!selectedItem]]"
-              disabled="[[loading]]"></bloombox-apothecary><!-- end bloombox-apothecary -->
+              disabled="[[loading]]"
+              editing="{{editing}}"></bloombox-apothecary><!-- end bloombox-apothecary -->
           </div><!-- end div.product-detail-pane -->
         </div><!-- end div.menu-page.apothecary-menu-page -->
 
@@ -580,12 +585,17 @@
               premium$="[[selectedItem.value.flags.premium]]"
               photos$="[[selectedItem.value.photos]]"
               hidden$="[[!selectedItem]]"
-              disabled="[[loading]]"></bloombox-cartridge><!-- end bloombox-cartridge -->
+              disabled="[[loading]]"
+              editing="{{editing}}"></bloombox-cartridge><!-- end bloombox-cartridge -->
           </div><!-- end div.product-detail-pane -->
         </div><!-- end div.menu-page.cartridges-menu-page -->
       </iron-pages><!-- end iron-pages#menuPages -->
 
-      <paper-fab id="addObjectButton" on-tap="_showZerostate" icon="add"></paper-fab>
+      <paper-fab
+        id="addObjectButton"
+        on-tap="_showZerostate"
+        icon="add"
+        hidden$="[[editing]]"></paper-fab>
     </div><!-- end div#menuWrap.menu-content -->
 
     <div hidden>
@@ -662,6 +672,13 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
           type: String,
           notify: true,
           computed: '_computeSectionHeading(section)'
+        },
+
+        editing: {
+          type: Boolean,
+          value: false,
+          notify: true,
+          reflectToAttribute: true
         },
 
         instock: {
