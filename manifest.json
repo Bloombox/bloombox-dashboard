@@ -3,7 +3,7 @@
   "short_name": "Bloombox",
   "description": "Manage and produce beautiful, powerful dispensary menus.",
   "version": "1.0.0",
-  "version_name": "Private Beta v1",
+  "version_name": "Beta",
   "manifest_version": 2,
   "default_locale": "en",
   "offline_enabled": false,
@@ -32,7 +32,7 @@
     "sizes": "1024x1024",
     "type": "image/png"
   }],
-  "start_url": "/",
+  "start_url": "/dashboard",
   "display": "standalone",
   "background_color": "#68b345",
   "theme_color": "#68b345",
