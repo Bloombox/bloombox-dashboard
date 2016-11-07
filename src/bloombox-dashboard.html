@@ -854,7 +854,8 @@
           BloomboxPartnerCache[partners[partner].key] = partners[partner];
         }
 
-        if (window.location.pathname == "" || window.location.pathname.length < 2) {
+        if (window.location.pathname == "" || window.location.pathname.length < 2 ||
+            window.location.pathname == "/dashboard") {
           // start us off with the first partner the user has access to
           this.partner = partners[0].key;
         } else if (oldValue == null || oldValue == undefined) {
