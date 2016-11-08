@@ -6,7 +6,7 @@
   "private": true,
   "dependencies": {
     "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.0.0",
-    "bloombox-elements": "git@github.com:bloombox/bloombox-elements.git#private-beta",
+    "bloombox-elements": "git@github.com:bloombox/bloombox-elements.git#^0.0.4",
     "polymer": "polymer/polymer#^1.5.0",
     "polymerfire": "firebase/polymerfire#^0.9.3",
     "iron-elements": "PolymerElements/iron-elements#^1.0.10",
