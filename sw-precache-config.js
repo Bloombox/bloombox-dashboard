@@ -1,8 +1,6 @@
 module.exports = {
   staticFileGlobs: [
-    '/index.html',
-    '/manifest.json',
-    '/bower_components/webcomponentsjs/webcomponents-lite.min.js'
+    '/manifest.json'
   ],
   templateFilePath: 'service-worker.tmpl',
   navigateFallback: '/',
