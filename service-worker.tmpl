@@ -39,7 +39,7 @@ importScripts(<%= importScripts %>);
 /* eslint-disable quotes, comma-spacing */
 var PrecacheConfig = <%= precacheConfig %>;
 /* eslint-enable quotes, comma-spacing */
-var CacheNamePrefix = 'sw-precache-<%= version %>-<%= cacheId %>-' + (self.registration ? self.registration.scope : '') + '-';
+var CacheNamePrefix = 'sw-precache-<%= version %>-v1-<%= cacheId %>-' + (self.registration ? self.registration.scope : '') + '-';
 
 <% if (handleFetch) { %>
 var IgnoreUrlParametersMatching = [<%= ignoreUrlParametersMatching %>];
