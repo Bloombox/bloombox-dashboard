@@ -2,7 +2,10 @@ module.exports = {
   staticFileGlobs: [
     '/manifest.json'
   ],
+  handleFetch: true,
+  skipWaiting: true,
   templateFilePath: 'service-worker.tmpl',
+  directoryIndex: false,
   navigateFallback: '/',
   navigateFallbackWhitelist: [/^(?!\/__)/],
   stripPrefixMulti: {
