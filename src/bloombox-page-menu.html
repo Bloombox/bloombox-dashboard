@@ -665,7 +665,8 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
         section: {
           type: String,
           notify: true,
-          value: 'flowers'
+          value: 'flowers',
+          observer: '_sectionDidChange'
         },
 
         heading: {
@@ -760,6 +761,13 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
 
       _computeSomePagesPrintSectionMode: function(sectionMode) {
         return sectionMode === "some";
+      },
+
+      _sectionDidChange: function(newSection, oldSection) {
+        if (oldSection && newSection) {
+          // clear any search terms
+          this.set("search", null);
+        }
       },
 
       _selectedItemDidChange: function(selectedItem, oldSelectedItem) {
