@@ -1,5 +1,5 @@
 {
-  "entrypoint": "/dashboard",
+  "entrypoint": "index.html",
   "shell": "src/bloombox-dashboard.html",
   "fragments": [
     "src/bloombox-page-home.html",
