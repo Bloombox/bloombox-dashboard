@@ -456,7 +456,7 @@
               species="[[_processSpeciesValue(selectedItem.value.species)]]"
               visible="[[_processVisible(selectedItem.value.flags.visible)]]"
               description$="[[selectedItem.value.description]]"
-              tests$="[[_processTests(selectedItem.value.tests)]]"
+              tests$="[[_processTests(selectedItem)]]"
               ancestry$="[[selectedItem.value.ancestry]]"
               sale$="[[selectedItem.value.flags.sale]]"
               bogo$="[[selectedItem.value.flags.bogo]]"
@@ -481,7 +481,7 @@
               pricing="[[selectedItem.value.pricing]]"
               visible="[[_processVisible(selectedItem.value.flags.visible)]]"
               description$="[[selectedItem.value.description]]"
-              tests$="[[_processTests(selectedItem.value.tests)]]"
+              tests$="[[_processTests(selectedItem)]]"
               sale$="[[selectedItem.value.flags.sale]]"
               bogo$="[[selectedItem.value.flags.bogo]]"
               premium$="[[selectedItem.value.flags.premium]]"
@@ -506,9 +506,10 @@
               brand="[[selectedItem.value.brand]]"
               type="[[selectedItem.value.type]]"
               pricing="[[selectedItem.value.pricing]]"
+              species="[[selectedItem.value.species]]"
               visible="[[_processVisible(selectedItem.value.flags.visible)]]"
               description$="[[selectedItem.value.description]]"
-              tests$="[[_processTests(selectedItem.value.tests)]]"
+              tests$="[[_processTests(selectedItem)]]"
               sale$="[[selectedItem.value.flags.sale]]"
               bogo$="[[selectedItem.value.flags.bogo]]"
               premium$="[[selectedItem.value.flags.premium]]"
@@ -533,7 +534,7 @@
               species="[[_processSpeciesValue(selectedItem.value.species)]]"
               visible="[[_processVisible(selectedItem.value.flags.visible)]]"
               description$="[[selectedItem.value.description]]"
-              tests$="[[_processTests(selectedItem.value.tests)]]"
+              tests$="[[_processTests(selectedItem)]]"
               sale$="[[selectedItem.value.flags.sale]]"
               bogo$="[[selectedItem.value.flags.bogo]]"
               premium$="[[selectedItem.value.flags.premium]]"
@@ -556,7 +557,7 @@
               pricing="[[selectedItem.value.pricing]]"
               visible="[[_processVisible(selectedItem.value.flags.visible)]]"
               description$="[[selectedItem.value.description]]"
-              tests$="[[_processTests(selectedItem.value.tests)]]"
+              tests$="[[_processTests(selectedItem)]]"
               sale$="[[selectedItem.value.flags.sale]]"
               bogo$="[[selectedItem.value.flags.bogo]]"
               premium$="[[selectedItem.value.flags.premium]]"
@@ -579,7 +580,7 @@
               pricing="[[selectedItem.value.pricing]]"
               visible="[[_processVisible(selectedItem.value.flags.visible)]]"
               description$="[[selectedItem.value.description]]"
-              tests$="[[_processTests(selectedItem.value.tests)]]"
+              tests$="[[_processTests(selectedItem)]]"
               sale$="[[selectedItem.value.flags.sale]]"
               bogo$="[[selectedItem.value.flags.bogo]]"
               premium$="[[selectedItem.value.flags.premium]]"
@@ -819,7 +820,8 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
         return "Unknown Species";
       },
 
-      _processTests: function(tests) {
+      _processTests: function(item) {
+        var tests = item ? item.value.tests : null;
         if (tests != null && tests != undefined && typeof tests === "object") {
           if (tests.terpenes != null && tests.terpenes != undefined && typeof tests.terpenes === "object") {
             return {
@@ -833,7 +835,10 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
             thc: tests.thc || 0
           };
         }
-        return false;  // removes the `tests` attribute entirely
+        return {
+          cbd: "",
+          thc: ""
+        };
       },
 
       _locationChanged: function(location) {
