@@ -453,7 +453,7 @@
               name="[[selectedItem.value.name]]"
               pricing="[[formatPricelist(selectedItem.value.pricelist)]]"
               grow="[[_processGrowValue(selectedItem.value.grow)]]"
-              species="[[_processSpeciesValue(selectedItem.value.species)]]"
+              species="[[_processSpeciesValue(selectedItem)]]"
               visible="[[_processVisible(selectedItem.value.flags.visible)]]"
               description$="[[selectedItem.value.description]]"
               tests$="[[_processTests(selectedItem)]]"
@@ -479,7 +479,7 @@
               brand="[[selectedItem.value.brand]]"
               type="[[selectedItem.value.type]]"
               pricing="[[selectedItem.value.pricing]]"
-              species="[[_processSpeciesValue(selectedItem.value.species)]]"
+              species="[[_processSpeciesValue(selectedItem)]]"
               visible="[[_processVisible(selectedItem.value.flags.visible)]]"
               description$="[[selectedItem.value.description]]"
               tests$="[[_processTests(selectedItem)]]"
@@ -532,7 +532,7 @@
               type="[[selectedItem.value.type]]"
               pricing="[[selectedItem.value.pricing]]"
               grow="[[_processGrowValue(selectedItem.value.grow)]]"
-              species="[[_processSpeciesValue(selectedItem.value.species)]]"
+              species="[[_processSpeciesValue(selectedItem)]]"
               visible="[[_processVisible(selectedItem.value.flags.visible)]]"
               description$="[[selectedItem.value.description]]"
               tests$="[[_processTests(selectedItem)]]"
@@ -815,7 +815,8 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
         return "Unknown Grow";
       },
 
-      _processSpeciesValue: function(species) {
+      _processSpeciesValue: function(item) {
+        var species = item ? item.value.species : null;
         if (species != null && species != undefined && typeof species === "string")
           return species;
         return "Unknown Species";
