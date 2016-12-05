@@ -23,6 +23,8 @@
 
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
 <link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
@@ -48,7 +50,7 @@
         left: 0;
         bottom: 0;
         right: 0;
-        background: #eee;
+        background-color: #eee;
         --paper-toast-color: white;
       }
 
@@ -260,6 +262,99 @@
         margin-top: 10px;
         margin-right: 10px;
       }
+
+      :host .bloombox-page {
+        background-color: #eee;
+        border-left: 1px solid #ddd;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        opacity: 1;
+        -webkit-transition-property: opacity;
+        -moz-transition-property: opacity;
+        transition-property: opacity;
+        -webkit-transition-duration: 0.2s;
+        -moz-transition-duration: 0.2s;
+        transition-duration: 0.2s;
+      }
+
+      :host .bloombox-page.not-yet-loaded {
+        opacity: 0 !important;
+      }
+
+      :host iron-pages.app-pages {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1000;
+      }
+
+      :host div.page-loader[loading] {
+        opacity: 0;
+      }
+
+      :host div.page-loader {
+        z-index: 999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        opacity: 1;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-repeat: no-repeat;
+        background-position: 50% 50%;
+        -webkit-transition-property: opacity;
+        -moz-transition-property: opacity;
+        transition-property: opacity;
+        -webkit-transition-duration: 0.2s;
+        -moz-transition-duration: 0.2s;
+        transition-duration: 0.2s;
+      }
+
+      :host div.page-loader > div {
+        width: 14px;
+        height: 14px;
+        margin: 0 10px;
+        background-color: #aaa;
+
+        border-radius: 100%;
+        display: inline-block;
+        -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+        animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+      }
+
+      :host div.page-loader .bounce1 {
+        -webkit-animation-delay: -0.32s;
+        animation-delay: -0.32s;
+      }
+
+      :host div.page-loader .bounce2 {
+        -webkit-animation-delay: -0.16s;
+        animation-delay: -0.16s;
+      }
+
+      @-webkit-keyframes sk-bouncedelay {
+        0%, 80%, 100% { -webkit-transform: scale(0) }
+        40% { -webkit-transform: scale(1.0) }
+      }
+
+      @keyframes sk-bouncedelay {
+        0%, 80%, 100% {
+          -webkit-transform: scale(0);
+          transform: scale(0);
+        } 40% {
+          -webkit-transform: scale(1.0);
+          transform: scale(1.0);
+        }
+      }
     </style>
 
     <!-- App State -->
@@ -292,10 +387,11 @@
       with-credentials
       last-response="{{_context}}"
       params='{"v":"1"}'
+      debounce-duration="1500"
       content-type="application/json"></iron-ajax>
 
     <!-- Layout / UI -->
-    <main>
+    <main class="app-content">
       <app-drawer-layout fullbleed responsive-width="1240px" narrow="{{_narrow}}">
         <!-- Drawer content -->
         <app-drawer>
@@ -353,7 +449,7 @@
             </app-toolbar>
           </app-header>
 
-          <iron-pages role="main" selected="[[page]]" attr-for-selected="name">
+          <iron-pages role="main" selected="[[page]]" attr-for-selected="name" class="app-pages">
             <template strip-whitespace is="dom-if" if="[[_booted]]" restamp>
               <bloombox-page-home
                 name="home"
@@ -362,7 +458,8 @@
                 locations="[[locations]]"
                 storage="[[storage]]"
                 loading="{{loading}}"
-                environment="[[environment]]"></bloombox-page-home>
+                environment="[[environment]]"
+                class="bloombox-page not-yet-loaded"></bloombox-page-home>
               <bloombox-page-analytics
                 name="analytics"
                 endpoint="[[endpoint]]"
@@ -372,7 +469,8 @@
                 storage="[[storage]]"
                 loading="{{loading}}"
                 read-key="[[partnerData.analytics.readKey]]"
-                environment="[[environment]]"></bloombox-page-analytics>
+                environment="[[environment]]"
+                class="bloombox-page not-yet-loaded"></bloombox-page-analytics>
               <bloombox-page-menu
                 name="menu"
                 endpoint="[[endpoint]]"
@@ -381,7 +479,8 @@
                 location="{{location}}"
                 storage="[[storage]]"
                 loading="{{loading}}"
-                environment="[[environment]]"></bloombox-page-menu>
+                environment="[[environment]]"
+                class="bloombox-page not-yet-loaded"></bloombox-page-menu>
               <bloombox-page-profile
                 name="profile"
                 endpoint="[[endpoint]]"
@@ -392,30 +491,41 @@
                 loading="{{loading}}"
                 environment="[[environment]]"
                 supervisor="[[_adminOrSupervisor]]"
-                api-key="[[api.key]]"></bloombox-page-profile>
+                api-key="[[api.key]]"
+                class="bloombox-page not-yet-loaded"></bloombox-page-profile>
               <bloombox-page-account
                 name="account"
                 endpoint="[[endpoint]]"
                 partner="[[partner]]"
                 storage="[[storage]]"
                 loading="{{loading}}"
-                environment="[[environment]]"></bloombox-page-account>
+                environment="[[environment]]"
+                class="bloombox-page not-yet-loaded"></bloombox-page-account>
               <bloombox-page-settings
                 name="settings"
                 endpoint="[[endpoint]]"
                 partner="[[partner]]"
                 storage="[[storage]]"
                 loading="{{loading}}"
-                environment="[[environment]]"></bloombox-page-settings>
+                environment="[[environment]]"
+                class="bloombox-page not-yet-loaded"></bloombox-page-settings>
               <bloombox-page-admin
                 name="admin"
                 endpoint="[[endpoint]]"
                 partner="[[partner]]"
                 storage="[[storage]]"
                 loading="{{loading}}"
-                environment="[[environment]]"></bloombox-page-admin>
+                environment="[[environment]]"
+                class="bloombox-page not-yet-loaded"></bloombox-page-admin>
             </template>
           </iron-pages>
+
+          <!-- Page Loader -->
+          <div class="page-loader" hidden$="[[loading]]">
+            <div class="bounce1"></div>
+            <div class="bounce2"></div>
+            <div class="bounce3"></div>
+          </div><!-- end div.page-loader -->
         </app-header-layout>
       </app-drawer-layout>
     </main>
@@ -424,6 +534,19 @@
     <div id="loadingOverlay" class="loading-overlay spinner-container">
       <bloombox-loader></bloombox-loader>
     </div><!-- end div.loading-overlay -->
+
+    <!-- Dialogs -->
+    <paper-dialog id="authDialog" always-on-top modal class="global-dialog auth-context-dialog">
+      <h2>Please log in</h2>
+      <paper-dialog-scrollable style="min-width: 400px;">
+        <div class="login-state-expired" strip-whitespace>
+          <p>Your login session has expired.<br />Please reload the page, or click OK to do so.</p>
+        </div><!-- end div.login-state-expired -->
+      </paper-dialog-scrollable>
+      <div class="buttons">
+        <paper-button class="confirmButton" autofocus on-tap="_reloadPage" style="cursor: pointer; margin-right: 10px">OK</paper-button>
+      </div>
+    </paper-dialog>
 
     <!-- Toasts & Snackbars -->
     <div class="menu-toasts">
@@ -800,15 +923,32 @@
         '_bootDashboard(user, transport, api, partners, credentials, firebase, environment)'
       ],
 
+      _showDialog: function(id) {
+        var dialog = this.$[id],
+            node = Polymer.dom(dialog).node,
+            confirm = node.querySelector(".confirmButton"),
+            that = this,
+            innerComponent;
+        document.body.appendChild(dialog);  // @TODO(sgammon): fix positioning when using a backdrop
+        dialog.style.marginBottom = "150px";
+        dialog.style.marginTop = "150px";
+        dialog.open();
+      },
+
       _contextError: function(error) {
         console.error("Received error fetching server-provided context: ", error);
-        alert("An error occurred while trying to load your user profile. Please refresh the page and try again. If the problem persists, "
-          + "let your administrator know or give support a call.");
+        this._showDialog("authDialog");
+      },
+
+      _reloadPage: function() {
+        console.log("Reloading page...");
+        window.location.reload();
       },
 
       _contextLoaded: function(context) {
         var debug = window["__debug"] || false,
-            app = window["bloom"] = window["bloom"] || {};
+            app = window["bloom"] = window["bloom"] || {},
+            that = this;
         app.config = context;  // mount config globally
 
         if (context != null) {
@@ -824,16 +964,18 @@
               this._setTransport(context.transport);
 
               // schedule reauthorization of our context based on JWT expiration
-              this._scheduleReauthorization(context.transport.token);
-            }
-            if (context.api != null) {
-              this._setApi(context.api);
-            }
-            if (context.credentials != null) {
-              this._setCredentials(context.credentials);
-            }
-            if (context.partners != null) {
-              this._setPartners(context.partners);
+              this._scheduleReauthorization(context.transport.token, (function() {
+                // callback is dispatched if reauthorization scheduling went ok
+                if (context.api != null) {
+                  that._setApi(context.api);
+                }
+                if (context.credentials != null) {
+                  that._setCredentials(context.credentials);
+                }
+                if (context.partners != null) {
+                  that._setPartners(context.partners);
+                }
+              }));
             }
           }
         }
@@ -929,20 +1071,26 @@
         return (user.admin === true || user.supervisor === true);
       },
 
-      _scheduleReauthorization: function(token) {
+      _scheduleReauthorization: function(token, callback) {
         var defaultTokenLifetime = 3000,
             parsedToken = JSON.parse(atob(token.split(".")[1])),
             expiration = (parsedToken && parsedToken["exp"]) ? parseInt(parsedToken["exp"]) : parseInt((+ new Date()) / 1000) + defaultTokenLifetime,
             expirationInterval = expiration - parseInt((+new Date()) / 1000) - 60,  // one minute before JWT expiration, in seconds
             that = this;
 
-        this._set_lastAuthorized(+ new Date());
-        console.info("Scheduling reauthorization in " + expirationInterval + " seconds.");
+        if (expirationInterval > 0) {
+          this._set_lastAuthorized(+ new Date());
+          console.info("Scheduling reauthorization in " + expirationInterval + " seconds.");
 
-        setTimeout((function() {
-          // reauthorize the user
-          that._reauthorize();
-        }), expirationInterval * 1000);
+          setTimeout((function() {
+            // reauthorize the user
+            that._reauthorize();
+          }), expirationInterval * 1000);
+
+          callback();  // continue booting dashboard
+        } else {
+          this._showDialog("authDialog");
+        }
       },
 
       _reauthorize: function() {
@@ -1090,6 +1238,16 @@
           setTimeout(function() {
             that.$.confirmToast.close();
           }, 60);
+        }
+      },
+
+      pageDidLoad: function(name) {
+        var target = this.$$("bloombox-page-" + name),
+            that = this;
+        if (target && target.classList.contains("not-yet-loaded")) {
+          this.async(function() {
+            target.classList.remove("not-yet-loaded");
+          }, BloomboxDashboardConfig.spinner.interval * 2);
         }
       },
 

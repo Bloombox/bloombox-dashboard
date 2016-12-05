@@ -52,8 +52,14 @@
 
       behaviors: [
         Polymer.BloomboxDashboardPageBehavior
-      ]
+      ],
 
+      /**
+       * Lifecycle callback for DOM attachment event.
+       */
+      attached: function() {
+        bloom.app.pageDidLoad("account");
+      }
     });
   </script>
 </dom-module>

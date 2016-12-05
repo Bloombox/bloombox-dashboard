@@ -46,14 +46,20 @@
   </template>
 
   <script>
-    var BloomboxPageAdmin = Bloombox.BloomboxPageAdmin = Polymer({
+    var BloomboxPageAdmin = Polymer.BloomboxPageAdmin = Polymer({
 
       is: "bloombox-page-admin",
 
       behaviors: [
         Polymer.BloomboxDashboardPageBehavior
-      ]
+      ],
 
+      /**
+       * Lifecycle callback for DOM attachment event.
+       */
+      attached: function() {
+        bloom.app.pageDidLoad("admin");
+      }
     });
   </script>
 </dom-module>

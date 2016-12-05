@@ -77,6 +77,13 @@
        */
       _defaultDeviceLabel: function(device) {
         return device.label || device.name;
+      },
+
+      /**
+       * Lifecycle callback for DOM attachment event.
+       */
+      attached: function() {
+        bloom.app.pageDidLoad("home");
       }
     });
   </script>

@@ -1553,6 +1553,13 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
             menu: this
           };
         }
+      },
+
+      /**
+       * Lifecycle callback for DOM attachment event.
+       */
+      attached: function() {
+        bloom.app.pageDidLoad("menu");
       }
     });
   </script>

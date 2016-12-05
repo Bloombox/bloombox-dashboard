@@ -447,6 +447,13 @@
        */
       _stopTicking: function() {
         // cancel timer
+      },
+
+      /**
+       * Lifecycle callback for DOM attachment event.
+       */
+      attached: function() {
+        bloom.app.pageDidLoad("analytics");
       }
     });
   </script>

@@ -315,6 +315,13 @@
        */
       handleAssetClear: function(event) {
         console.log("User cleared the current partner brand asset.", event.detail);
+      },
+
+      /**
+       * Lifecycle callback for DOM attachment event.
+       */
+      attached: function() {
+        bloom.app.pageDidLoad("profile");
       }
     });
   </script>
