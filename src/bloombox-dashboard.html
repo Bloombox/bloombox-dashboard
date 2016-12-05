@@ -291,6 +291,7 @@
       json-prefix="^.^"
       with-credentials
       last-response="{{_context}}"
+      params='{"v":"1"}'
       content-type="application/json"></iron-ajax>
 
     <!-- Layout / UI -->
@@ -481,6 +482,16 @@
         _booted: {
           type: Boolean,
           notify: true
+        },
+
+        /**
+         * Timestamp for when we last refreshed our user authorization
+         * context.
+         */
+        _lastAuthorized: {
+          type: Number,
+          notify: true,
+          readOnly: true
         },
 
         /**
@@ -777,6 +788,10 @@
         }
       },
 
+      listeners: {
+        'appContext.error': '_contextError'
+      },
+
       observers: [
         '_routePageChanged(_routeData.page)',
         '_routePartnerChanged(_routeData.partner)',
@@ -785,8 +800,16 @@
         '_bootDashboard(user, transport, api, partners, credentials, firebase, environment)'
       ],
 
+      _contextError: function(error) {
+        console.error("Received error fetching server-provided context: ", error);
+        alert("An error occurred while trying to load your user profile. Please refresh the page and try again. If the problem persists, "
+          + "let your administrator know or give support a call.");
+      },
+
       _contextLoaded: function(context) {
-        var debug = window["__debug"] || false;
+        var debug = window["__debug"] || false,
+            app = window["bloom"] = window["bloom"] || {};
+        app.config = context;  // mount config globally
 
         if (context != null) {
           if (debug) {
@@ -799,6 +822,9 @@
             }
             if (context.transport != null) {
               this._setTransport(context.transport);
+
+              // schedule reauthorization of our context based on JWT expiration
+              this._scheduleReauthorization(context.transport.token);
             }
             if (context.api != null) {
               this._setApi(context.api);
@@ -903,6 +929,27 @@
         return (user.admin === true || user.supervisor === true);
       },
 
+      _scheduleReauthorization: function(token) {
+        var defaultTokenLifetime = 3000,
+            parsedToken = JSON.parse(atob(token.split(".")[1])),
+            expiration = (parsedToken && parsedToken["exp"]) ? parseInt(parsedToken["exp"]) : parseInt((+ new Date()) / 1000) + defaultTokenLifetime,
+            expirationInterval = expiration - parseInt((+new Date()) / 1000) - 60,  // one minute before JWT expiration, in seconds
+            that = this;
+
+        this._set_lastAuthorized(+ new Date());
+        console.info("Scheduling reauthorization in " + expirationInterval + " seconds.");
+
+        setTimeout((function() {
+          // reauthorize the user
+          that._reauthorize();
+        }), expirationInterval * 1000);
+      },
+
+      _reauthorize: function() {
+        console.info("Reauthorizing user context (last checkin was at " + this._lastAuthorized + ")...");
+        this.$.appContext.generateRequest();
+      },
+
       _routePageChanged: function(page) {
         this.page = page || 'home';
       },
@@ -989,7 +1036,6 @@
         this._booted = true;
 
         setTimeout(function() {
-          console.log("Dashboard is ready for use.");
           that.loading = false;
         }, BloomboxDashboardConfig.spinner.delay);
       },
