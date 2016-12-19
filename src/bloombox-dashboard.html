@@ -410,7 +410,9 @@
             <a name="profile" on-tap="navigate"><iron-icon icon="room"></iron-icon><span class="nav-label">Club Profile</span></a>
             <a name="account" on-tap="navigate" class$="[[_adminOnly]]"><iron-icon icon="fingerprint"></iron-icon><span class="nav-label" class$="[[_adminOnly]]">Account</span></a>
             <a name="settings" on-tap="navigate" class$="[[_adminOnly]]"><iron-icon icon="settings"></iron-icon><span class="nav-label" class$="[[_adminOnly]]">Settings</span></a>
-            <a name="admin" on-tap="navigate" class$="[[_adminOnly]]"><iron-icon icon="weekend"></iron-icon><span class="nav-label" class$="[[_adminOnly]]">Admin</span></a>
+            <template is="dom-if" if="[[_adminOnly]]">
+              <a name="admin" on-tap="navigate"><iron-icon icon="weekend"></iron-icon><span class="nav-label">Admin</span></a>
+            </template>
           </iron-selector>
         </app-drawer>
 
@@ -703,7 +705,7 @@
         _multiplePartners: {
           type: Boolean,
           notify: true,
-          computed: '_computeMultiplePartners(partners)'
+          computed: '_computeMultiplePartners(partners, page)'
         },
 
         /**
@@ -993,7 +995,9 @@
         this.authorize(transport.token, transport.environment);
       },
 
-      _computeMultiplePartners: function(partners) {
+      _computeMultiplePartners: function(partners, page) {
+        if (page === "admin")
+          return false;  // don't show selection on admin page
         return Array.isArray(partners) && partners.length > 1;
       },
 
@@ -1017,6 +1021,11 @@
         var debug = window["__debug"] || false,
             existingPartner = this.partner;
 
+        // special case: if it's `admin`, it's not a partner
+        if (partners === "admin") {
+          return;  // we don't need to change partners right now
+        }
+
         if (debug) {
           console.info("Loaded user partner access.", partners);
         }
@@ -1027,7 +1036,7 @@
         }
 
         if (window.location.pathname == "" || window.location.pathname.length < 2 ||
-            window.location.pathname == "/dashboard") {
+            window.location.pathname == "/home" || window.location.pathname == "/admin") {
           // start us off with the first partner the user has access to
           this.partner = partners[0].key;
         } else if (oldValue == null || oldValue == undefined) {
@@ -1272,7 +1281,9 @@
         var partner = this.partner,
             link = !event.target.hasAttribute("name") ? event.target.parentElement : event.target,
             page = link.getAttribute("name");
-        this.partner = partner;
+        if (page !== "admin") {
+          this.partner = partner;
+        }
         this.page = page;
       },
 

@@ -1,51 +1,752 @@
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+
+<link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../bower_components/paper-toolbar/paper-toolbar.html">
+
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+
+<link rel="import" href="../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../bower_components/paper-radio-button/paper-radio-button.html">
+
+<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+
 <link rel="import" href="../bower_components/bloombox-styles/bloombox-styles.html">
+
 <link rel="import" href="./behaviors/bloombox-dashboard-page-behavior.html">
+
+
+<dom-module id="bloombox-infrastructure-chart">
+  <template strip-whitespace>
+    <style is="custom-style">
+      :host {
+        background: white;
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+        padding: 10px;
+        border-radius: 5px;
+        color: #757575;
+        margin: 10px 17px;
+        max-height: var(--bloombox-infrastructure-chart-height, 170px);
+        max-width: var(--bloombox-infrastructure-chart-width, 345px);
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .chart-card .chart-container {
+        margin-top: 20px;
+        overflow: hidden;
+        max-height: calc(var(--bloombox-infrastructure-chart-height, 240px) - 40px);
+        width: var(--bloombox-infrastructure-chart-width, 345px);
+      }
+
+      iframe {
+        border: none;
+        overflow: visible;
+      }
+    </style>
+
+    <div class="chart-card">
+      <div class="chart-container">
+        <iframe
+          src="[[_chartSource]]"
+          width="[[width]]"
+          height="260"
+          scrolling$="[[scrolling]]"
+          seamless></iframe>
+      </div><!-- end .chart-container -->
+    </div><!-- end .chart-card -->
+  </template>
+
+  <script type="text/javascript">
+    "use strict";
+
+    /**
+     * Enumerates available chart timeframes.
+     *
+     * @enum {string}
+     */
+    var AdminChartTimeframe = {
+      ONE_HOUR: "1h",
+      SIX_HOURS: "6h",
+      ONE_DAY: "1d",
+      ONE_WEEK: "1w",
+      ONE_MONTH: "1M",
+      SIX_WEEKS: "6w"
+    };
+
+    /**
+     * Enumerates available chart themes.
+     *
+     * @enum {string}
+     */
+    var AdminChartTheme = {
+      LIGHT: "light",
+      DARK: "dark"
+    };
+
+    /**
+     * Enumerates available theme colors.
+     *
+     * @enum {string}
+     */
+    var AdminThemeColors = {
+      LightText: "#ddd",
+      DarkText: "#333"
+    };
+
+    /**
+     * `<bloombox-infrastructure-chart>`
+     */
+    var BloomboxInfrastructureChart = Polymer.BloomboxInfrastructureChart = Polymer({
+      is: "bloombox-infrastructure-chart",
+
+      properties: {
+        /**
+         * Computed property that provides a built URI for the `<iframe>`
+         * source for a given chart.
+         *
+         * @type {string}
+         */
+        _chartSource: {
+          type: String,
+          notify: true,
+          reflectToAttribute: false,
+          computed: "_computeChartSource(chartId, drawMode, showLegend, theme, autoRefresh, timeframe)"
+        },
+
+        /**
+         * ID of a Stackdriver chart that is public and should be displayed
+         * within this component.
+         *
+         * @type {string}
+         */
+        chartId: {
+          type: String,
+          notify: true,
+          reflectToAttribute: true
+        },
+
+        /**
+         * Stackdriver draw mode of the chart. Defaults to `color`.
+         *
+         * @type {string}
+         */
+        drawMode: {
+          type: String,
+          notify: true,
+          reflectToAttribute: true,
+          value: "color"
+        },
+
+        /**
+         * Whether we should show a legend on the chart we are displaying.
+         *
+         * @type {boolean}
+         */
+        showLegend: {
+          type: Boolean,
+          notify: true,
+          reflectToAttribute: true,
+          value: true
+        },
+
+        /**
+         * The visual theme we should use for this chart. Valid options
+         * are `light` and `dark`.
+         *
+         * @type {AdminChartTheme}
+         */
+        theme: {
+          type: String,
+          notify: true,
+          reflectToAttribute: true,
+          value: AdminChartTheme.LIGHT
+        },
+
+        /**
+         * The width, in pixels, of this chart.
+         *
+         * @type {number}
+         */
+        width: {
+          type: Number,
+          notify: true,
+          reflectToAttribute: true,
+          value: 370
+        },
+
+        /**
+         * Whether to allow scrolling in the target `<iframe>`. Rarely
+         * used and defaults to `false`.
+         *
+         * @type {boolean}
+         */
+        scrolling: {
+          type: Boolean,
+          notify: true,
+          value: false
+        },
+
+        /**
+         * Whether the auto-refresh feature is active.
+         *
+         * @type {boolean}
+         */
+        autoRefresh: {
+          type: Boolean,
+          notify: true
+        },
+
+        /**
+         * Current setting for chart timeframe control.
+         *
+         * @type {AdminChartTimeframe}
+         */
+        timeframe: {
+          type: String,
+          notify: true,
+          value: AdminChartTimeframe.SIX_HOURS
+        }
+      },
+
+      /**
+       * Compute the `<iframe>` source for an admin insfrastructure chart.
+       *
+       * @param {string} chartId The ID of the Stackdriver chart.
+       * @param {string} drawMode The draw mode of the chart.
+       * @param {boolean} showLegend Whether we should show a legend.
+       * @param {string} theme The color theme of the chart, either `dark` or `light`.
+       * @param {boolean} autoRefresh Whether to enable auto-refresh.
+       * @param {string} timeframe Charting timeframe to apply.
+       * @returns {string} Valid URI to use as an `<iframe>` source for the chart.
+       */
+      _computeChartSource: function(chartId, drawMode, showLegend, theme, autoRefresh, timeframe) {
+        var link = "https://public.google.stackdriver.com/public/chart/" + chartId +
+                  "?drawMode=" + drawMode +
+                  "&showLegend=" + (showLegend === true ? "true" : "false") +
+                  "&theme=" + theme +
+                  "&timeframe=" + timeframe +
+                  "&autoRefresh=" + (autoRefresh === true ? "true" : "false");
+        console.log("iframe link: ", link);
+        return link;
+      }
+    });
+  </script>
+</dom-module>
+
+
+<dom-module id="bloombox-admin-chart-controls">
+  <template strip-whitespace>
+    <style is="custom-style" include="bloombox-styles">
+      :root {
+        --primary-text-color: var(--bloombox-controls-color);
+        --secondary-text-color: var(--bloombox-controls-color);
+        --paper-input-container-input-color: var(--bloombox-theme-foreground);
+      }
+
+      :host {
+        min-width: 200px;
+        min-height: 52px;
+        color: var(--bloombox-controls-color);
+      }
+
+      :host,
+      :host div.control-content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-right: 50px;
+        color: var(--bloombox-controls-color);
+      }
+
+      :host,
+      :host paper-checkbox
+      :host span.checkbox-label {
+        color: var(--bloombox-controls-color);
+      }
+
+      :host div.control-content.admin-control-theme-dark,
+      :host div.control-content.admin-control-theme-dark paper-checkbox,
+      :host div.control-content.admin-control-theme-dark span.checkbox-label,
+      :host div.control-content.admin-control-theme-dark span.radio-label {
+        color: #ddd !important;
+
+        --paper-input-container-input-color: var(--bloombox-theme-foreground);
+
+        --paper-dropdown-menu-input: {
+          color: #ddd !important;
+        }
+      }
+
+      :host div.control-content.admin-control-theme-dark paper-item,
+      :host div.control-content.admin-control-theme-dark paper-listbox {
+        background-color: #111;
+        opacity: 0.95;
+      }
+
+      :host div.control-content.admin-control-theme-dark {
+        color: #ddd;
+      }
+
+      :host paper-dropdown-menu {
+        margin-left: 40px;
+      }
+
+      :host paper-radio-group {
+        margin-left: 40px;
+      }
+
+      :host paper-item {
+        width: 150px;
+        cursor: pointer;
+      }
+    </style>
+
+    <div class$="[[_controlsClasses]]">
+      <paper-checkbox
+        name="autorefresh"
+        toggles
+        class="autorefresh-toggle"
+        checked$="{{autoRefresh}}"><span class="checkbox-label">Auto Refresh</span></paper-checkbox><!-- end paper-checkbox.autorefresh-toggle -->
+
+      <paper-radio-group
+        selected="{{theme}}"
+        attr-for-selected="key"
+        class="theme-selection">
+          <paper-radio-button key="light"><span class="radio-label">Light</span></paper-radio-button>
+          <paper-radio-button key="dark"><span class="radio-label">Dark</span></paper-radio-button>
+      </paper-radio-group><!-- end paper-radio-group.theme-selection -->
+
+      <paper-dropdown-menu
+        name="timeframe"
+        label="Timeframe"
+        class="timeframe-selection"
+        always-float-label>
+        <paper-listbox
+          selected="{{timeframe}}"
+          attr-for-selected="key"
+          class="dropdown-content">
+          <paper-item key="1h">1 hour</paper-item>
+          <paper-item key="6h">6 hours</paper-item>
+          <paper-item key="1d">24 hours</paper-item>
+          <paper-item key="1w">1 week</paper-item>
+          <paper-item key="1M">1 month</paper-item>
+          <paper-item key="6w">6 weeks</paper-item>
+        </paper-listbox>
+      </paper-dropdown-menu><!-- end paper-dropdown-menu.timeframe-selection -->
+    </div><!-- end .control-content -->
+  </template>
+
+  <script type="text/javascript">
+    "use strict";
+
+    /**
+     * `<bloombox-admin-chart-tools>`
+     */
+    var BloomboxAdminChartTools = Polymer.BloomboxAdminChartTools = Polymer({
+      is: "bloombox-admin-chart-controls",
+
+      properties: {
+        /**
+         * Calculated set of classes to apply to the controls.
+         *
+         * @type {string}
+         */
+        _controlsClasses: {
+          type: String,
+          notify: true,
+          computed: "_computeControlsClasses(section, theme, autoRefresh, timeframe)"
+        },
+
+        /**
+         * The admin section we are currently running in.
+         *
+         * @type {string}
+         */
+        section: {
+          type: String,
+          notify: true
+        },
+
+        /**
+         * The current theme to use for this chart.
+         *
+         * @type {string}
+         */
+        theme: {
+          type: String,
+          notify: true,
+          value: AdminChartTheme.LIGHT,
+          observer: "_themeDidChange"
+        },
+
+        /**
+         * Whether the auto-refresh feature is active.
+         *
+         * @type {boolean}
+         */
+        autoRefresh: {
+          type: Boolean,
+          notify: true
+        },
+
+        /**
+         * Current setting for chart timeframe control.
+         *
+         * @type {AdminChartTimeframe}
+         */
+        timeframe: {
+          type: String,
+          notify: true,
+          value: AdminChartTimeframe.SIX_HOURS
+        }
+      },
+
+      /**
+       * Computes a set of classes to apply to the local controls.
+       *
+       * @param {string} section Section we are currently controlling.
+       * @param {string} theme Visual charting theme we are currently using.
+       * @param {boolean} autoRefresh Whether auto-refresh is active or not.
+       * @param {string} timeframe Current charting timeframe.
+       * @returns {string} Computed set of classes to add to the content wrapper.
+       */
+      _computeControlsClasses: function(section, theme, autoRefresh, timeframe) {
+        return [
+          "control-content",
+          "admin-control-section-" + section,
+          "admin-control-theme-" + theme,
+          "admin-control-timeframe-" + timeframe,
+          autoRefresh ? "admin-control-autorefresh" : ""
+        ].join(" ").trim();
+      },
+
+      /**
+       * Dispatched when the active theme is changed.
+       *
+       * @param {string} newTheme The theme to transition to.
+       * @param {string} oldTheme The theme we're transitioning from.
+       */
+      _themeDidChange: function(newTheme, oldTheme) {
+        this.customStyle["--bloombox-controls-color"] = (
+          newTheme === "dark" ? AdminThemeColors.LightText : AdminThemeColors.DarkText);
+        this.updateStyles();
+      }
+    });
+  </script>
+</dom-module>
 
 
 <dom-module id="bloombox-page-admin">
   <template strip-whitespace>
     <style is="custom-style" include="bloombox-styles">
+      :root {
+        --primary-text-color: var(--bloombox-theme-foreground);
+        --secondary-text-color: var(--bloombox-theme-foreground);
+        --paper-toolbar-background: transparent;
+        --paper-listbox-color: var(--bloombox-theme-foreground);
+        --bloombox-controls-color: var(--bloombox-theme-foreground);
+        --paper-checkbox-label-color: var(--bloombox-theme-foreground);
+        --paper-radio-button-label-color: var(--bloombox-theme-foreground);
+        --paper-input-container-input-color: var(--bloombox-theme-foreground);
+
+        --paper-input-container-label: {
+          color: var(--bloombox-theme-foreground);
+        }
+      }
+
       :host {
-        display: block;
-        padding: 10px;
+        color: var(--bloombox-theme-foreground);
       }
-      .card {
-        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
-        padding: 16px;
-        margin: 24px;
-        border-radius: 5px;
-        background-color: #fff;
-        color: #757575;
+
+      /** -- Sections -- **/
+      :host iron-pages,
+      :host iron-pages section {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
       }
-      .circle {
-        display: inline-block;
-        height: 64px;
-        width: 64px;
-        border-radius: 50%;
-        background: #ddd;
-        line-height: 64px;
-        font-size: 30px;
-        color: #555;
-        text-align: center;
+
+      :host main {
+        height: 100%;
       }
-      h1 {
-        font-size: 22px;
-        margin: 16px 0;
-        color: #212121;
+
+      :host main iron-pages section div.chart-tools {
+        width: 100%;
+        margin: 20px 0;
+      }
+
+      :host main iron-pages section div.chart-content {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+      }
+
+      :host main header,
+      :host main header paper-tabs {
+        background: white;
+        color: var(--bloombox-theme-foreground);
+      }
+
+      :host main header paper-tabs paper-tab {
+        color: var(--bloombox-theme-foreground);
+      }
+
+      :host main paper-toolbar {
+        height: 50px;
+        margin-bottom: 5px;
+        color: #444;
+        width: 100%;
+      }
+
+      :host main iron-pages section paper-toolbar bloombox-admin-chart-controls {
+        color: var(--bloombox-theme-foreground);
+        --bloombox-controls-color: var(--bloombox-theme-foreground);
+      }
+
+      :host main iron-pages section paper-toolbar span.title {
+        height: 50px;
+        display: flex;
+        margin-left: 44px;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+      }
+
+      :host main iron-pages section paper-toolbar span.title h3 {
+        margin: 0;
+        -webkit-margin-before: 0;
+        -webkit-margin-after: 0;
+        -webkit-margin-start: 0;
+        -webkit-margin-end: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      :host .admin-static-content {
+        padding: 20px
+      }
+
+      /** -- Themes -- **/
+      :host main.admin-theme-dark {
+        background-color: #333;
+      }
+
+      :host main.admin-theme-dark header,
+      :host main.admin-theme-dark header paper-tabs {
+        background-color: #333;
+        color: #ddd;
+      }
+
+      :host main.admin-theme-dark header paper-tabs paper-tab {
+        color: #ddd;
+      }
+
+      :host main.admin-theme-dark iron-pages bloombox-infrastructure-chart {
+        background-color: #111;
+      }
+
+      :host main.admin-theme-dark iron-pages span.title {
+        color: #fdfdfd;
+      }
+
+      :host main.admin-theme-dark iron-pages paper-toolbar bloombox-admin-chart-controls {
+        color: #ddd;
+      }
+
+      :host main.admin-theme-dark iron-pages paper-toolbar {
+        color: #ddd;
       }
     </style>
 
-    <div class="card">
-      <div class="circle">3</div>
-      <p>Modus commodo minimum eum te, vero utinam assueverit per eu.</p>
-      <p>Ea duis bonorum nec, falli paulo aliquid ei eum.Has at minim mucius aliquam, est id tempor laoreet.Pro saepe pertinax ei, ad pri animal labores suscipiantur.</p>
-    </div>
+    <main class$="[[_contentClasses]]">
+      <header>
+        <paper-tabs selected="{{selectedTab}}" attr-for-selected="name">
+          <paper-tab name="summary">Summary</paper-tab>
+          <paper-tab name="monitoring">Monitoring</paper-tab>
+          <paper-tab name="analytics">Analytics</paper-tab>
+          <paper-tab name="settings">Settings</paper-tab>
+        </paper-tabs>
+      </header><!-- end header -->
 
+      <iron-pages selected="[[selectedTab]]" attr-for-selected="name" class="chart-panes">
+        <!-- /// Admin Summary /// -->
+        <section name="summary">
+          <div class="admin-static-content">
+            <b>Welcome, admins!</b>
+          </div><!-- end div.admin-static-content -->
+        </section><!-- end section[name=summary] -->
+
+        <!-- /// Monitoring Charts /// -->
+        <section name="monitoring">
+          <div class="chart-tools">
+            <paper-toolbar>
+              <span class="title">
+                <paper-icon-button
+                  icon="link"
+                  on-tap="navigateToMonitoringDashboard"
+                  data-dashboard-link="https://app.google.stackdriver.com/monitoring/1030943/bloombox?project=momentum-ideas"></paper-icon-button>
+                <h3>Systems &amp; Infrastructure</h3>
+              </span><!-- end span.title -->
+
+              <bloombox-admin-chart-controls
+                section="monitoring"
+                theme="{{theme}}"
+                timeframe="{{timeframe}}"
+                auto-refresh$="{{autoRefresh}}"></bloombox-admin-chart-controls>
+            </paper-toolbar><!-- end paper-toolbar -->
+          </div><!-- end .chart-tools -->
+
+          <div class="chart-content">
+            <!-- Origin -->
+            <bloombox-infrastructure-chart
+              name="Origin Responses"
+              chart-id="blLcdOgf9Nv9vfGS"
+              timeframe="[[timeframe]]"
+              auto-refresh="[[autoRefresh]]"
+              theme="[[theme]]"></bloombox-infrastructure-chart>
+
+            <bloombox-infrastructure-chart
+              name="Origin Errors"
+              chart-id="g0OlR5eofkTZ6Ys2"
+              timeframe="[[timeframe]]"
+              auto-refresh="[[autoRefresh]]"
+              theme="[[theme]]"></bloombox-infrastructure-chart>
+
+            <bloombox-infrastructure-chart
+              name="Origin Caching"
+              chart-id="n7NJGSFMizt3tNzS"
+              timeframe="[[timeframe]]"
+              auto-refresh="[[autoRefresh]]"
+              theme="[[theme]]"></bloombox-infrastructure-chart>
+
+            <bloombox-infrastructure-chart
+              name="RPCs"
+              chart-id="3izFHxT1HEajy2Is"
+              timeframe="[[timeframe]]"
+              auto-refresh="[[autoRefresh]]"
+              theme="[[theme]]"></bloombox-infrastructure-chart>
+
+            <!-- Endpoint Latency -->
+            <bloombox-infrastructure-chart
+              name="Web Latency"
+              chart-id="GiDz8K619NrDLM54"
+              timeframe="[[timeframe]]"
+              auto-refresh="[[autoRefresh]]"
+              theme="[[theme]]"></bloombox-infrastructure-chart>
+
+            <bloombox-infrastructure-chart
+              name="App Latency"
+              chart-id="6ST5QBwvo4qxJta3"
+              timeframe="[[timeframe]]"
+              auto-refresh="[[autoRefresh]]"
+              theme="[[theme]]"></bloombox-infrastructure-chart>
+
+            <bloombox-infrastructure-chart
+              name="API Latency"
+              chart-id="5VedzJ0n94BWSh44"
+              timeframe="[[timeframe]]"
+              auto-refresh="[[autoRefresh]]"
+              theme="[[theme]]"></bloombox-infrastructure-chart>
+
+            <bloombox-infrastructure-chart
+              name="Media Latency"
+              chart-id="NL1SVhLr4XXMyy0F"
+              timeframe="[[timeframe]]"
+              auto-refresh="[[autoRefresh]]"
+              theme="[[theme]]"></bloombox-infrastructure-chart>
+
+            <!-- Machine Metrics -->
+            <bloombox-infrastructure-chart
+              name="Instance Activity"
+              chart-id="7YxRTrx5mkFScdXU"
+              timeframe="[[timeframe]]"
+              auto-refresh="[[autoRefresh]]"
+              theme="[[theme]]"></bloombox-infrastructure-chart>
+
+            <bloombox-infrastructure-chart
+              name="CPU Usage"
+              chart-id="DZI7wKhein7so66H"
+              timeframe="[[timeframe]]"
+              auto-refresh="[[autoRefresh]]"
+              theme="[[theme]]"></bloombox-infrastructure-chart>
+
+            <bloombox-infrastructure-chart
+              name="Memory Usage"
+              chart-id="6dMxG0d3b8TmlCSl"
+              timeframe="[[timeframe]]"
+              auto-refresh="[[autoRefresh]]"
+              theme="[[theme]]"></bloombox-infrastructure-chart>
+
+            <bloombox-infrastructure-chart
+              name="Network Traffic"
+              chart-id="nb8jqtlLw1s32nEN"
+              timeframe="[[timeframe]]"
+              auto-refresh="[[autoRefresh]]"
+              theme="[[theme]]"></bloombox-infrastructure-chart>
+
+            <!-- Persistence & Cache Metrics -->
+            <bloombox-infrastructure-chart
+              name="Datastore Operations"
+              chart-id="kN5qDkKhOtqAgaW3"
+              timeframe="[[timeframe]]"
+              auto-refresh="[[autoRefresh]]"
+              theme="[[theme]]"></bloombox-infrastructure-chart>
+
+            <bloombox-infrastructure-chart
+              name="Datastore Bandwidth"
+              chart-id="zciew4CENfgZR3PB"
+              timeframe="[[timeframe]]"
+              auto-refresh="[[autoRefresh]]"
+              theme="[[theme]]"></bloombox-infrastructure-chart>
+
+            <bloombox-infrastructure-chart
+              name="Memcache Operations"
+              chart-id="VNLmx4VRMuFcpMfQ"
+              timeframe="[[timeframe]]"
+              auto-refresh="[[autoRefresh]]"
+              theme="[[theme]]"></bloombox-infrastructure-chart>
+
+            <bloombox-infrastructure-chart
+              name="Memcache Traffic"
+              chart-id="exO9vItsB5t2enZF"
+              timeframe="[[timeframe]]"
+              auto-refresh="[[autoRefresh]]"
+              theme="[[theme]]"></bloombox-infrastructure-chart>
+          </div><!-- end .chart-content -->
+        </section><!-- end section[name=monitoring] -->
+
+        <section name="analytics">
+          <b>hi this is analytics</b>
+        </section><!-- end section[name=analytics] -->
+
+        <section name="settings">
+          <b>hi this is settings</b>
+        </section><!-- end section[name=settings] -->
+      </iron-pages><!-- end iron-pages.chart-panes -->
+    </main><!-- end main -->
   </template>
 
-  <script>
+  <script type="text/javascript">
+    "use strict";
+
+    /**
+     * `<bloombox-page-admin>`
+     */
     var BloomboxPageAdmin = Polymer.BloomboxPageAdmin = Polymer({
 
       is: "bloombox-page-admin",
@@ -53,6 +754,109 @@
       behaviors: [
         Polymer.BloomboxDashboardPageBehavior
       ],
+
+      properties: {
+        /**
+         * Calculated set of classes to apply to the active content area.
+         *
+         * @type {string}
+         */
+        _contentClasses: {
+          type: String,
+          notify: true,
+          reflectToAttribute: true,
+          computed: "_computeContentClasses(selectedTab, timeframe, theme, autoRefresh)"
+        },
+
+        /**
+         * Currently selected tab in the admin view.
+         *
+         * @type {string}
+         */
+        selectedTab: {
+          type: String,
+          notify: true,
+          reflectToAttribute: true,
+          value: "summary"
+        },
+
+        /**
+         * Currently selected charting timeframe.
+         *
+         * @type {string}
+         */
+        timeframe: {
+          type: String,
+          notify: true,
+          reflectToAttribute: true,
+          value: AdminChartTimeframe.SIX_HOURS
+        },
+
+        /**
+         * Currently selected charting theme.
+         *
+         * @type {string}
+         */
+        theme: {
+          type: String,
+          notify: true,
+          reflectToAttribute: true,
+          value: AdminChartTheme.LIGHT,
+          observer: "_themeDidChange"
+        },
+
+        /**
+         * Whether to activate the auto-refresh feature.
+         *
+         * @type {boolean}
+         */
+        autoRefresh: {
+          type: Boolean,
+          notify: true,
+          reflectToAttribute: true,
+          value: true
+        }
+      },
+
+      /**
+       * Compute a set of classes to apply to active local page content.
+       *
+       * @param {string} selectedTab The currently selected main navigation tab.
+       * @param {string} timeframe The currently selected charting timeframe.
+       * @param {string} theme The name of the currently-active charting theme.
+       * @param {boolean} autoRefresh Whether the auto-refresh feature is active
+       * @returns {string} Set of classes to apply to content.
+       */
+      _computeContentClasses: function(selectedTab, timeframe, theme, autoRefresh) {
+        return [
+          "admin-section-" + selectedTab,
+          "admin-timeframe-" + timeframe,
+          "admin-theme-" + theme,
+          autoRefresh ? "admin-auto-refresh" : ""
+        ].join(" ").trim();
+      },
+
+      /**
+       * Dispatched when the active theme is changed.
+       *
+       * @param {string} newTheme The theme to transition to.
+       * @param {string} oldTheme The theme we're transitioning from.
+       */
+      _themeDidChange: function(newTheme, oldTheme) {
+        this.customStyle["--bloombox-theme-foreground"] = this.customStyle["--bloombox-controls-color"] = (
+          newTheme === "dark" ? AdminThemeColors.LightText : AdminThemeColors.DarkText);
+        this.updateStyles();
+      },
+
+      /**
+       * Navigate to a monitoring dashboard's external link.
+       *
+       * @param {Event} event Browser event for the tap.
+       */
+      navigateToMonitoringDashboard: function(event) {
+        debugger;
+        event.parent.target.click();
+      },
 
       /**
        * Lifecycle callback for DOM attachment event.
