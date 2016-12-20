@@ -1,5 +1,9 @@
 
-<script>
+<script type="text/javascript">
+  "use strict";
+
+  var __DEFAULT_KEEN_PROJECT_ID__ = "57a940b0c9e1631bb251f04e";
+
   /**
    * `Polymer.BloomboxDashboardPageBehavior` provides properties
    * and logic that are common to all dashboard page elements.
@@ -37,6 +41,26 @@
         type: String,
         notify: true,
         observer: '_partnerChanged'
+      },
+
+      /**
+       * Holds a Keen project ID to fetch analytics data from.
+       */
+      _projectId: {
+        type: String,
+        notify: true,
+        readOnly: true,
+        value: __DEFAULT_KEEN_PROJECT_ID__
+      },
+
+      /**
+       * Scoped and encrypted Keen read key, so we can read data
+       * to generate charts.
+       */
+      readKey: {
+        type: String,
+        notify: true,
+        reflectToAttribute: true
       },
 
       /**

@@ -271,8 +271,7 @@
   </template>
 
   <script>
-    var __DEFAULT_PROJECT_ID__ = "57a940b0c9e1631bb251f04e",
-        BloomboxPageAnalytics = Polymer.BloomboxPageAnalytics = Polymer({
+    var BloomboxPageAnalytics = Polymer.BloomboxPageAnalytics = Polymer({
       
       is: "bloombox-page-analytics",
 
@@ -308,7 +307,7 @@
           type: String,
           notify: true,
           readOnly: true,
-          value: __DEFAULT_PROJECT_ID__
+          value: __DEFAULT_KEEN_PROJECT_ID__
         },
 
         /**
@@ -339,16 +338,6 @@
           notify: true,
           reflectToAttribute: true,
           value: false
-        },
-
-        /**
-         * Scoped and encrypted Keen read key, so we can read data
-         * to generate charts.
-         */
-        readKey: {
-          type: String,
-          notify: true,
-          reflectToAttribute: true
         },
 
         /**
