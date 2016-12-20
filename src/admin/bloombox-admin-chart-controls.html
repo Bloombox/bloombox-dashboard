@@ -1,0 +1,213 @@
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../../bower_components/paper-radio-button/paper-radio-button.html">
+
+<link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
+
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+
+
+<dom-module id="bloombox-admin-chart-controls">
+  <template strip-whitespace>
+    <style is="custom-style" include="bloombox-styles">
+      :root {
+        --primary-text-color: var(--bloombox-controls-color);
+        --secondary-text-color: var(--bloombox-controls-color);
+        --paper-input-container-input-color: var(--bloombox-theme-foreground);
+      }
+
+      :host {
+        min-width: 200px;
+        min-height: 52px;
+        color: var(--bloombox-controls-color);
+      }
+
+      :host,
+      :host div.control-content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-right: 50px;
+        color: var(--bloombox-controls-color);
+      }
+
+      :host,
+      :host paper-checkbox
+      :host span.checkbox-label {
+        color: var(--bloombox-controls-color);
+      }
+
+      :host div.control-content.admin-control-theme-dark,
+      :host div.control-content.admin-control-theme-dark paper-checkbox,
+      :host div.control-content.admin-control-theme-dark span.checkbox-label,
+      :host div.control-content.admin-control-theme-dark span.radio-label {
+        color: #ddd !important;
+
+        --paper-input-container-input-color: var(--bloombox-theme-foreground);
+
+        --paper-dropdown-menu-input: {
+          color: #ddd !important;
+        }
+      }
+
+      :host div.control-content.admin-control-theme-dark paper-item,
+      :host div.control-content.admin-control-theme-dark paper-listbox {
+        background-color: #111;
+        opacity: 0.95;
+      }
+
+      :host div.control-content.admin-control-theme-dark {
+        color: #ddd;
+      }
+
+      :host paper-dropdown-menu {
+        margin-left: 40px;
+      }
+
+      :host paper-radio-group {
+        margin-left: 40px;
+      }
+
+      :host paper-item {
+        width: 150px;
+        cursor: pointer;
+      }
+    </style>
+
+    <div class$="[[_controlsClasses]]">
+      <paper-checkbox
+        name="autorefresh"
+        toggles
+        class="autorefresh-toggle"
+        checked$="{{autoRefresh}}"><span class="checkbox-label">Auto Refresh</span></paper-checkbox><!-- end paper-checkbox.autorefresh-toggle -->
+
+      <paper-radio-group
+        selected="{{theme}}"
+        attr-for-selected="key"
+        class="theme-selection">
+          <paper-radio-button key="light"><span class="radio-label">Light</span></paper-radio-button>
+          <paper-radio-button key="dark"><span class="radio-label">Dark</span></paper-radio-button>
+      </paper-radio-group><!-- end paper-radio-group.theme-selection -->
+
+      <paper-dropdown-menu
+        name="timeframe"
+        label="Timeframe"
+        class="timeframe-selection"
+        always-float-label>
+        <paper-listbox
+          selected="{{timeframe}}"
+          attr-for-selected="key"
+          class="dropdown-content">
+          <paper-item key="1h">1 hour</paper-item>
+          <paper-item key="6h">6 hours</paper-item>
+          <paper-item key="1d">24 hours</paper-item>
+          <paper-item key="1w">1 week</paper-item>
+          <paper-item key="1M">1 month</paper-item>
+          <paper-item key="6w">6 weeks</paper-item>
+        </paper-listbox>
+      </paper-dropdown-menu><!-- end paper-dropdown-menu.timeframe-selection -->
+    </div><!-- end .control-content -->
+  </template>
+
+  <script type="text/javascript">
+    "use strict";
+
+    /**
+     * `<bloombox-admin-chart-tools>`
+     */
+    var BloomboxAdminChartTools = Polymer.BloomboxAdminChartTools = Polymer({
+      is: "bloombox-admin-chart-controls",
+
+      properties: {
+        /**
+         * Calculated set of classes to apply to the controls.
+         *
+         * @type {string}
+         */
+        _controlsClasses: {
+          type: String,
+          notify: true,
+          computed: "_computeControlsClasses(section, theme, autoRefresh, timeframe)"
+        },
+
+        /**
+         * The admin section we are currently running in.
+         *
+         * @type {string}
+         */
+        section: {
+          type: String,
+          notify: true
+        },
+
+        /**
+         * The current theme to use for this chart.
+         *
+         * @type {string}
+         */
+        theme: {
+          type: String,
+          notify: true,
+          value: AdminChartTheme.LIGHT,
+          observer: "_themeDidChange"
+        },
+
+        /**
+         * Whether the auto-refresh feature is active.
+         *
+         * @type {boolean}
+         */
+        autoRefresh: {
+          type: Boolean,
+          notify: true
+        },
+
+        /**
+         * Current setting for chart timeframe control.
+         *
+         * @type {AdminChartTimeframe}
+         */
+        timeframe: {
+          type: String,
+          notify: true,
+          value: AdminChartTimeframe.SIX_HOURS
+        }
+      },
+
+      /**
+       * Computes a set of classes to apply to the local controls.
+       *
+       * @param {string} section Section we are currently controlling.
+       * @param {string} theme Visual charting theme we are currently using.
+       * @param {boolean} autoRefresh Whether auto-refresh is active or not.
+       * @param {string} timeframe Current charting timeframe.
+       * @returns {string} Computed set of classes to add to the content wrapper.
+       */
+      _computeControlsClasses: function(section, theme, autoRefresh, timeframe) {
+        return [
+          "control-content",
+          "admin-control-section-" + section,
+          "admin-control-theme-" + theme,
+          "admin-control-timeframe-" + timeframe,
+          autoRefresh ? "admin-control-autorefresh" : ""
+        ].join(" ").trim();
+      },
+
+      /**
+       * Dispatched when the active theme is changed.
+       *
+       * @param {string} newTheme The theme to transition to.
+       * @param {string} oldTheme The theme we're transitioning from.
+       */
+      _themeDidChange: function(newTheme, oldTheme) {
+        this.customStyle["--bloombox-controls-color"] = (
+          newTheme === "dark" ? AdminThemeColors.LightText : AdminThemeColors.DarkText);
+        this.updateStyles();
+      }
+    });
+  </script>
+</dom-module>
