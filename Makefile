@@ -5,7 +5,7 @@
 
 BUILDBOT ?= 0
 ENV ?= .env/
-TARGET ?= build/
+TARGET ?= build
 CREDENTIALS ?= 1
 
 all: build
@@ -16,7 +16,7 @@ all: build
 ## Build Flow
 #
 
-build: $(TARGET) $(ENV) dependencies
+$(TARGET): $(ENV) dependencies
 	@polymer build --sw-precache-config ./sw-precache-config.js
 	@echo "Build complete."
 
@@ -53,10 +53,6 @@ $(ENV):
 	@echo "Establishing envroot..."
 	@mkdir -p $(ENV)
 
-$(TARGET):
-	@echo "Establishing buildroot..."
-	@mkdir -p $(TARGET)
 
-
-.PHONY: all build release dependencies clean distclean forceclean
+.PHONY: all release dependencies clean distclean forceclean
 
