@@ -7,6 +7,7 @@
     "src/bloombox-page-menu.html",
     "src/bloombox-page-profile.html",
     "src/bloombox-page-account.html",
-    "src/bloombox-page-settings.html"
+    "src/bloombox-page-settings.html",
+    "src/bloombox-page-admin.html"
   ]
 }
