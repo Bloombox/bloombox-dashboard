@@ -2,6 +2,7 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/polymerfire/firebase-document.html">
 
+<link rel="import" href="../bower_components/bloombox-analytics-chart/bloombox-analytics-chart.html">
 <link rel="import" href="../bower_components/bloombox-device/bloombox-device.html">
 <link rel="import" href="../bower_components/bloombox-styles/bloombox-styles.html">
 
@@ -15,11 +16,35 @@
         display: block;
         padding: 20px 40px;
       }
+
       h1 {
         font-size: 28px;
         margin: 16px 0;
         color: #212121;
       }
+
+      /** -- 'Today on Bloombox' -- **/
+      section.today {
+        display: flex;
+        flex-direction: column;
+      }
+
+      section.today bloombox-analytics-chart {
+        --bloombox-chart-border: none;
+        --bloombox-chart-background-color: transparent;
+      }
+
+      section.today .realtime-column {
+        display: flex;
+
+      }
+
+      section.today .metric-block {
+        margin: 0 60px 0 0;
+        max-width: 240px;
+      }
+
+      /** -- 'Active Devices' -- **/
       :host bloombox-device {
         margin-bottom: 20px;
         display: inline-block;
@@ -34,24 +59,223 @@
       path="[[endpoint]]/devices"
       data="{{devices}}"></firebase-document>
 
-    <h1>Active Devices</h1>
-
-    <div class="device-list-wrap">
-      <template is="dom-repeat" items="[[_toArray(devices)]]" as="device">
-        <bloombox-device
-          partner="[[partner]]"
-          name="[[device.key]]"
-          label="[[device.value.label]]"
-          online="[[device.value.online]]"
-          software-version="[[device.value.version]]"
-          hardware-version="V1.R1"
-          type="MENU"
-          visibility="PRIVATE"></bloombox-device>
-      </template>
-    </div><!-- end .device-list-wrap -->
+    <main class="bloombox-home">
+      <section class="today">
+        <h1>Today on Bloombox</h1>
+        <div class="realtime-column product-analytics-summary">
+          <!-- Section Views -->
+          <div class="metric-block">
+            <bloombox-analytics-chart
+              heading="Section Views"
+              environment="[[environment]]"
+              partner="[[partner]]"
+              location="[[location]]"
+              chart-type="metric"
+              analysis-type="count"
+              data-type="sections"
+              timeframe="1_day"
+              project-id="[[_projectId]]"
+              colors='["transparent"]'
+              read-key="[[readKey]]"
+              filters='[{"operator":"not_contains","property_name":"device","property_value":"MM"}]'
+              auto-refresh></bloombox-analytics-chart>
+            <div class="sparklines">
+              <bloombox-analytics-chart
+                heading="Last hour"
+                environment="[[environment]]"
+                partner="[[partner]]"
+                location="[[location]]"
+                chart-type="sparkline"
+                analysis-type="count"
+                data-type="sections"
+                timeframe="60_minutes"
+                interval="minutely"
+                project-id="[[_projectId]]"
+                colors='["#333"]'
+                filters='[{"operator":"not_contains","property_name":"device","property_value":"MM"}]'
+                read-key="[[readKey]]"></bloombox-analytics-chart>
+              <bloombox-analytics-chart
+                heading="Last 6 hours"
+                environment="[[environment]]"
+                partner="[[partner]]"
+                location="[[location]]"
+                chart-type="sparkline"
+                analysis-type="count"
+                data-type="sections"
+                timeframe="6_hours"
+                timeframe-mode="this"
+                interval="minutely"
+                project-id="[[_projectId]]"
+                colors='["#333"]'
+                filters='[{"operator":"not_contains","property_name":"device","property_value":"MM"}]'
+                read-key="[[readKey]]"></bloombox-analytics-chart>
+              <bloombox-analytics-chart
+                heading="Last 30 days"
+                environment="[[environment]]"
+                partner="[[partner]]"
+                location="[[location]]"
+                collection="screens"
+                chart-type="sparkline"
+                analysis-type="count"
+                data-type="sections"
+                timeframe="30_days"
+                timeframe-mode="previous"
+                interval="daily"
+                project-id="[[_projectId]]"
+                colors='["#333"]'
+                filters='[{"operator":"not_contains","property_name":"device","property_value":"MM"}]'
+                read-key="[[readKey]]"></bloombox-analytics-chart>
+            </div><!-- end div.sparklines -->
+          </div><!-- end div.metric-block -->
+          <!-- Product Clicks -->
+          <div class="metric-block">
+            <bloombox-analytics-chart
+              heading="Product Views"
+              environment="[[environment]]"
+              partner="[[partner]]"
+              location="[[location]]"
+              chart-type="metric"
+              analysis-type="count"
+              data-type="products"
+              timeframe="1_day"
+              project-id="[[_projectId]]"
+              colors='["transparent"]'
+              read-key="[[readKey]]"
+              filters='[{"operator":"not_contains","property_name":"device","property_value":"MM"}]'
+              auto-refresh></bloombox-analytics-chart>
+            <div class="sparklines">
+              <bloombox-analytics-chart
+                heading="This hour"
+                environment="[[environment]]"
+                partner="[[partner]]"
+                location="[[location]]"
+                chart-type="sparkline"
+                analysis-type="count"
+                data-type="products"
+                timeframe="60_minutes"
+                interval="minutely"
+                project-id="[[_projectId]]"
+                colors='["#333"]'
+                filters='[{"operator":"not_contains","property_name":"device","property_value":"MM"}]'
+                read-key="[[readKey]]"></bloombox-analytics-chart>
+              <bloombox-analytics-chart
+                heading="Last 6 hours"
+                environment="[[environment]]"
+                partner="[[partner]]"
+                location="[[location]]"
+                chart-type="sparkline"
+                analysis-type="count"
+                data-type="products"
+                timeframe="6_hours"
+                timeframe-mode="this"
+                interval="minutely"
+                project-id="[[_projectId]]"
+                colors='["#333"]'
+                filters='[{"operator":"not_contains","property_name":"device","property_value":"MM"}]'
+                read-key="[[readKey]]"></bloombox-analytics-chart>
+              <bloombox-analytics-chart
+                heading="Last 30 days"
+                environment="[[environment]]"
+                partner="[[partner]]"
+                location="[[location]]"
+                chart-type="sparkline"
+                analysis-type="count"
+                data-type="products"
+                timeframe="30_days"
+                timeframe-mode="previous"
+                interval="daily"
+                project-id="[[_projectId]]"
+                colors='["#333"]'
+                filters='[{"operator":"not_contains","property_name":"device","property_value":"MM"}]'
+                read-key="[[readKey]]"></bloombox-analytics-chart>
+            </div><!-- end div.sparklines -->
+          </div><!-- end .metric-block -->
+          <!-- Product Actions -->
+          <div class="metric-block">
+            <bloombox-analytics-chart
+              heading="Actions"
+              environment="[[environment]]"
+              partner="[[partner]]"
+              location="[[location]]"
+              chart-type="metric"
+              analysis-type="count"
+              data-type="actions"
+              timeframe="1_day"
+              project-id="[[_projectId]]"
+              colors='["transparent"]'
+              read-key="[[readKey]]"
+              filters='[{"operator":"not_contains","property_name":"device","property_value":"MM"}]'
+              auto-refresh></bloombox-analytics-chart>
+            <div class="sparklines">
+              <bloombox-analytics-chart
+                heading="This hour"
+                environment="[[environment]]"
+                partner="[[partner]]"
+                location="[[location]]"
+                chart-type="sparkline"
+                analysis-type="count"
+                data-type="actions"
+                timeframe="60_minutes"
+                interval="minutely"
+                project-id="[[_projectId]]"
+                colors='["#333"]'
+                filters='[{"operator":"not_contains","property_name":"device","property_value":"MM"}]'
+                read-key="[[readKey]]"></bloombox-analytics-chart>
+              <bloombox-analytics-chart
+                heading="Last 6 hours"
+                environment="[[environment]]"
+                partner="[[partner]]"
+                location="[[location]]"
+                chart-type="sparkline"
+                analysis-type="count"
+                data-type="actions"
+                timeframe="6_hours"
+                timeframe-mode="this"
+                interval="minutely"
+                project-id="[[_projectId]]"
+                colors='["#333"]'
+                filters='[{"operator":"not_contains","property_name":"device","property_value":"MM"}]'
+                read-key="[[readKey]]"></bloombox-analytics-chart>
+              <bloombox-analytics-chart
+                heading="Last 30 days"
+                environment="[[environment]]"
+                partner="[[partner]]"
+                location="[[location]]"
+                chart-type="sparkline"
+                analysis-type="count"
+                data-type="actions"
+                timeframe="30_days"
+                timeframe-mode="previous"
+                interval="daily"
+                project-id="[[_projectId]]"
+                colors='["#333"]'
+                filters='[{"operator":"not_contains","property_name":"device","property_value":"MM"}]'
+                read-key="[[readKey]]"></bloombox-analytics-chart>
+            </div><!-- end div.sparklines -->
+          </div><!-- end .metric-block -->
+        </div><!-- end .realtime-column -->
+      </section><!-- end section.today -->
+      <section class="device-summary">
+        <h1>Active Devices</h1>
+        <div class="device-list-wrap">
+          <template is="dom-repeat" items="[[_toArray(devices)]]" as="device">
+            <bloombox-device
+              partner="[[partner]]"
+              name="[[device.key]]"
+              label="[[device.value.label]]"
+              online="[[device.value.online]]"
+              software-version="[[device.value.version]]"
+              hardware-version="V1.R1"
+              type="MENU"
+              visibility="PRIVATE"></bloombox-device>
+          </template>
+        </div><!-- end .device-list-wrap -->
+      </section><!-- end section.device-summary -->
+    </main><!-- end main.bloombox-home -->
   </template>
+  <script type="text/javascript">
+    "use strict";
 
-  <script>
     var BloomboxPageHome = Polymer.BloomboxPageHome = Polymer({
       is: "bloombox-page-home",
 
