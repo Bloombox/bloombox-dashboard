@@ -1,30 +1,33 @@
-/**
- * Copyright 2016 Google Inc. All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
-// This generated service worker JavaScript will precache your site's resources.
-// The code needs to be saved in a .js file at the top-level of your site, and registered
-// from your pages in order to be used. See
-// https://github.com/googlechrome/sw-precache/blob/master/demo/app/js/service-worker-registration.js
-// for an example of how you can register this script and handle various service worker events.
+/**
+ * Bloombox - Dashboard - Service Worker
+ *
+ * @fileoverview Provides a frontend Service Worker, compiled and generated from
+ *   dashboard sources, to facilitate offline dashboard use and fine-grained
+ *   control of resource caching.
+ *
+ * @preserve Copyright 2017, Bloombox
+ * @license Private source code, all rights reserved.
+ */
 
 /* eslint-env worker, serviceworker */
 /* eslint-disable indent, no-unused-vars, no-multiple-empty-lines, max-nested-callbacks, space-before-function-paren */
-'use strict';
+"use strict";
 
-var _debug = true;
+
+/**
+ * Whether we should output debug information or not.
+ *
+ * @define {boolean}
+ */
+var DEBUG = true;
+
+/**
+ * Name of this major release track, like `beta` or `live`.
+ *
+ * @define {string}
+ */
+var RELEASE = "beta";
 
 <% if (handleFetch && swToolboxCode) { %>
 // *** Start of auto-included sw-toolbox code. ***
@@ -55,10 +58,18 @@ var CurrentCacheNamesToAbsoluteUrl = mappings.currentCacheNamesToAbsoluteUrl;
 
 /**
  * Private function to dispatch logs, based on severity and debug status.
+ *
+ * @param {boolean} important Whether the log message should be considered
+ *                            important enough to use `info`, and ignore
+ *                            the current status of `DEBUG`.
+ * @param {string} method Console method to use when outputting our log
+ *                        statement. Usually uses `log` or `info`.
+ * @param {string} module A generic module name to prefix the log message
+ *                        with, indicating where it came from.
  */
 function _sendLog(important, method, module) {
   var statements, variadic;
-  if (important || _debug) {
+  if (important || DEBUG) {
     statements = ["%c[" + module.charAt(0).toUpperCase() + module.slice(1) + "]", "color: rgba(51, 51, 51, 0.75);"];
     if (arguments.length > 3) {
       variadic = [];
@@ -71,6 +82,8 @@ function _sendLog(important, method, module) {
 
 /**
  * Send a debug-level logline.
+ *
+ * @param {...Object}
  */
 function say() {
   var args = [false, "log", "service"];
@@ -80,6 +93,8 @@ function say() {
 
 /**
  * Send an info-level logline.
+ *
+ * @param {...Object}
  */
 function info() {
   var args = [false, "info", "service"];
@@ -89,6 +104,8 @@ function info() {
 
 /**
  * Send an warning-level logline.
+ *
+ * @param {...Object}
  */
 function warn() {
   var args = [true, "warn", "service"];
@@ -98,6 +115,8 @@ function warn() {
 
 /**
  * Send an error-level logline.
+ *
+ * @param {...Object}
  */
 function error() {
   var args = [true, "error", "service"];
@@ -105,6 +124,9 @@ function error() {
   return _sendLog.apply(this, args);
 }
 
+/**
+ * Delete all local caches held by the Service Worker.
+ */
 function deleteAllCaches() {
   return caches.keys().then(function(cacheNames) {
     return Promise.all(

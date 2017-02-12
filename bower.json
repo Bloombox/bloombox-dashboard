@@ -1,12 +1,23 @@
 {
   "name": "bloombox-dashboard",
+  "description": "Bloombox Dashboard UI code and logic.",
+  "version": "0.0.1",
   "authors": [
     "Sam Gammon <sam@momentum.io"
   ],
+  "keywords": [
+    "web-app",
+    "polymer",
+    "bloombox"
+  ],
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/bloombox/bloombox-dashboard.git"
+  },
   "dependencies": {
     "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.0.0",
-    "bloombox-elements": "git@github.com:bloombox/bloombox-elements.git#^0.0.4",
+    "bloombox-elements": "bloombox/bloombox-elements",
     "polymer": "polymer/polymer#^1.5.0",
     "polymerfire": "firebase/polymerfire#^0.9.3",
     "iron-elements": "PolymerElements/iron-elements#^1.0.10",
@@ -54,9 +65,6 @@
     "paper-toggle-button": "PolymerElements/paper-toggle-button#^1.0.0",
     "paper-toolbar": "PolymerElements/paper-toolbar#^1.0.0",
     "paper-tooltip": "PolymerElements/paper-tooltip#^1.0.0"
-  },
-  "devDependencies": {
-    "web-component-tester": "^4.0.0"
   },
   "resolution": {
     "paper-radio-group": "master"

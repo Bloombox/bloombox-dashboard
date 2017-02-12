@@ -1,0 +1,23 @@
+engines:
+  scss-lint:
+    enabled: true
+  csslint:
+    enabled: true
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - javascript
+  eslint:
+    enabled: true
+  fixme:
+    enabled: true
+ratings:
+  paths:
+  - "**.css"
+  - "**.js"
+  - "**.html"
+  - "**.sass"
+  - "**.scss"
+exclude_paths:
+- "gulpfile.js"
