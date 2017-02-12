@@ -5,10 +5,35 @@
 
 BUILDBOT ?= 0
 ENV ?= .env/
+LINKS ?= no
 TARGET ?= build/
-CREDENTIALS ?= 1
+CREDENTIALS ?=1
+COMPONENTS_PATH ?= components/
+VERBOSE ?= 0
+VERSION ?= 0.0.4
+POLYMER_BUILD_FLAGS ?= --sw-precache-config ./sw-precache-config.js
+POLYMER_RELEASE_FLAGS ?= --sw-precache-config ./sw-precache-config.js --insert-dependency-links --html.collapseWhitespace
 
-all: build
+ifeq ($(VERBOSE),1)
+RM ?= rm -v
+CP ?= cp -v
+RSYNC ?= rsync -v
+TAR ?= tar -v
+else
+RM ?= rm
+CP ?= cp
+RSYNC ?= rsync
+TAR ?= tar
+endif
+
+ifeq ($(LINKS),yes)
+LINK_DEPS ?= link
+else
+LINK_DEPS ?=
+endif
+
+
+all: $(TARGET)
 	@echo "bloombox-dashboard is ready."
 
 
@@ -16,29 +41,66 @@ all: build
 ## Build Flow
 #
 
-build: $(TARGET) $(ENV) dependencies
-	@polymer build --sw-precache-config ./sw-precache-config.js
+$(TARGET): $(ENV) dependencies $(LINK_DEPS)
+	@mkdir -p $(TARGET)
+	@echo "Staging build..."
+	@polymer build $(POLYMER_BUILD_FLAGS);
 	@echo "Build complete."
+	@$(TAR) -czf release.tar.gz $(TARGET)/
 
-release: build
+release: $(ENV) dependencies $(LINK_DEPS)
+	@mkdir -p $(TARGET)
+	@echo "Building dashboard in release mode..."
+	@polymer build $(POLYMER_RELEASE_FLAGS);
+	@echo "Build complete."
 	@echo "Building release package..."
-	@tar -czvf release.tar.gz $(TARGET)/
-	@mv release.tar.gz $(TARGET)/
+	@cp -frv ./*.json ./*.html ./Makefile $(TARGET)
+	@cd $(TARGET) && $(TAR) -czf ../$(VERSION).tar.gz *
 	@echo "Release ready."
 
-dependencies:
+dependencies: $(COMPONENTS_PATH)
+
+$(COMPONENTS_PATH):
 	@echo "Installing project dependencies..."
 	@bower install
 	@echo "Dependencies ready."
 
+link: $(COMPONENTS_PATH)
+	@echo "Linking local dependencies..."
+	@bower link bloombox-account
+	@bower link bloombox-partner-info
+	@bower link bloombox-settings
+	@bower link bloombox-profile
+	@bower link bloombox-elements
+	@bower link bloombox-enroll
+	@bower link bloombox-strain
+	@bower link bloombox-edible
+	@bower link bloombox-preroll
+	@bower link bloombox-concentrate
+	@bower link bloombox-cartridge
+	@bower link bloombox-apothecary
+	@bower link bloombox-device
+	@bower link bloombox-analytics-chart
+	@bower link bloombox-testing
+	@bower link bloombox-menutools
+	@bower link bloombox-media
+	@bower link bloombox-user
+	@bower link bloombox-logo
+	@bower link bloombox-icons
+	@bower link bloombox-pricelist
+	@bower link bloombox-product-list
+	@bower link bloombox-product
+	@bower link bloombox-styles
+
+
 clean:
 	@echo "Cleaning project..."
 	@find . -name .DS_Store -delete
-	@rm -frv $(TARGET)
+	@$(RM) -fr $(TARGET) *.tar.gz
 
 distclean: clean
 	@echo "Resetting project..."
-	@rm -frv $(TARGET) $(ENV)
+	@$(RM) -frv $(TARGET) $(ENV) $(COMPONENTS_PATH)
 	@git reset --hard
 
 forceclean: distclean
@@ -52,11 +114,6 @@ forceclean: distclean
 $(ENV):
 	@echo "Establishing envroot..."
 	@mkdir -p $(ENV)
-
-$(TARGET):
-	@echo "Establishing buildroot..."
-	@mkdir -p $(TARGET)
-
 
 .PHONY: all build release dependencies clean distclean forceclean
 

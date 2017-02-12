@@ -1,0 +1,25 @@
+{
+  "name": "bloombox-dashboard",
+  "version": "0.0.4",
+  "description": "Bloombox Dashboard UI code and logic.",
+  "main": "index.html",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/bloombox/bloombox-dashboard.git"
+  },
+  "keywords": [
+    "polymer",
+    "bloombox",
+    "momentum"
+  ],
+  "author": "Sam Gammon <s@momentum.io>",
+  "private": true,
+  "bugs": {
+    "url": "https://github.com/bloombox/bloombox-dashboard/issues"
+  },
+  "homepage": "https://github.com/bloombox/bloombox-dashboard",
+  "dependencies": {
+    "bower-art-resolver": "^2.0.8",
+    "bower": "^1.4.1"
+  }
+}

@@ -1,0 +1,304 @@
+
+<link rel="import" href="../../components/polymer/polymer.html">
+
+<link rel="import" href="../../components/paper-spinner/paper-spinner-lite.html">
+
+<link rel="import" href="../../components/bloombox-styles/bloombox-styles.html">
+
+
+<dom-module id="bloombox-infrastructure-chart">
+  <template strip-whitespace>
+    <style is="custom-style" include="bloombox-styles">
+      :host {
+        background: white;
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+        padding: 10px;
+        border-radius: 5px;
+        color: #757575;
+        margin: 10px 17px;
+        height: var(--bloombox-infrastructure-chart-height, 170px);
+        width: var(--bloombox-infrastructure-chart-width, 345px);
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+      }
+
+      .ifx-chart-loading-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .chart-card .chart-container {
+        margin-top: 20px;
+        overflow: hidden;
+        height: calc(var(--bloombox-infrastructure-chart-height, 240px) - 40px);
+        width: var(--bloombox-infrastructure-chart-width, 345px);
+      }
+
+      iframe {
+        border: none;
+        overflow: visible;
+      }
+
+      iframe[hidden] {
+        display: none;
+      }
+    </style>
+
+    <div class="chart-card">
+      <template is="dom-if" if="[[_readyToStamp]]" restamp>
+        <div class="chart-container">
+          <iframe
+            src="[[_chartSource]]"
+            width="[[width]]"
+            height="260"
+            scrolling$="[[scrolling]]"
+            hidden="[[loading]]"
+            seamless></iframe>
+        </div><!-- end .chart-container -->
+      </template>
+      <template is="dom-if" if="[[loading]]" restamp>
+        <div class="ifx-chart-loading-container">
+          <paper-spinner-lite active></paper-spinner-lite>
+        </div><!-- end div.ifx-chart-loading-container -->
+      </template>
+    </div><!-- end .chart-card -->
+  </template>
+
+  <script type="text/javascript">
+    "use strict";
+
+    /**
+     * Enumerates available chart timeframes.
+     *
+     * @enum {string}
+     */
+    var AdminChartTimeframe = {
+      ONE_HOUR: "1h",
+      SIX_HOURS: "6h",
+      ONE_DAY: "1d",
+      ONE_WEEK: "1w",
+      ONE_MONTH: "1M",
+      SIX_WEEKS: "6w"
+    };
+
+    /**
+     * Enumerates available chart themes.
+     *
+     * @enum {string}
+     */
+    var AdminChartTheme = {
+      LIGHT: "light",
+      DARK: "dark"
+    };
+
+    /**
+     * Enumerates available theme colors.
+     *
+     * @enum {string}
+     */
+    var AdminThemeColors = {
+      LightText: "#ddd",
+      DarkText: "#333"
+    };
+
+    /**
+     * `<bloombox-infrastructure-chart>`
+     */
+    var BloomboxInfrastructureChart = Polymer.BloomboxInfrastructureChart = Polymer({
+      is: "bloombox-infrastructure-chart",
+
+      properties: {
+        /**
+         * Computed property that provides a built URI for the `<iframe>`
+         * source for a given chart.
+         *
+         * @type {string}
+         */
+        _chartSource: {
+          type: String,
+          notify: true,
+          reflectToAttribute: false,
+          computed: "_computeChartSource(chartId, drawMode, showLegend, theme, autoRefresh, timeframe)"
+        },
+
+        /**
+         * Notifies this element when it should plant its `<iframe>`.
+         *
+         * @type {boolean}
+         */
+        _readyToStamp: {
+          type: Boolean,
+          notify: true,
+          value: false
+        },
+
+        /**
+         * ID of a Stackdriver chart that is public and should be displayed
+         * within this component.
+         *
+         * @type {string}
+         */
+        chartId: {
+          type: String,
+          notify: true,
+          reflectToAttribute: true
+        },
+
+        /**
+         * Stackdriver draw mode of the chart. Defaults to `color`.
+         *
+         * @type {string}
+         */
+        drawMode: {
+          type: String,
+          notify: true,
+          reflectToAttribute: true,
+          value: "color"
+        },
+
+        /**
+         * Whether we should show a legend on the chart we are displaying.
+         *
+         * @type {boolean}
+         */
+        showLegend: {
+          type: Boolean,
+          notify: true,
+          reflectToAttribute: true,
+          value: true
+        },
+
+        /**
+         * The visual theme we should use for this chart. Valid options
+         * are `light` and `dark`.
+         *
+         * @type {AdminChartTheme}
+         */
+        theme: {
+          type: String,
+          notify: true,
+          reflectToAttribute: true,
+          value: AdminChartTheme.LIGHT
+        },
+
+        /**
+         * The width, in pixels, of this chart.
+         *
+         * @type {number}
+         */
+        width: {
+          type: Number,
+          notify: true,
+          reflectToAttribute: true,
+          value: 370
+        },
+
+        /**
+         * Whether to allow scrolling in the target `<iframe>`. Rarely
+         * used and defaults to `false`.
+         *
+         * @type {boolean}
+         */
+        scrolling: {
+          type: Boolean,
+          notify: true,
+          value: false
+        },
+
+        /**
+         * Whether the auto-refresh feature is active.
+         *
+         * @type {boolean}
+         */
+        autoRefresh: {
+          type: Boolean,
+          notify: true
+        },
+
+        /**
+         * Current setting for chart timeframe control.
+         *
+         * @type {AdminChartTimeframe}
+         */
+        timeframe: {
+          type: String,
+          notify: true,
+          value: AdminChartTimeframe.SIX_HOURS
+        },
+
+        /**
+         * Whether we are still loading or not.
+         *
+         * @type {boolean}
+         */
+        loading: {
+          type: Boolean,
+          value: true
+        }
+      },
+
+      /**
+       * Compute the `<iframe>` source for an admin insfrastructure chart.
+       *
+       * @param {string} chartId The ID of the Stackdriver chart.
+       * @param {string} drawMode The draw mode of the chart.
+       * @param {boolean} showLegend Whether we should show a legend.
+       * @param {string} theme The color theme of the chart, either `dark` or `light`.
+       * @param {boolean} autoRefresh Whether to enable auto-refresh.
+       * @param {string} timeframe Charting timeframe to apply.
+       * @returns {string} Valid URI to use as an `<iframe>` source for the chart.
+       */
+      _computeChartSource: function(chartId, drawMode, showLegend, theme, autoRefresh, timeframe) {
+        return "https://public.google.stackdriver.com/public/chart/" + chartId +
+                  "?drawMode=" + drawMode +
+                  "&showLegend=" + (showLegend === true ? "true" : "false") +
+                  "&theme=" + theme +
+                  "&timeframe=" + timeframe +
+                  "&autoRefresh=" + (autoRefresh === true ? "true" : "false");
+      },
+
+      /**
+       * Tell this chart it's time to load up.
+       */
+      notifyLoad: function() {
+        var that = this;
+        this.async(function() {
+          that.set("_readyToStamp", true);
+
+          this.async(function() {
+            that.set("loading", false);
+          }, 3000);
+        }, 200);
+      },
+
+      /**
+       * Tell this chart it's time to load up.
+       */
+      notifyUnload: function() {
+        var that = this;
+        this.async(function() {
+          that.set("_readyToStamp", false);
+          that.async(function() {
+            that.set("loading", true);
+          });
+        });
+      },
+
+      /**
+       * Lifecycle event, called upon attachment to the DOM.
+       */
+      attached: function() {
+        this.domHost.registerMonitoringChart(this);
+      }
+    });
+  </script>
+</dom-module>

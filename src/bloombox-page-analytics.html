@@ -1,21 +1,21 @@
 
-<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../components/polymer/polymer.html">
 
-<link rel="import" href="../bower_components/bloombox-styles/bloombox-styles.html">
-<link rel="import" href="../bower_components/bloombox-analytics-chart/bloombox-analytics-chart.html">
+<link rel="import" href="../components/bloombox-styles/bloombox-styles.html">
+<link rel="import" href="../components/bloombox-analytics-chart/bloombox-analytics-chart.html">
 
-<link rel="import" href="../bower_components/iron-label/iron-label.html">
-<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../components/iron-label/iron-label.html">
+<link rel="import" href="../components/iron-pages/iron-pages.html">
 
-<link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
-<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
-<link rel="import" href="../bower_components/paper-item/paper-item.html">
-<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
-<link rel="import" href="../bower_components/paper-toolbar/paper-toolbar.html">
-<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
-<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../components/paper-tabs/paper-tab.html">
+<link rel="import" href="../components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../components/paper-item/paper-item.html">
+<link rel="import" href="../components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../components/paper-toolbar/paper-toolbar.html">
+<link rel="import" href="../components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../components/paper-dropdown-menu/paper-dropdown-menu.html">
 
-<link rel="import" href="../bower_components/google-analytics/google-analytics-date-selector.html">
+<link rel="import" href="../components/google-analytics/google-analytics-date-selector.html">
 
 <link rel="import" href="./behaviors/bloombox-dashboard-page-behavior.html">
 
@@ -96,7 +96,13 @@
 
       /** -- Main Content -- **/
       main iron-pages {
-        margin: 25px;
+        margin: 0 25px;
+        overflow-x: scroll;
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        top: 112px;
       }
 
       iron-pages section h2.column-title {
@@ -113,6 +119,17 @@
         flex: 1 0 auto;
       }
 
+      iron-pages section .chart-row {
+        display: flex;
+        flex-direction: row;
+        padding: 5px;
+      }
+
+      iron-pages section .chart-row bloombox-analytics-chart {
+        flex: 1;
+        margin: 5px;
+      }
+
       iron-pages section .column-spacer {
         display: inline-block;
         width: 20px;
@@ -126,7 +143,37 @@
 
       /** -- Summary Section -- **/
       iron-pages section.summary-page .sparkline-toplevel {
+        max-width: 400px;
+      }
+
+      iron-pages section.summary-page .sparkline-toplevel .sparkline-charts {
+        display: flex;
+        margin-bottom: 30px;
+      }
+
+      iron-pages section.summary-page .sparkline-charts .sparklines {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 40px;
+      }
+
+      iron-pages section.summary-page .sparkline-charts .sparklines,
+      iron-pages section.summary-page .sparkline-charts .metrics {
         max-width: 200px;
+      }
+
+      iron-pages section.summary-page .sparkline-charts bloombox-analytics-chart {
+        width: 200px;
+        --bloombox-chart-width: 200px;
+        margin-bottom: 5px;
+        margin-top: 5px;
+      }
+
+      iron-pages section.summary-page .sparkline-charts .metrics bloombox-analytics-chart {
+        height: 150px;
+        --bloombox-chart-min-height: 150px;
       }
 
       iron-pages section.summary-page .sparkline-toplevel bloombox-analytics-chart {
@@ -142,11 +189,12 @@
         fallback-selection="summary"
         selected="{{tab}}"
         class="nav-tabs"
-        disabled$="[[loading]]"
-        hidden>
+        disabled$="[[loading]]">
         <paper-tab key="summary">Summary</paper-tab>
-        <paper-tab key="sections">Sections</paper-tab>
         <paper-tab key="products">Products</paper-tab>
+        <paper-tab key="actions">Actions</paper-tab>
+        <paper-tab key="testing">Testing</paper-tab>
+        <paper-tab key="grow-and-species">Grow &amp; Species</paper-tab>
       </paper-tabs><!-- end paper-tabs#analyticsSectionTabs -->
       <paper-toolbar id="mainToolbar">
         <h1>[[heading]]</h1>
@@ -182,37 +230,86 @@
         attr-for-selected="key"
         class="main-pages">
         <section key="summary" class="summary-page">
-          <h2 class="column-title">30-day trends</h2>
           <div class="chart-columns">
             <div class="chart-column sparkline-toplevel">
+              <div class="sparkline-charts top-box">
+                <div class="metrics">
+                  <bloombox-analytics-chart
+                    heading="Section Views"
+                    environment="[[environment]]"
+                    partner="[[partner]]"
+                    location="[[location]]"
+                    chart-type="metric"
+                    analysis-type="count"
+                    data-type="sections"
+                    timeframe="1_day"
+                    project-id="[[_projectId]]"
+                    colors='["transparent"]'
+                    read-key="[[readKey]]"
+                    filters='[{"operator":"not_contains","property_name":"device","property_value":"MM"}]'
+                    auto-refresh></bloombox-analytics-chart>
+                  <bloombox-analytics-chart
+                    heading="Product Views"
+                    environment="[[environment]]"
+                    partner="[[partner]]"
+                    location="[[location]]"
+                    chart-type="metric"
+                    analysis-type="count"
+                    data-type="products"
+                    timeframe="1_day"
+                    project-id="[[_projectId]]"
+                    colors='["transparent"]'
+                    read-key="[[readKey]]"
+                    filters='[{"operator":"not_contains","property_name":"device","property_value":"MM"}]'
+                    auto-refresh></bloombox-analytics-chart>
+                </div><!-- end div.metrics -->
+                <div class="sparklines">
+                  <bloombox-analytics-chart
+                    heading="Section views"
+                    environment="[[environment]]"
+                    partner="[[partner]]"
+                    location="[[location]]"
+                    collection="screens"
+                    chart-type="sparkline"
+                    analysis-type="count"
+                    data-type="sections"
+                    timeframe="30_days"
+                    interval="daily"
+                    colors='["#333"]'
+                    project-id="[[_projectId]]"
+                    read-key="[[readKey]]"></bloombox-analytics-chart>
+                  <bloombox-analytics-chart
+                    heading="Product views"
+                    environment="[[environment]]"
+                    partner="[[partner]]"
+                    location="[[location]]"
+                    collection="products"
+                    chart-type="sparkline"
+                    analysis-type="count"
+                    data-type="products"
+                    timeframe="30_days"
+                    interval="daily"
+                    project-id="[[_projectId]]"
+                    colors='["#333"]'
+                    read-key="[[readKey]]"></bloombox-analytics-chart>
+                  <bloombox-analytics-chart
+                    heading="Actions"
+                    environment="[[environment]]"
+                    partner="[[partner]]"
+                    location="[[location]]"
+                    collection="actions"
+                    chart-type="sparkline"
+                    analysis-type="count"
+                    data-type="actions"
+                    timeframe="30_days"
+                    interval="daily"
+                    colors='["#333"]'
+                    project-id="[[_projectId]]"
+                    read-key="[[readKey]]"></bloombox-analytics-chart>
+                </div><!-- end div.sparklines -->
+              </div><!-- end div.sparkline-charts.top-box -->
               <bloombox-analytics-chart
-                heading="Section views"
-                environment="[[environment]]"
-                partner="[[partner]]"
-                location="[[location]]"
-                collection="screens"
-                chart-type="sparkline"
-                analysis-type="count"
-                data-type="sections"
-                timeframe="1_month"
-                interval="daily"
-                project-id="[[_projectId]]"
-                read-key="[[readKey]]"></bloombox-analytics-chart>
-              <bloombox-analytics-chart
-                heading="Product clicks"
-                environment="[[environment]]"
-                partner="[[partner]]"
-                location="[[location]]"
-                collection="products"
-                chart-type="sparkline"
-                analysis-type="count"
-                data-type="products"
-                timeframe="1_month"
-                interval="daily"
-                project-id="[[_projectId]]"
-                colors='["coral"]'
-                read-key="[[readKey]]"></bloombox-analytics-chart>
-              <bloombox-analytics-chart
+                heading="Section Views"
                 environment="[[environment]]"
                 partner="[[partner]]"
                 location="[[location]]"
@@ -220,59 +317,292 @@
                 chart-type="pie"
                 analysis-type="count"
                 data-type="sections"
-                timeframe="1_month"
+                timeframe="30_days"
                 group-by="name"
+                colors="#333"
+                project-id="[[_projectId]]"
+                read-key="[[readKey]]"></bloombox-analytics-chart>
+              <bloombox-analytics-chart
+                heading="Actions"
+                environment="[[environment]]"
+                partner="[[partner]]"
+                location="[[location]]"
+                collection="actions"
+                chart-type="pie"
+                analysis-type="count"
+                data-type="actions"
+                timeframe="30_days"
+                group-by="action"
+                colors="#333"
                 project-id="[[_projectId]]"
                 read-key="[[readKey]]"></bloombox-analytics-chart>
             </div><!-- end div.chart-column.sparkline-toplevel -->
             <div class="column-spacer"></div><!-- end div.column-spacer -->
             <div class="chart-column">
+              <div class="chart-row">
+                <bloombox-analytics-chart
+                  heading="Daily screens by section"
+                  environment="[[environment]]"
+                  partner="[[partner]]"
+                  location="[[location]]"
+                  collection="screens"
+                  chart-type="line"
+                  analysis-type="count"
+                  data-type="sections"
+                  timeframe="30_days"
+                  timeframe-mode="previous"
+                  interval="daily"
+                  group-by="name"
+                  project-id="[[_projectId]]"
+                  read-key="[[readKey]]"></bloombox-analytics-chart>
+              </div><!-- end div.chart-row -->
+              <div class="chart-row">
+                <bloombox-analytics-chart
+                  heading="Daily actions by type"
+                  environment="[[environment]]"
+                  partner="[[partner]]"
+                  location="[[location]]"
+                  collection="actions"
+                  chart-type="line"
+                  analysis-type="count"
+                  data-type="actions"
+                  timeframe="30_days"
+                  timeframe-mode="previous"
+                  interval="daily"
+                  group-by="action"
+                  filters='[{"property_name":"action","operator":"exists","property_value":true},{"property_name":"action","operator":"ne","property_value":null},{"property_name":"action","operator":"not_contains","property_value":"null"}]'
+                  project-id="[[_projectId]]"
+                  read-key="[[readKey]]"></bloombox-analytics-chart>
+              </div><!-- end div.chart-row -->
+            </div><!-- end div.chart-column -->
+          </div><!-- end div.chart-columns -->
+        </section><!-- end section.summary-page -->
+        <section key="products" class="products-page">
+          <div class="chart-columns">
+            <div class="chart-column">
               <bloombox-analytics-chart
-                heading="Daily screens by section"
+                heading="Daily product views by section"
                 environment="[[environment]]"
                 partner="[[partner]]"
                 location="[[location]]"
-                collection="screens"
-                chart-type="multiline"
+                collection="products"
+                chart-type="line"
                 analysis-type="count"
-                data-type="sections"
-                timeframe="1_month"
+                data-type="products"
+                timeframe="30_days"
+                timeframe-mode="previous"
                 interval="daily"
-                group-by="name"
+                group-by="type"
+                filters='[{"property_name":"type","operator":"exists","property_value":true},{"property_name":"type","operator":"ne","property_value":null},{"property_name":"type","operator":"not_contains","property_value":"null"}]'
                 project-id="[[_projectId]]"
                 read-key="[[readKey]]"></bloombox-analytics-chart>
+              <bloombox-analytics-chart
+                heading="Daily non-flower product views, by section"
+                environment="[[environment]]"
+                partner="[[partner]]"
+                location="[[location]]"
+                collection="products"
+                chart-type="line"
+                analysis-type="count"
+                data-type="products"
+                timeframe="30_days"
+                timeframe-mode="previous"
+                interval="daily"
+                group-by="type"
+                filters='[{"property_name":"type","operator":"exists","property_value":true},{"property_name":"type","operator":"ne","property_value":null},{"property_name":"type","operator":"ne","property_value":"Flower"},{"property_name":"type","operator":"not_contains","property_value":"null"}]'
+                project-id="[[_projectId]]"
+                read-key="[[readKey]]"></bloombox-analytics-chart>
+              <bloombox-analytics-chart
+                heading="Non-flower product views, by brand"
+                environment="[[environment]]"
+                partner="[[partner]]"
+                location="[[location]]"
+                collection="products"
+                chart-type="line"
+                analysis-type="count"
+                data-type="products"
+                timeframe="30_days"
+                timeframe-mode="previous"
+                interval="daily"
+                group-by="brand"
+                filters='[{"property_name":"type","operator":"exists","property_value":true},{"property_name":"type","operator":"ne","property_value":null},{"property_name":"type","operator":"ne","property_value":"Flower"},{"property_name":"type","operator":"not_contains","property_value":"null"}]'
+                project-id="[[_projectId]]"
+                read-key="[[readKey]]"></bloombox-analytics-chart>
+            </div><!-- end div.chart-column -->
+          </div><!-- end div.chart-columns -->
+        </section><!-- end section.products-page -->
+        <section key="actions" class="actions-page">
+          <div class="chart-columns">
+            <div class="chart-column">
+              <bloombox-analytics-chart
+                heading="Daily actions by type"
+                environment="[[environment]]"
+                partner="[[partner]]"
+                location="[[location]]"
+                collection="actions"
+                chart-type="line"
+                analysis-type="count"
+                data-type="actions"
+                timeframe="30_days"
+                timeframe-mode="previous"
+                interval="daily"
+                group-by="action"
+                filters='[{"property_name":"action","operator":"exists","property_value":true},{"property_name":"action","operator":"ne","property_value":null},{"property_name":"action","operator":"not_contains","property_value":"null"}]'
+                project-id="[[_projectId]]"
+                read-key="[[readKey]]"></bloombox-analytics-chart>
+              <bloombox-analytics-chart
+                heading="Total actions by section"
+                environment="[[environment]]"
+                partner="[[partner]]"
+                location="[[location]]"
+                collection="actions"
+                chart-type="line"
+                analysis-type="count"
+                data-type="actions"
+                timeframe="30_days"
+                timeframe-mode="previous"
+                interval="daily"
+                group-by="section"
+                filters='[{"property_name":"section","operator":"exists","property_value":true},{"property_name":"section","operator":"ne","property_value":null},{"property_name":"section","operator":"not_contains","property_value":"null"}]'
+                project-id="[[_projectId]]"
+                read-key="[[readKey]]"></bloombox-analytics-chart>
+              <bloombox-analytics-chart
+                heading="Actions by type and section"
+                environment="[[environment]]"
+                partner="[[partner]]"
+                location="[[location]]"
+                collection="actions"
+                chart-type="line"
+                analysis-type="count"
+                data-type="actions"
+                timeframe="30_days"
+                timeframe-mode="previous"
+                interval="daily"
+                group-by='["section", "action"]'
+                filters='[{"property_name":"section","operator":"exists","property_value":true},{"property_name":"section","operator":"ne","property_value":null},{"property_name":"section","operator":"not_contains","property_value":"null"}]'
+                project-id="[[_projectId]]"
+                read-key="[[readKey]]"></bloombox-analytics-chart>
+            </div><!-- end div.chart-column -->
+          </div><!-- end div.chart-columns -->
+        </section><!-- end section.actions-page -->
+        <section key="testing" class="testing-page">
+          <div class="chart-columns">
+            <div class="chart-column">
+              <div class="chart-row">
+                <bloombox-analytics-chart
+                  heading="THC per strain viewed"
+                  environment="[[environment]]"
+                  partner="[[partner]]"
+                  location="[[location]]"
+                  collection="products"
+                  chart-type="line"
+                  analysis-type="average"
+                  target-property="tests.thc"
+                  data-type="products"
+                  timeframe="30_days"
+                  timeframe-mode="previous"
+                  interval="daily"
+                  filters='[{"property_name":"type","operator":"eq","property_value":"Flower"}]'
+                  project-id="[[_projectId]]"
+                  read-key="[[readKey]]"></bloombox-analytics-chart>
+              </div><!-- end div.chart-row -->
+              <div class="chart-row">
+                <bloombox-analytics-chart
+                  heading="THC per strain viewed"
+                  environment="[[environment]]"
+                  partner="[[partner]]"
+                  location="[[location]]"
+                  collection="products"
+                  chart-type="line"
+                  analysis-type="average"
+                  target-property="tests.thc"
+                  data-type="products"
+                  timeframe="30_days"
+                  timeframe-mode="previous"
+                  interval="daily"
+                  filters='[{"property_name":"type","operator":"eq","property_value":"Flower"}]'
+                  project-id="[[_projectId]]"
+                  read-key="[[readKey]]"></bloombox-analytics-chart>
+                <bloombox-analytics-chart
+                  heading="CBD per strain viewed"
+                  environment="[[environment]]"
+                  partner="[[partner]]"
+                  location="[[location]]"
+                  collection="products"
+                  chart-type="line"
+                  analysis-type="average"
+                  target-property="tests.cbd"
+                  data-type="products"
+                  timeframe="30_days"
+                  timeframe-mode="previous"
+                  interval="daily"
+                  filters='[{"property_name":"type","operator":"eq","property_value":"Flower"}]'
+                  project-id="[[_projectId]]"
+                  read-key="[[readKey]]"></bloombox-analytics-chart>
+              </div><!-- end div.chart-row -->
+            </div><!-- end div.chart-column -->
+          </div><!-- end div.chart-columns -->
+        </section><!-- end section.testing-page -->
+        <section key="grow-and-species" class="grow-and-species-page">
+          <div class="chart-columns">
+            <div class="chart-column">
               <bloombox-analytics-chart
                 heading="Daily clicks by species"
                 environment="[[environment]]"
                 partner="[[partner]]"
                 location="[[location]]"
                 collection="products"
-                chart-type="multiline"
+                chart-type="line"
                 analysis-type="count"
                 data-type="products"
-                timeframe="1_month"
+                timeframe="30_days"
+                timeframe-mode="previous"
                 interval="daily"
                 group-by="species"
+                filters='[{"property_name":"species","operator":"exists","property_value":true},{"property_name":"species","operator":"ne","property_value":null},{"property_name":"species","operator":"not_contains","property_value":"null"}]'
+                project-id="[[_projectId]]"
+                read-key="[[readKey]]"></bloombox-analytics-chart>
+              <bloombox-analytics-chart
+                heading="Daily clicks by grow"
+                environment="[[environment]]"
+                partner="[[partner]]"
+                location="[[location]]"
+                collection="products"
+                chart-type="line"
+                analysis-type="count"
+                data-type="products"
+                timeframe="30_days"
+                timeframe-mode="previous"
+                interval="daily"
+                group-by="grow"
+                filters='[{"property_name":"grow","operator":"ne","property_value":null},{"property_name":"grow","operator":"not_contains","property_value":"null"}]'
+                project-id="[[_projectId]]"
+                read-key="[[readKey]]"></bloombox-analytics-chart>
+              <bloombox-analytics-chart
+                heading="Daily clicks by species and grow"
+                environment="[[environment]]"
+                partner="[[partner]]"
+                location="[[location]]"
+                collection="products"
+                chart-type="line"
+                analysis-type="count"
+                data-type="products"
+                timeframe="30_days"
+                timeframe-mode="previous"
+                interval="daily"
+                group-by='["species", "grow"]'
+                filters='[{"property_name":"grow","operator":"ne","property_value":null},{"property_name":"grow","operator":"not_contains","property_value":"null"}]'
                 project-id="[[_projectId]]"
                 read-key="[[readKey]]"></bloombox-analytics-chart>
             </div><!-- end div.chart-column -->
           </div><!-- end div.chart-columns -->
-        </section><!-- end section.summary-page -->
-
-        <section key="sections" class="sections-page">
-          <b>sections</b>
-        </section><!-- end section.sections-page -->
-
-        <section key="products" class="products-page">
-          <b>products</b>
-        </section><!-- end section.products-page -->
+        </section><!-- end section.grow-and-species-page -->
       </iron-pages><!-- end iron-pages.main-pages -->
     </main>
   </template>
 
   <script>
-    var __DEFAULT_PROJECT_ID__ = "57a940b0c9e1631bb251f04e",
-        BloomboxPageAnalytics = Polymer.BloomboxPageAnalytics = Polymer({
+    var BloomboxPageAnalytics = Polymer.BloomboxPageAnalytics = Polymer({
       
       is: "bloombox-page-analytics",
 
@@ -308,7 +638,7 @@
           type: String,
           notify: true,
           readOnly: true,
-          value: __DEFAULT_PROJECT_ID__
+          value: __DEFAULT_KEEN_PROJECT_ID__
         },
 
         /**
@@ -339,16 +669,6 @@
           notify: true,
           reflectToAttribute: true,
           value: false
-        },
-
-        /**
-         * Scoped and encrypted Keen read key, so we can read data
-         * to generate charts.
-         */
-        readKey: {
-          type: String,
-          notify: true,
-          reflectToAttribute: true
         },
 
         /**
@@ -387,11 +707,15 @@
        */
       _computeHeading: function(tab) {
         if (tab === "summary")
-          return "Analytics Summary";
-        if (tab === "sections")
-          return "Stats by Section";
+          return "30-day Trends";
         if (tab === "products")
           return "Product Analytics";
+        if (tab === "actions")
+          return "User Actions";
+        if (tab === "testing")
+          return "Lab Test Stats";
+        if (tab === "grow-and-species")
+          return "Grow and Species";
         return "";
       },
 

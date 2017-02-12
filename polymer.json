@@ -7,6 +7,18 @@
     "src/bloombox-page-menu.html",
     "src/bloombox-page-profile.html",
     "src/bloombox-page-account.html",
-    "src/bloombox-page-settings.html"
+    "src/bloombox-page-settings.html",
+    "src/bloombox-page-admin.html"
+  ],
+  "sourceGlobs": [
+   "src/**/*",
+   "_local/**/*",
+   "assets/**/*",
+   "bower.json"
+  ],
+  "includeDependencies": [
+    "manifest.json",
+    "components/bloombox-enroll/bloombox-enroll.html",
+    "components/webcomponentsjs/webcomponents-lite.min.js"
   ]
 }

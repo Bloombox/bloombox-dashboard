@@ -1,6 +1,7 @@
 module.exports = {
   staticFileGlobs: [
-    '/manifest.json'
+    '/manifest.json',
+    '/components/webcomponentsjs/webcomponents-lite.min.js'
   ],
   handleFetch: true,
   skipWaiting: true,
@@ -9,11 +10,17 @@ module.exports = {
   navigateFallback: '/',
   navigateFallbackWhitelist: [/^(?!\/__)/],
   stripPrefixMulti: {
-    'bower_components': '/bower_components',
-    'bower_components/': '/bower_components/',
-    'src/bower_components/': '/bower_components/',
-    '/src/bower_components/': '/bower_components/',
-    '../src/bower_components/': '/bower_components/',
-    '../bower_components/': '/bower_components/'
+    'bower_components': '/components',
+    'bower_components/': '/components/',
+    'src/bower_components/': '/components/',
+    '/src/bower_components/': '/components/',
+    '../src/bower_components/': '/components/',
+    '../bower_components/': '/components/',
+    'components': '/components',
+    'components/': '/components/',
+    'src/components/': '/components/',
+    '/src/components/': '/components/',
+    '../src/components/': '/components/',
+    '../components/': '/components/'
   }
 };
