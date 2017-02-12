@@ -68,5 +68,8 @@
   },
   "resolution": {
     "paper-radio-group": "master"
+  },
+  "resolutions": {
+    "bloombox-styles": "0.0.4"
   }
 }

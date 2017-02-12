@@ -1,4 +1,6 @@
 bower_components
+components
+components/
 dist
 node_modules
 build
