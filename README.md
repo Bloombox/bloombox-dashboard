@@ -1,4 +1,6 @@
-# Bloombox Dashboard
+# Bloombox Dashboard  [![Build Status](https://buildbot.hq.mm-corp.systems/jenkins/buildStatus/icon?job=Bloombox/Dashboard)](https://buildbot.hq.mm-corp.systems/jenkins/job/Bloombox/Dashboard)
+
+[![Code Climate](https://codeclimate.com/repos/589fa5560d110112e6000001/badges/ca2ebf423c39fe91f120/gpa.svg)](https://codeclimate.com/repos/589fa5560d110112e6000001/feed) [![Issue Count](https://codeclimate.com/repos/589fa5560d110112e6000001/badges/ca2ebf423c39fe91f120/issue_count.svg)](https://codeclimate.com/repos/589fa5560d110112e6000001/feed)
 
 Further docs coming soon.
 

@@ -21,3 +21,4 @@ ratings:
   - "**.scss"
 exclude_paths:
 - "gulpfile.js"
+- "assets/style/lib/*"
