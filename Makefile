@@ -45,6 +45,7 @@ $(TARGET): $(ENV) dependencies $(LINK_DEPS)
 	@mkdir -p $(TARGET)
 	@echo "Staging build..."
 	@polymer build $(POLYMER_BUILD_FLAGS);
+	@cp -frv src/ $(TARGET)/bundled/
 	@echo "Build complete."
 	@$(TAR) -czf release.tar.gz $(TARGET)/
 
@@ -53,6 +54,7 @@ release: $(ENV) dependencies $(LINK_DEPS)
 	@echo "Building dashboard in release mode..."
 	@polymer build $(POLYMER_RELEASE_FLAGS);
 	@echo "Build complete."
+	@cp -frv src/ $(TARGET)/bundled/
 	@echo "Building release package..."
 	@cp -frv ./*.json ./*.html ./Makefile $(TARGET)
 	@cd $(TARGET) && $(TAR) -czf ../$(VERSION).tar.gz *
