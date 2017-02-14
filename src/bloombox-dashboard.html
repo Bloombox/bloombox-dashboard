@@ -1159,15 +1159,21 @@
         var that = this,
             newLocations = [],
             partners = this.partners,
-            partnerSpec = BloomboxPartnerCache[partner];
+            partnerKey = partner ? partner : null,
+            partnerSpec;
 
         if (partners !== null && partners !== undefined) {
-          console.info("Loading for partner '" + partner + "'...", partnerSpec);
-          this._setPartnerData(partnerSpec);
-          this.locations = partnerSpec.locations;
+          if (partnerKey === null) {
+            // load the first partner given
+            partnerKey = partners[0].key;
+          }
 
-          if (partner != null && partner != undefined && partner.length > 1) {
-            this._routeChanged(partner, this.page || 'home');
+          if (partnerKey != null && partnerKey !== undefined && partnerKey.length > 1) {
+            partnerSpec = BloomboxPartnerCache[partnerKey];
+            console.info("Loading for partner '" + partnerKey + "'...", partnerSpec);
+            this._setPartnerData(partnerSpec);
+            this.locations = partnerSpec.locations;
+            this._routeChanged(partnerKey, this.page || 'home');
           }
         }
       },
