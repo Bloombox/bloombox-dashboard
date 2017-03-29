@@ -866,9 +866,11 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
         body.appendChild(dialog);  // @TODO(sgammon): see TODO below for backdrop fix info
         dialog.style.marginBottom = "150px";
         dialog.style.marginTop = "150px";
-        cancelButton.style.position = "absolute";
-        cancelButton.style.left = "10px";
-        proceedButton.style.fontWeight = "bold";
+        if (cancelButton) {
+          cancelButton.style.position = "absolute";
+          cancelButton.style.left = "10px";
+          proceedButton.style.fontWeight = "bold";
+        }
         this._actionCallback = (function(state) {
           actionCallback(action, state, dialog);
         });
