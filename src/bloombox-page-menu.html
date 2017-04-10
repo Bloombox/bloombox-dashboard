@@ -451,7 +451,7 @@
               partner="[[partner]]"
               environment="[[environment]]"
               name="[[selectedItem.value.name]]"
-              pricing="[[formatPricelist(selectedItem.value.pricelist)]]"
+              pricing="[[formatPricelistForFlower(selectedItem.value.pricelist)]]"
               grow="[[_processGrowValue(selectedItem.value.grow)]]"
               species="[[_processSpeciesValue(selectedItem)]]"
               visible="[[_processVisible(selectedItem.value.flags.visible)]]"
@@ -506,7 +506,7 @@
               name="[[selectedItem.value.name]]"
               brand="[[selectedItem.value.brand]]"
               type="[[selectedItem.value.type]]"
-              pricing="[[selectedItem.value.pricing]]"
+              pricing="[[formatPricelistForConcentrate(selectedItem.value.pricing)]]"
               species="[[selectedItem.value.species]]"
               visible="[[_processVisible(selectedItem.value.flags.visible)]]"
               description$="[[selectedItem.value.description]]"
@@ -1038,7 +1038,7 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
         console.groupEnd();
       },
 
-      formatPricelist: function(pricelist) {
+      formatPricelistForFlower: function(pricelist) {
         if (pricelist == null)
           return [];
         return [
@@ -1047,6 +1047,15 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
           {"label": "7g", "available": pricelist["quarter"]["available"], "price": pricelist["quarter"]["price"]},
           {"label": "14g", "available": pricelist["half"]["available"], "price": pricelist["half"]["price"]},
           {"label": "28g", "available": pricelist["ounce"]["available"], "price": pricelist["ounce"]["price"]}
+        ];
+      },
+
+      formatPricelistForConcentrate: function(pricelist) {
+        if (pricelist == null)
+          return [];
+        return [
+          {"label": "1g", "available": pricelist["gram"]["available"], "price": pricelist["gram"]["value"]},
+          {"label": ".5g", "available": pricelist["halfgram"]["available"], "price": pricelist["halfgram"]["value"]}
         ];
       },
 
