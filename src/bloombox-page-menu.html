@@ -14,10 +14,13 @@
 <link rel="import" href="../components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../components/paper-button/paper-button.html">
 <link rel="import" href="../components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../components/paper-toggle-button/paper-toggle-button.html">
 <link rel="import" href="../components/paper-dialog-scrollable/paper-dialog-scrollable.html">
 
 <link rel="import" href="../components/neon-animation/animations/scale-up-animation.html">
 <link rel="import" href="../components/neon-animation/animations/fade-out-animation.html">
+
+<link rel="import" href="../components/marked-element/marked-element.html">
 
 <link rel="import" href="../components/polymerfire/firebase-document.html">
 
@@ -46,7 +49,6 @@
     <style is="custom-style" include="bloombox-styles">
       :root {
         --bloombox-product-list-width: 420px;
-        --paper-fab-background: #4c9d2f;
       }
 
       :host {
@@ -211,6 +213,64 @@
       data="{{products}}"></firebase-document>
 
     <div class="action-dialogs">
+      <!-- Embed Menu Dialog -->
+      <paper-dialog id="embedMenuActionDialog" always-on-top modal class="menu-action-dialog" style="top: 100px;">
+        <h2>Embedded Menus</h2>
+        <paper-dialog-scrollable style="width: 600px; min-height: 300px; display: flex; justify-content: center;">
+          <form is="iron-form" id="embedMenuSettingsForm" content-type="application/json">
+            <p><b>New!</b> Embedded Menus allow you to show your menu on your own website.</p>
+            <hr />
+
+            <div style="padding: 10px; margin-bottom: 10px;">
+              <h3>Things to know</h3>
+
+              <p>Installing your embedded menu is easy. The feature must remain active for menu updates to keep being pushed, but otherwise, you may shut it off at any time, and it will be out-of-date but won't break your website.</p>
+
+              <p>We use the powerful <a target="_blank" href="https://polymer-project.org">Polymer</a> framework from Google for Bloombox. If you already use Polymer, you can also <a target="_blank" href="https://github.com/bloombox/bloombox-embedded-menu">import and use</a> the menu component directly.</p>
+
+              <p><b>Note:</b> This will expose your menu data in a public manner. Once you activate this feature, updates are pushed to your webpage. It should not incur any additional charges for your website.</p>
+              <paper-checkbox
+                name="permission"
+                checked="{{_userAuthorizesEmbeddedMenus}}"
+                disabled="{{_userAuthorizesEmbeddedMenus}}"
+                style="user-select: none; cursor: pointer;">I understand</paper-checkbox>
+            </div><!-- end .embedded-menu-message -->
+
+            <div style$="[[_stylesForEmbedSettingsForm]]">
+              <paper-toggle-button
+                name="enabled"
+                active="{{_userEnabledEmbeddedMenus}}"
+                disabled="{{!_userAuthorizesEmbeddedMenus}}"
+                style="user-select: none; cursor: pointer; margin-top:10px; margin-bottom: 10px; touch-action: pan-y;">Enable Embedded Menus</paper-toggle-button>
+
+              <div class="universal-embedded-menu-instructions">
+                <marked-element id="embedCodeSample" hidden="[[!_userEnabledEmbeddedMenus]]">
+                  <div class="markdown-html"></div>
+                  <script type="text/markdown">
+                    ## Installation
+
+                    Example:
+
+                    ```html
+                    <paper-toolbar>
+                      <paper-icon-button icon="menu"></paper-icon-button>
+                      <div class="title">Title</div>
+                      <paper-icon-button icon="more"></paper-icon-button>
+                    </paper-toolbar>
+                    ```
+
+                    _Nifty_ features.
+                  </script>
+                </marked-element>
+              </div><!-- end div.universal-embedded-menu-instructions -->
+            </div><!-- end .embedded-menu-settings -->
+          </form>
+        </paper-dialog-scrollable>
+        <div class="buttons">
+          <paper-button class="proceedButton" autofocus on-tap="_proceedWithAction">OK</paper-button>
+        </div>
+      </paper-dialog>
+
       <!-- Print Menu Dialog -->
       <paper-dialog id="printMenuActionDialog" always-on-top modal class="menu-action-dialog">
         <h2>Print Menu: Settings</h2>
@@ -653,6 +713,25 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
           notify: true
         },
 
+        _userAuthorizesEmbeddedMenus: {
+          type: Boolean,
+          notify: true,
+          value: false
+        },
+
+        _userEnabledEmbeddedMenus: {
+          type: Boolean,
+          notify: true,
+          value: false,
+          observer: "_embeddedMenuEnableToggled"
+        },
+
+        _stylesForEmbedSettingsForm: {
+          type: String,
+          notify: true,
+          computed: "_computeStylesForEmbedSettingsForm(_userAuthorizesEmbeddedMenus, _userEnabledEmbeddedMenus)"
+        },
+
         zerostate: {
           type: Boolean,
           notify: true,
@@ -765,6 +844,13 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
         return sectionMode === "some";
       },
 
+      _computeStylesForEmbedSettingsForm: function(authorized, enabled) {
+        let baseStyles = "padding: 10px; overflow: hidden;";
+        if (!enabled)
+          return baseStyles + "border: 1px solid rgba(153, 153, 153, 0.6);";
+        return baseStyles + "border: 1px solid rgba(62, 128, 38, 0.8);";
+      },
+
       _sectionDidChange: function(newSection, oldSection) {
         if (oldSection && newSection) {
           // clear any search terms
@@ -841,6 +927,10 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
           cbd: "",
           thc: ""
         };
+      },
+
+      _embeddedMenuEnableToggled: function(newValue, oldValue) {
+        // @TODO: actually enable embedded menus
       },
 
       _locationChanged: function(location) {
