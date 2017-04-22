@@ -257,7 +257,7 @@
                 disabled="{{!_userAuthorizesEmbeddedMenus}}"
                 style="user-select: none; cursor: pointer; margin-top:10px; margin-bottom: 10px; touch-action: pan-y;">Enable Embedded Menus</paper-toggle-button>
 
-              <div class="universal-embedded-menu-instructions">
+              <div class="universal-embedded-menu-instructions" hidden="[[!_userEnabledEmbeddedMenus]]">
                 <marked-element id="embedCodeSample" hidden="[[!_userEnabledEmbeddedMenus]]" gfm renderer="[[_markdownRenderer]]">
                   <div class="markdown-html"></div>
                   <script type="text/markdown">
@@ -772,13 +772,15 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
         _userAuthorizesEmbeddedMenus: {
           type: Boolean,
           notify: true,
-          observer: "_userDidAuthorizeEmbeddedMenus"
+          observer: "_userDidAuthorizeEmbeddedMenus",
+          value: false
         },
 
         _userEnabledEmbeddedMenus: {
           type: Boolean,
           notify: true,
-          observer: "_userDidToggleEmbeddedMenus"
+          observer: "_userDidToggleEmbeddedMenus",
+          value: false
         },
 
         _stylesForEmbedSettingsForm: {
