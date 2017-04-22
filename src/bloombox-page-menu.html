@@ -212,11 +212,23 @@
       path="[[_menuEndpoint]]/[[section]]"
       data="{{products}}"></firebase-document>
 
+    <firebase-document
+      id="locationSettingsCollection"
+      log$="[[debug]]"
+      path="[[_locationSettingsEndpoint]]"
+      data="{{locationSettings}}"></firebase-document>
+
+    <firebase-document
+      id="locationStateCollection"
+      log$="[[debug]]"
+      path="[[_locationStateEndpoint]]"
+      data="{{locationState}}"></firebase-document>
+
     <div class="action-dialogs">
       <!-- Embed Menu Dialog -->
       <paper-dialog id="embedMenuActionDialog" always-on-top modal class="menu-action-dialog" style="top: 100px;">
         <h2>Embedded Menus</h2>
-        <paper-dialog-scrollable style="width: 600px; min-height: 300px; display: flex; justify-content: center;">
+        <paper-dialog-scrollable style="width: 700px; min-height: 300px; display: flex; justify-content: center;">
           <form is="iron-form" id="embedMenuSettingsForm" content-type="application/json">
             <p><b>New!</b> Embedded Menus allow you to show your menu on your own website.</p>
             <hr />
@@ -224,11 +236,13 @@
             <div style="padding: 10px; margin-bottom: 10px;">
               <h3>Things to know</h3>
 
-              <p>Installing your embedded menu is easy. The feature must remain active for menu updates to keep being pushed, but otherwise, you may shut it off at any time, and it will be out-of-date but won't break your website.</p>
+              <p>Embedded Menus are enabled or disabled on a per-location basis.</p>
 
-              <p>We use the powerful <a target="_blank" href="https://polymer-project.org">Polymer</a> framework from Google for Bloombox. If you already use Polymer, you can also <a target="_blank" href="https://github.com/bloombox/bloombox-embedded-menu">import and use</a> the menu component directly.</p>
+              <p>Installing your embedded menu is easy. The feature must remain active for menu updates to keep being pushed to your website. Otherwise, you may shut it off at any time, and it may be out-of-date but won't break your website.</p>
 
-              <p><b>Note:</b> This will expose your menu data in a public manner. Once you activate this feature, updates are pushed to your webpage. It should not incur any additional charges for your website.</p>
+              <p>We use the <a target="_blank" href="https://www.polymer-project.org">Polymer</a> framework from Google for Bloombox. If you already use Polymer, you can also <a target="_blank" href="https://github.com/bloombox/bloombox-embedded-menu">import and use</a> the menu component directly.</p>
+
+              <p><b>Note:</b> This will expose your menu data in a public manner. As long as this feature is active, any menus you embed will automatically update. It should not incur any additional charges for your website.</p>
               <paper-checkbox
                 name="permission"
                 checked="{{_userAuthorizesEmbeddedMenus}}"
@@ -244,22 +258,41 @@
                 style="user-select: none; cursor: pointer; margin-top:10px; margin-bottom: 10px; touch-action: pan-y;">Enable Embedded Menus</paper-toggle-button>
 
               <div class="universal-embedded-menu-instructions">
-                <marked-element id="embedCodeSample" hidden="[[!_userEnabledEmbeddedMenus]]">
+                <marked-element id="embedCodeSample" hidden="[[!_userEnabledEmbeddedMenus]]" gfm renderer="[[_markdownRenderer]]">
                   <div class="markdown-html"></div>
                   <script type="text/markdown">
                     ## Installation
 
-                    Example:
+                    The following is a snippet you can paste into an HTML page, in two parts, pre-customized with this location's menu details. Our embed code is highly optimized
+                    so as not to slow down your website for your visitors.
+
+                    ### Menu element
+
+                    Place a selectable element wherever on the page you would like to embed your menu:
 
                     ```html
-                    <paper-toolbar>
-                      <paper-icon-button icon="menu"></paper-icon-button>
-                      <div class="title">Title</div>
-                      <paper-icon-button icon="more"></paper-icon-button>
-                    </paper-toolbar>
+                    <div id="menu"></div>
                     ```
 
-                    _Nifty_ features.
+                    ### Script tag
+
+                    Then, place the script tag right before the &lt;/body&gt;:
+                    <pre><code>
+                    &lt;script
+                      id=&quot;bbembed&quot; type=&quot;text/javascript&quot;
+                      defer async
+                      src=&quot;https://app.bloomware.media/assets/scripts/lib/embed/thin.js&quot;
+                      data-bloombox-title=&quot;Bloom Menu&quot;
+                      data-bloombox-sort-mode=&quot;PRICE&quot;
+                      data-bloombox-apikey=&quot;__EMBED_API_KEY__&quot;
+                      data-bloombox-partner=&quot;__PARTNER__&quot;
+                      data-bloombox-selector=&quot;#menu&quot;
+                      data-bloombox-location=&quot;__LOCATION__&quot;&gt;&lt;/script&gt;
+                    </code></pre>
+
+                    ### Customization
+
+                    The menu is customizable with additional attributes on the &lt;script&gt; tag. For that and advanced embed options, take a look at the <a href="https://github.com/bloombox/bloombox-embedded-menu" target="_blank">source</a>.
                   </script>
                 </marked-element>
               </div><!-- end div.universal-embedded-menu-instructions -->
@@ -684,6 +717,18 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
           computed: '_computeMenuEndpoint(endpoint, location)'
         },
 
+        _locationSettingsEndpoint: {
+          type: String,
+          notify: true,
+          computed: '_computeLocationSettingsEndpoint(endpoint, location)'
+        },
+
+        _locationStateEndpoint: {
+          type: String,
+          notify: true,
+          computed: '_computeLocationStateEndpoint(endpoint, location)'
+        },
+
         _hasSelectedItems: {
           type: Boolean,
           notify: true,
@@ -708,6 +753,17 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
           computed: '_computeSomePagesPrintSectionMode(_printSettings.sectionMode)'
         },
 
+        _markdownRenderer: {
+          type: Function,
+          computed: "_computeMarkdownRenderer(partner, location, _embedApiKey)"
+        },
+
+        _embedApiKey: {
+          type: String,
+          notify: true,
+          readOnly: true
+        },
+
         _actionCallback: {
           type: Object,
           notify: true
@@ -716,14 +772,13 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
         _userAuthorizesEmbeddedMenus: {
           type: Boolean,
           notify: true,
-          value: false
+          observer: "_userDidAuthorizeEmbeddedMenus"
         },
 
         _userEnabledEmbeddedMenus: {
           type: Boolean,
           notify: true,
-          value: false,
-          observer: "_embeddedMenuEnableToggled"
+          observer: "_userDidToggleEmbeddedMenus"
         },
 
         _stylesForEmbedSettingsForm: {
@@ -741,6 +796,18 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
         products: {
           type: Object,
           notify: true,
+        },
+
+        locationSettings: {
+          type: Object,
+          notify: true,
+          observer: '_locationSettingsDidChange'
+        },
+
+        locationState: {
+          type: Object,
+          notify: true,
+          observer: '_locationStateDidChange'
         },
 
         section: {
@@ -814,6 +881,14 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
         return endpoint + "/locations/" + location + "/menu";
       },
 
+      _computeLocationSettingsEndpoint: function(endpoint, location) {
+        return endpoint + "/locations/" + location + "/settings";
+      },
+
+      _computeLocationStateEndpoint: function(endpoint, location) {
+        return endpoint + "/locations/" + location + "/state";
+      },
+
       _computeSectionHeading: function(section) {
         // @TODO: better section heading definitions
         return section.charAt(0).toUpperCase() + section.slice(1);
@@ -849,6 +924,18 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
         if (!enabled)
           return baseStyles + "border: 1px solid rgba(153, 153, 153, 0.6);";
         return baseStyles + "border: 1px solid rgba(62, 128, 38, 0.8);";
+      },
+
+      _computeMarkdownRenderer: function(partner, location, apikey) {
+        return function(renderer) {
+          let originalHTMLrenderer = renderer.html;
+          renderer.html = function(html) {
+            html = html.replace("__EMBED_API_KEY__", apikey);
+            html = html.replace("__PARTNER__", partner);
+            html = html.replace("__LOCATION__", location);
+            return originalHTMLrenderer(html);
+          };
+        };
       },
 
       _sectionDidChange: function(newSection, oldSection) {
@@ -927,10 +1014,6 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
           cbd: "",
           thc: ""
         };
-      },
-
-      _embeddedMenuEnableToggled: function(newValue, oldValue) {
-        // @TODO: actually enable embedded menus
       },
 
       _locationChanged: function(location) {
@@ -1068,6 +1151,58 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
           return processed;
         }
         return [];
+      },
+
+      _locationStateDidChange: function(newState, oldState) {
+        if ("embeddedMenuPermission" in newState)
+          this.set("_userAuthorizesEmbeddedMenus", true);
+      },
+
+      _locationSettingsDidChange: function(newState, oldState) {
+        if ("publish" in newState)
+          this.set("_userEnabledEmbeddedMenus", newState["publish"]["menu"] || false);
+        if ("api" in newState)
+          this._set_embedApiKey(newState["api"]["embed"] || null);
+      },
+
+      _userDidAuthorizeEmbeddedMenus: function(newValue, oldValue) {
+        if (newValue === true && (oldValue != null && oldValue != undefined))
+          return this.$.locationStateCollection.ref
+                              .update({"embeddedMenuPermission": true})
+                              .then(function() {
+                                console.info("Embedded menu authorization state saved.");
+                              })
+                              .catch(function(error) {
+                                console.error("Encountered error persisting authorization state for menus.", error);
+                              });
+      },
+
+      _userDidToggleEmbeddedMenus: function(newValue, oldValue) {
+        if (oldValue != null && oldValue != undefined) {
+          if (newValue === true) {
+            this.toggleEmbeddedMenus(true);
+          } else {
+            this.toggleEmbeddedMenus(false);
+          }
+        }
+      },
+
+      toggleEmbeddedMenus: function(activatedState) {
+        let targetState = activatedState || !this._userEnabledEmbeddedMenus;
+        return this.$.locationSettingsCollection.ref
+                            .child("publish")
+                            .update({"menu": targetState})
+                            .then(function() {
+                              console.info(targetState === true ? "Embedded menus enabled." : "Embedded menus disabled.");
+                            })
+                            .catch(function(error) {
+                              console.error("Encountered error enabling or disabling embedded menus.", error);
+                            });
+      },
+
+      _toggleEmbeddedWebMenus: function(event) {
+        let activeState = event.target.active;
+        this.toggleEmbeddedMenus(activeState);
       },
 
       _buildPrinterFrame: function(settings, manifest) {
