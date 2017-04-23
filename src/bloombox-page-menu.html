@@ -260,40 +260,7 @@
               <div class="universal-embedded-menu-instructions" hidden="[[!_userEnabledEmbeddedMenus]]">
                 <marked-element id="embedCodeSample" hidden="[[!_userEnabledEmbeddedMenus]]" gfm renderer="[[_markdownRenderer]]">
                   <div class="markdown-html"></div>
-                  <script type="text/markdown">
-                    ## Installation
-
-                    The following is a snippet you can paste into an HTML page, in two parts, pre-customized with this location's menu details. Our embed code is highly optimized
-                    so as not to slow down your website for your visitors.
-
-                    ### Menu element
-
-                    Place a selectable element wherever on the page you would like to embed your menu:
-
-                    ```html
-                    <div id="menu"></div>
-                    ```
-
-                    ### Script tag
-
-                    Then, place the script tag right before the &lt;/body&gt;:
-                    <pre><code>
-                    &lt;script
-                      id=&quot;bbembed&quot; type=&quot;text/javascript&quot;
-                      defer async
-                      src=&quot;https://app.bloomware.media/assets/scripts/lib/embed/thin.js&quot;
-                      data-bloombox-title=&quot;Bloom Menu&quot;
-                      data-bloombox-sort-mode=&quot;PRICE&quot;
-                      data-bloombox-apikey=&quot;__EMBED_API_KEY__&quot;
-                      data-bloombox-partner=&quot;__PARTNER__&quot;
-                      data-bloombox-selector=&quot;#menu&quot;
-                      data-bloombox-location=&quot;__LOCATION__&quot;&gt;&lt;/script&gt;
-                    </code></pre>
-
-                    ### Customization
-
-                    The menu is customizable with additional attributes on the &lt;script&gt; tag. For that and advanced embed options, take a look at the <a href="https://github.com/bloombox/bloombox-embedded-menu" target="_blank">source</a>.
-                  </script>
+                  <script type="text/markdown" src="../snippets/embedded-menu-codesample.md"></script>
                 </marked-element>
               </div><!-- end div.universal-embedded-menu-instructions -->
             </div><!-- end .embedded-menu-settings -->
@@ -922,7 +889,7 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
       },
 
       _computeStylesForEmbedSettingsForm: function(authorized, enabled) {
-        let baseStyles = "padding: 10px; overflow: hidden;";
+        var baseStyles = "padding: 10px; overflow: hidden;";
         if (!enabled)
           return baseStyles + "border: 1px solid rgba(153, 153, 153, 0.6);";
         return baseStyles + "border: 1px solid rgba(62, 128, 38, 0.8);";
@@ -930,7 +897,7 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
 
       _computeMarkdownRenderer: function(partner, location, apikey) {
         return function(renderer) {
-          let originalHTMLrenderer = renderer.html;
+          var originalHTMLrenderer = renderer.html;
           renderer.html = function(html) {
             html = html.replace("__EMBED_API_KEY__", apikey);
             html = html.replace("__PARTNER__", partner);
@@ -1190,7 +1157,7 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
       },
 
       toggleEmbeddedMenus: function(activatedState) {
-        let targetState = activatedState || !this._userEnabledEmbeddedMenus;
+        var targetState = activatedState || !this._userEnabledEmbeddedMenus;
         return this.$.locationSettingsCollection.ref
                             .child("publish")
                             .update({"menu": targetState})
@@ -1203,7 +1170,7 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
       },
 
       _toggleEmbeddedWebMenus: function(event) {
-        let activeState = event.target.active;
+        var activeState = event.target.active;
         this.toggleEmbeddedMenus(activeState);
       },
 
