@@ -10,8 +10,8 @@ TARGET ?= build/
 CREDENTIALS ?=1
 COMPONENTS_PATH ?= components/
 VERBOSE ?= 0
-VERSION ?= 0.0.2
-POLYMER_BUILD_FLAGS ?= --sw-precache-config ./sw-precache-config.js
+VERSION ?= 0.0.3
+POLYMER_BUILD_FLAGS ?= --sw-precache-config ./sw-precache-config.js --insert-dependency-links --html.collapseWhitespace
 POLYMER_RELEASE_FLAGS ?= --sw-precache-config ./sw-precache-config.js --insert-dependency-links --html.collapseWhitespace
 
 ifeq ($(VERBOSE),1)
