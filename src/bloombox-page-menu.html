@@ -1268,21 +1268,32 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
       formatPricelistForFlower: function(pricelist) {
         if (pricelist == null)
           return [];
+
+        var gramPricing = pricelist["gram"];
+        var eighthPricing = pricelist["eighth"];
+        var quarterPricing = pricelist["quarter"];
+        var halfPricing = pricelist["half"];
+        var ouncePricing = pricelist["ounce"];
+
         return [
-          {"label": "1g", "available": pricelist["gram"]["available"], "price": pricelist["gram"]["price"]},
-          {"label": "3.5g", "available": pricelist["eighth"]["available"], "price": pricelist["eighth"]["price"]},
-          {"label": "7g", "available": pricelist["quarter"]["available"], "price": pricelist["quarter"]["price"]},
-          {"label": "14g", "available": pricelist["half"]["available"], "price": pricelist["half"]["price"]},
-          {"label": "28g", "available": pricelist["ounce"]["available"], "price": pricelist["ounce"]["price"]}
+          {"label": "1g", "available": gramPricing ? gramPricing["available"] : false, "price": gramPricing ? gramPricing["price"] : 0.0},
+          {"label": "3.5g", "available": eighthPricing ? eighthPricing["available"] : false, "price": eighthPricing ? eighthPricing["price"] : 0.0},
+          {"label": "7g", "available": quarterPricing ? quarterPricing["available"] : false, "price": quarterPricing ? quarterPricing["price"] : 0.0},
+          {"label": "14g", "available": halfPricing ? halfPricing["available"] : false, "price": halfPricing ? halfPricing["price"] : 0.0},
+          {"label": "28g", "available": ouncePricing ? ouncePricing["available"] : false, "price": ouncePricing ? ouncePricing["price"] : 0.0}
         ];
       },
 
       formatPricelistForConcentrate: function(pricelist) {
         if (pricelist == null)
           return [];
+
+        var gramPricing = pricelist["gram"];
+        var halfgramPricing = pricelist["halfgram"];
+
         return [
-          {"label": "1g", "available": pricelist["gram"]["available"], "price": pricelist["gram"]["value"]},
-          {"label": ".5g", "available": pricelist["halfgram"]["available"], "price": pricelist["halfgram"]["value"]}
+          {"label": "1g", "available": gramPricing ? gramPricing["available"] : false, "price": gramPricing ? gramPricing["value"] : 0.0},
+          {"label": ".5g", "available": halfgramPricing ? halfgramPricing["available"] : false, "price": halfgramPricing ? halfgramPricing["value"] : 0.0}
         ];
       },
 
