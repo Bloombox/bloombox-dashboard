@@ -897,9 +897,11 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
 
       _computeMarkdownRenderer: function(partner, location, apikey) {
         return function(renderer) {
+          var globalRevision = window["bloom"] ? window["bloom"]["app"].revision : "staging";
           var originalHTMLrenderer = renderer.html;
           renderer.html = function(html) {
             html = html.replace("__EMBED_API_KEY__", apikey);
+            html = html.replace("__EMBED_API_VERSION__", globalRevision);
             html = html.replace("__PARTNER__", partner);
             html = html.replace("__LOCATION__", location);
             return originalHTMLrenderer(html);

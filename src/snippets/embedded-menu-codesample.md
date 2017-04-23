@@ -18,7 +18,7 @@ Then, place the script tag right before the &lt;/body&gt;:
 &lt;script
   id=&quot;bbembed&quot; type=&quot;text/javascript&quot;
   defer async
-  src=&quot;https://app.bloomware.media/assets/scripts/lib/embed/thin.js&quot;
+  src=&quot;https://app.bloomware.media/embed/__EMBED_API_VERSION__/ui.js&quot;
   data-bloombox-title=&quot;Bloom Menu&quot;
   data-bloombox-sort-mode=&quot;PRICE&quot;
   data-bloombox-apikey=&quot;__EMBED_API_KEY__&quot;

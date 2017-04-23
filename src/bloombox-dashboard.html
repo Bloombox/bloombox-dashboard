@@ -916,6 +916,16 @@
           type: String,
           notify: true,
           computed: '_computeStorage(environment, partner)'
+        },
+
+        /**
+         * Holds the revision string that we use for assets in this particular
+         * deployed copy of the dashboard. Passed in at invocation time.
+         */
+        revision: {
+          type: String,
+          notify: true,
+          value: "staging"
         }
       },
 
