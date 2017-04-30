@@ -228,7 +228,7 @@
       <!-- Embed Menu Dialog -->
       <paper-dialog id="embedMenuActionDialog" always-on-top modal class="menu-action-dialog" style="top: 100px;">
         <h2>Embedded Menus</h2>
-        <paper-dialog-scrollable style="width: 600px; min-height: 275px; display: flex; justify-content: center;">
+        <paper-dialog-scrollable style="width: 650px; min-height: 275px; display: flex; justify-content: center;">
           <paper-tabs selected="{{_embeddedMenuDialogSection}}" attr-for-selected="key" style="position: absolute; top: 0; left: 0; right: 0;">
             <paper-tab key="code">Installation</paper-tab>
             <paper-tab key="preview">Example Screenshot</paper-tab>
@@ -287,7 +287,7 @@
                         &lt;script
                           id=&quot;bbembed&quot; type=&quot;text/javascript&quot;
                           defer async
-                          src=&quot;https://app.bloomware.media/assets/scripts/lib/embed/thin.js&quot;
+                          src=&quot;https://app.bloomware.media/embed/__EMBED_API_VERSION__/thin.js&quot;
                           data-bloombox-title=&quot;Bloom Menu&quot;
                           data-bloombox-sort-mode=&quot;PRICE&quot;
                           data-bloombox-apikey=&quot;__EMBED_API_KEY__&quot;
