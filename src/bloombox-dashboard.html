@@ -83,23 +83,6 @@
         margin-left: -10px;
       }
 
-      app-drawer app-toolbar div.beta-label {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-      }
-
-      app-drawer app-toolbar div.beta-label iron-label {
-        background: var(--bloombox-yellow-accent);
-        color: #333;
-        text-transform: uppercase;
-        font-size: 8pt;
-        padding: 3px;
-        border-radius: 3px;
-        margin-left: 7px;
-      }
-
       #dispensaryMenuItems paper-item {
         cursor: pointer;
       }
@@ -398,9 +381,6 @@
           <app-toolbar>
             <div title>
               <bloombox-logo mode="icon" logotext></bloombox-logo>
-              <div class="beta-label">
-                <iron-label class="beta-label">Beta</iron-label>
-              </div><!-- end .beta-label -->
             </div><!-- end div[title] -->
           </app-toolbar>
           <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
@@ -916,6 +896,16 @@
           type: String,
           notify: true,
           computed: '_computeStorage(environment, partner)'
+        },
+
+        /**
+         * Holds the revision string that we use for assets in this particular
+         * deployed copy of the dashboard. Passed in at invocation time.
+         */
+        revision: {
+          type: String,
+          notify: true,
+          value: "staging"
         }
       },
 
