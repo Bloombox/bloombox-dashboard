@@ -39,6 +39,7 @@
 <link rel="import" href="../components/bloombox-cartridge/bloombox-cartridge.html">
 <link rel="import" href="../components/bloombox-apothecary/bloombox-apothecary.html">
 <link rel="import" href="../components/bloombox-concentrate/bloombox-concentrate.html">
+<link rel="import" href="../components/bloombox-merch/bloombox-merch.html">
 
 <!-- Local Imports -->
 <link rel="import" href="./behaviors/bloombox-dashboard-page-behavior.html">
@@ -353,6 +354,7 @@
                 <paper-checkbox name="prerolls">Prerolls</paper-checkbox>
                 <paper-checkbox name="apothecary">Apothecary</paper-checkbox>
                 <paper-checkbox name="cartridges">Cartridges</paper-checkbox>
+                <paper-checkbox name="merch">Merchandise</paper-checkbox>
               </div><!-- end div.sections-to-print-selection -->
             </div><!-- end div.selection-radio-group -->
 
@@ -480,6 +482,23 @@
         </div>
         <paper-toast always-on-top text="Please fill in all required fields." class="validation-toast bottom notification-toast"></paper-toast>
       </paper-dialog>
+
+      <!-- Merch Zerostate -->
+      <paper-dialog id="merchCreateDialog" always-on-top modal class="product-zero-state zero-state-dialog">
+        <h2>Create Merchandise</h2>
+        <paper-dialog-scrollable style="min-width: 600px;">
+          <div hidden class="hidden zerostate-template" strip-whitespace>
+            <bloombox-merch zerostate class="zerostate-component"></bloombox-merch>
+          </div>
+          <div class="product-zero-state-content">
+          </div><!-- end div.product-zero-state-content -->
+        </paper-dialog-scrollable>
+        <div class="buttons">
+          <paper-button class="discardButton" dialog-dismiss on-tap="_zerostateDismiss">Discard</paper-button>
+          <paper-button class="confirmButton" autofocus on-tap="_saveZerostate">Create</paper-button>
+        </div>
+        <paper-toast always-on-top text="Please fill in all required fields." class="validation-toast bottom notification-toast"></paper-toast>
+      </paper-dialog>
     </div><!-- end div.zerostate-dialogs -->
 
     <!-- Card UI -->
@@ -504,6 +523,7 @@
           <paper-tab key="prerolls">Pre-Rolls</paper-tab>
           <paper-tab key="apothecary">Apothecary</paper-tab>
           <paper-tab key="cartridges">Cartridges</paper-tab>
+          <paper-tab key="merch">Merchandise</paper-tab>
         </paper-tabs>
       </div><!-- end div.menu-nav -->
     </paper-card><!-- end .paper-card.menutools-container -->
@@ -602,6 +622,30 @@
               editing="{{editing}}"></bloombox-edible><!-- end bloombox-edible -->
             </div><!-- end div.product-detail-pane -->
         </div><!-- end div.menu-page.edibles-menu-page -->
+
+        <div class="menu-page merch-menu-page" section="merch">
+          <!-- Product Detail -->
+          <div class="product-detail-pane">
+            <bloombox-merch
+              key="[[selectedItem.key]]"
+              partner="[[partner]]"
+              environment="[[environment]]"
+              name="[[selectedItem.value.name]]"
+              brand="[[selectedItem.value.brand]]"
+              type="[[selectedItem.value.type]]"
+              pricing="[[selectedItem.value.pricing]]"
+              visible="[[_processVisible(selectedItem.value.flags.visible)]]"
+              description$="[[selectedItem.value.description]]"
+              sale$="[[selectedItem.value.flags.sale]]"
+              bogo$="[[selectedItem.value.flags.bogo]]"
+              lastchance$="[[selectedItem.value.flags.lastchance]]"
+              premium$="[[selectedItem.value.flags.premium]]"
+              photos$="[[selectedItem.value.photos]]"
+              hidden$="[[!selectedItem]]"
+              disabled="[[loading]]"
+              editing="{{editing}}"></bloombox-merch><!-- end bloombox-merch -->
+            </div><!-- end div.product-detail-pane -->
+        </div><!-- end div.menu-page.merch-menu-page -->
 
         <div class="menu-page concentrates-menu-page" section="concentrates">
           <div class="product-detail-pane">
@@ -1709,7 +1753,8 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
             "concentrates",
             "prerolls",
             "apothecary",
-            "cartridges"
+            "cartridges",
+            "merch"
           ];
         } else if (settings.sectionMode === "selected") {
           // print only the active section
