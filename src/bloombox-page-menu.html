@@ -574,19 +574,20 @@
               key="[[selectedItem.key]]"
               partner="[[partner]]"
               environment="[[environment]]"
+              brand="[[selectedItem.value.brand]]"
               name="[[selectedItem.value.name]]"
-              pricing="[[formatPricelistForFlower(selectedItem.value.pricelist)]]"
+              pricing="[[formatPricelistForFlower(selectedItem.value)]]"
               grow="[[_processGrowValue(selectedItem.value.grow)]]"
               species="[[_processSpeciesValue(selectedItem)]]"
               visible="[[_processVisible(selectedItem.value.flags.visible)]]"
               description$="[[selectedItem.value.description]]"
-              tests$="[[_processTests(selectedItem)]]"
+              tests="[[_processTests(selectedItem)]]"
               ancestry$="[[selectedItem.value.ancestry]]"
               sale$="[[selectedItem.value.flags.sale]]"
               bogo$="[[selectedItem.value.flags.bogo]]"
               lastchance$="[[selectedItem.value.flags.lastchance]]"
               premium$="[[selectedItem.value.flags.premium]]"
-              photos$="[[selectedItem.value.pictures]]"
+              photos$="[[_processMedia(selectedItem.value)]]"
               hidden$="[[!selectedItem]]"
               disabled="[[loading]]"
               editing="{{editing}}"></bloombox-strain><!-- end bloombox-strain -->
@@ -660,7 +661,7 @@
               species="[[selectedItem.value.species]]"
               visible="[[_processVisible(selectedItem.value.flags.visible)]]"
               description$="[[selectedItem.value.description]]"
-              tests$="[[_processTests(selectedItem)]]"
+              tests="[[_processTests(selectedItem)]]"
               sale$="[[selectedItem.value.flags.sale]]"
               bogo$="[[selectedItem.value.flags.bogo]]"
               lastchance$="[[selectedItem.value.flags.lastchance]]"
@@ -1059,11 +1060,36 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
         return "Unknown Grow";
       },
 
+      _processMedia: function(obj) {
+        if (obj) {
+          return obj["photos"] || obj["pictures"] || obj["media"];
+        }
+      },
+
       _processSpeciesValue: function(item) {
         var species = item ? item.value.species : null;
         if (species != null && species != undefined && typeof species === "string")
-          return species;
+          return species.split(">").join(" > ");
         return "Unknown Species";
+      },
+
+      _processTerpene: function(terpene) {
+        if (!terpene["rating"])
+          return {"presence": false};
+        var rating = parseFloat(terpene["rating"]);
+        return {
+          "rating": rating,
+          "presence": rating > 0.0
+        };
+      },
+
+      _processTerpenes: function(terpenes) {
+        var processed = {};
+        for (var key in terpenes) {
+          if (terpenes.hasOwnProperty(key))
+            processed[key] = this._processTerpene(terpenes[key]);
+        }
+        return processed;
       },
 
       _processTests: function(item) {
@@ -1073,7 +1099,7 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
             return {
               cbd: tests.cbd || 0,
               thc: tests.thc || 0,
-              terpenes: tests.terpenes
+              terpenes: this._processTerpenes(tests.terpenes)
             };
           }
           return {
@@ -1334,9 +1360,10 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
         console.groupEnd();
       },
 
-      formatPricelistForFlower: function(pricelist) {
-        if (pricelist == null)
+      formatPricelistForFlower: function(obj) {
+        if (obj == null)
           return [];
+        var pricelist = obj["pricelist"] || obj["pricing"];
 
         var gramPricing = pricelist["gram"];
         var eighthPricing = pricelist["eighth"];
@@ -1345,11 +1372,11 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
         var ouncePricing = pricelist["ounce"];
 
         return [
-          {"label": "1g", "available": gramPricing ? gramPricing["available"] : false, "price": gramPricing ? gramPricing["price"] : 0.0},
-          {"label": "3.5g", "available": eighthPricing ? eighthPricing["available"] : false, "price": eighthPricing ? eighthPricing["price"] : 0.0},
-          {"label": "7g", "available": quarterPricing ? quarterPricing["available"] : false, "price": quarterPricing ? quarterPricing["price"] : 0.0},
-          {"label": "14g", "available": halfPricing ? halfPricing["available"] : false, "price": halfPricing ? halfPricing["price"] : 0.0},
-          {"label": "28g", "available": ouncePricing ? ouncePricing["available"] : false, "price": ouncePricing ? ouncePricing["price"] : 0.0}
+          {"label": "1g", "available": gramPricing ? gramPricing["available"] : false, "value": gramPricing ? gramPricing["price"] || gramPricing["value"] : 0.0},
+          {"label": "3.5g", "available": eighthPricing ? eighthPricing["available"] : false, "value": eighthPricing ? eighthPricing["price"] || eighthPricing["value"] : 0.0},
+          {"label": "7g", "available": quarterPricing ? quarterPricing["available"] : false, "value": quarterPricing ? quarterPricing["price"] || quarterPricing["value"] : 0.0},
+          {"label": "14g", "available": halfPricing ? halfPricing["available"] : false, "value": halfPricing ? halfPricing["price"] || halfPricing["value"] : 0.0},
+          {"label": "28g", "available": ouncePricing ? ouncePricing["available"] : false, "value": ouncePricing ? ouncePricing["price"] || ouncePricing["value"] : 0.0}
         ];
       },
 
@@ -1361,8 +1388,8 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
         var halfgramPricing = pricelist["halfgram"];
 
         return [
-          {"label": "1g", "available": gramPricing ? gramPricing["available"] : false, "price": gramPricing ? gramPricing["value"] : 0.0},
-          {"label": ".5g", "available": halfgramPricing ? halfgramPricing["available"] : false, "price": halfgramPricing ? halfgramPricing["value"] : 0.0}
+          {"label": "1g", "available": gramPricing ? gramPricing["available"] : false, "value": gramPricing ? gramPricing["value"] : 0.0},
+          {"label": ".5g", "available": halfgramPricing ? halfgramPricing["available"] : false, "value": halfgramPricing ? halfgramPricing["value"] : 0.0}
         ];
       },
 
