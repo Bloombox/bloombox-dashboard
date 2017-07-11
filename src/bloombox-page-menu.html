@@ -1098,17 +1098,48 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
           if (tests.terpenes != null && tests.terpenes != undefined && typeof tests.terpenes === "object") {
             return {
               cbd: tests.cbd || 0,
+              cbda: tests.cbda || 0,
+              cbc: tests.cbc || 0,
+              cbv: tests.cbv || 0,
+              cbva: tests.cbva || 0,
+              cbv: tests.cbv || 0,
+              cbg: tests.cbg || 0,
+              cbga: tests.cbga || 0,
+              cbn: tests.cbn || 0,
               thc: tests.thc || 0,
+              thca: tests.thca || 0,
+              thcv: tests.thcv || 0,
               terpenes: this._processTerpenes(tests.terpenes)
             };
           }
           return {
             cbd: tests.cbd || 0,
-            thc: tests.thc || 0
+            cbda: tests.cbda || 0,
+            cbc: tests.cbc || 0,
+            cbv: tests.cbv || 0,
+            cbva: tests.cbva || 0,
+            cbv: tests.cbv || 0,
+            cbg: tests.cbg || 0,
+            cbga: tests.cbga || 0,
+            cbn: tests.cbn || 0,
+            thc: tests.thc || 0,
+            thca: tests.thca || 0,
+            thcv: tests.thcv || 0,
           };
         }
         return {
           cbd: "",
+          cbda: "",
+          cbc: "",
+          cbv: "",
+          cbva: "",
+          cbv: "",
+          cbg: "",
+          cbga: "",
+          cbn: "",
+          thc: "",
+          thca: "",
+          thcv: "",
           thc: ""
         };
       },
