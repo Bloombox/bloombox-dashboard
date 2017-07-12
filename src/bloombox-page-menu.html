@@ -1075,7 +1075,7 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
 
       _processTerpene: function(terpene) {
         if (!terpene["rating"])
-          return {"presence": false};
+          return {"presence": false, "rating": 0};
         var rating = parseFloat(terpene["rating"]);
         return {
           "rating": rating,
@@ -1085,9 +1085,15 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
 
       _processTerpenes: function(terpenes) {
         var processed = {};
-        for (var key in terpenes) {
-          if (terpenes.hasOwnProperty(key))
+        for (var key in defaultTerpeneConfig()) {
+          if (terpenes.hasOwnProperty(key)) {
             processed[key] = this._processTerpene(terpenes[key]);
+          } else {
+            processed[key] = {
+              "presence": false,
+              "rating": 0
+            };
+          }
         }
         return processed;
       },
