@@ -49,7 +49,7 @@
   <template strip-whitespace>
     <style is="custom-style" include="bloombox-styles">
       :root {
-        --bloombox-product-list-width: 420px;
+        --bloombox-product-list-width: 450px;
       }
 
       :host {
@@ -116,7 +116,7 @@
       }
 
       :host bloombox-product-list {
-        width: 420px;
+        width: 450px;
         height: 100%;
         flex: 1 0 400px;
       }
@@ -1408,12 +1408,18 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
         var halfPricing = pricelist["half"];
         var ouncePricing = pricelist["ounce"];
 
+        var cast = (function (i) {
+          if (typeof i === "number")
+            return i;
+          return parseFloat(i);
+        });
+
         return [
-          {"label": "1g", "available": gramPricing ? gramPricing["available"] : false, "value": gramPricing ? gramPricing["price"] || gramPricing["value"] : 0.0},
-          {"label": "3.5g", "available": eighthPricing ? eighthPricing["available"] : false, "value": eighthPricing ? eighthPricing["price"] || eighthPricing["value"] : 0.0},
-          {"label": "7g", "available": quarterPricing ? quarterPricing["available"] : false, "value": quarterPricing ? quarterPricing["price"] || quarterPricing["value"] : 0.0},
-          {"label": "14g", "available": halfPricing ? halfPricing["available"] : false, "value": halfPricing ? halfPricing["price"] || halfPricing["value"] : 0.0},
-          {"label": "28g", "available": ouncePricing ? ouncePricing["available"] : false, "value": ouncePricing ? ouncePricing["price"] || ouncePricing["value"] : 0.0}
+          {"label": "1g", "available": gramPricing ? gramPricing["available"] : false, "value": cast(gramPricing ? gramPricing["price"] || gramPricing["value"] : 0.0)},
+          {"label": "3.5g", "available": eighthPricing ? eighthPricing["available"] : false, "value": cast(eighthPricing ? eighthPricing["price"] || eighthPricing["value"] : 0.0)},
+          {"label": "7g", "available": quarterPricing ? quarterPricing["available"] : false, "value": cast(quarterPricing ? quarterPricing["price"] || quarterPricing["value"] : 0.0)},
+          {"label": "14g", "available": halfPricing ? halfPricing["available"] : false, "value": cast(halfPricing ? halfPricing["price"] || halfPricing["value"] : 0.0)},
+          {"label": "28g", "available": ouncePricing ? ouncePricing["available"] : false, "value": cast(ouncePricing ? ouncePricing["price"] || ouncePricing["value"] : 0.0)}
         ];
       },
 
