@@ -8,3 +8,5 @@ build
 *.DS_Store
 */*.DS_Store
 _local/api/*
+build.zip
+components.zip
