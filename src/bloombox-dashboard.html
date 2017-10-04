@@ -206,8 +206,8 @@
       select:focus,
       textarea:focus,
       button:focus {
-          outline: none;
-          outline-width: 0;
+        outline: none;
+        outline-width: 0;
       }
 
       /** -- Toasts -- **/
@@ -343,35 +343,35 @@
     <!-- App State -->
     <app-location route="{{route}}"></app-location>
     <app-route
-      route="{{route}}"
-      pattern="/:partner/:page"
-      data="{{_routeData}}"
-      tail="{{subroute}}"></app-route>
+    route="{{route}}"
+    pattern="/:partner/:page"
+    data="{{_routeData}}"
+    tail="{{subroute}}"></app-route>
     <app-route
-      route="{{subroute}}"
-      pattern="/:location"
-      data="{{_subrouteData}}"></app-route>
+    route="{{subroute}}"
+    pattern="/:location"
+    data="{{_subrouteData}}"></app-route>
 
     <!-- Persistence -->
     <firebase-app
-      api-key="[[api.key]]"
-      app="{{firebase}}"
-      database-url="https://[[transport.base]].firebaseio.com/"
-      auth-domain="[[transport.base]].firebaseapp.com"
-      storage-bucket="bloombox-io.appspot.com"></firebase-app>
+    api-key="[[api.key]]"
+    app="{{firebase}}"
+    database-url="https://[[transport.base]].firebaseio.com/"
+    auth-domain="[[transport.base]].firebaseapp.com"
+    storage-bucket="bloombox-io.appspot.com"></firebase-app>
 
     <!-- JavaScript Context -->
     <iron-ajax
-      id="appContext"
-      url="[[_contextEndpoint]]"
-      verbose$="[[_debug]]"
-      auto
-      json-prefix="^.^"
-      with-credentials
-      last-response="{{_context}}"
-      params='{"v":"1"}'
-      debounce-duration="1500"
-      content-type="application/json"></iron-ajax>
+    id="appContext"
+    url="[[_contextEndpoint]]"
+    verbose$="[[_debug]]"
+    auto
+    json-prefix="^.^"
+    with-credentials
+    last-response="{{_context}}"
+    params='{"v":"1"}'
+    debounce-duration="1500"
+    content-type="application/json"></iron-ajax>
 
     <!-- Layout / UI -->
     <main class="app-content">
@@ -387,6 +387,10 @@
             <a name="home" on-tap="navigate"><iron-icon icon="home"></iron-icon><span class="nav-label">Home</span></a>
             <a name="analytics" on-tap="navigate"><iron-icon icon="timeline"></iron-icon><span class="nav-label">Analytics</span></a>
             <a name="menu" on-tap="navigate"><iron-icon icon="store"></iron-icon><span class="nav-label">Menu Manager</span></a>
+            <a name="tv" on-tap="navigate"><svg style="width:24px;height:24px;margin:-1px 16px 0 2px;vertical-align: middle;" viewBox="0 0 24 24">
+              <path fill="#777777" d="M20,17H4V5H20M20,3H4C2.89,3 2,3.89 2,5V17A2,2 0 0,0 4,19H8V21H16V19H20A2,2 0 0,0 22,17V5C22,3.89 21.1,3 20,3Z" />
+            </svg><span class="nav-label" class$="[[_adminOnly]]">TV Manager</span></a>
+            <a name="orders" on-tap="navigate"><svg xmlns="http://www.w3.org/2000/svg" data-name="Layer 1" viewBox="0 0 100 125" x="0px" y="0px" style="width:24px;height:24px;margin:-1px 16px 0 2px;vertical-align: middle;"><title>138all</title><path d="M93,27.47,28.64,22.81,26.22,8.64H7v6H21.16l9.57,56.12a10.82,10.82,0,1,0,14.25,5H70.81a10.8,10.8,0,1,0,9.67-6H36.64L35.48,63H83.23Z"></path></svg><span class="nav-label" class$="[[_adminOnly]]">Orders</span></a>
             <a name="profile" on-tap="navigate"><iron-icon icon="room"></iron-icon><span class="nav-label">Club Profile</span></a>
             <a name="account" on-tap="navigate" class$="[[_adminOnly]]"><iron-icon icon="fingerprint"></iron-icon><span class="nav-label" class$="[[_adminOnly]]">Account</span></a>
             <a name="settings" on-tap="navigate" class$="[[_adminOnly]]"><iron-icon icon="settings"></iron-icon><span class="nav-label" class$="[[_adminOnly]]">Settings</span></a>
@@ -419,10 +423,10 @@
                 </paper-dropdown-menu><!-- end paper-dropdown-menu#partnerSelection -->
 
                 <bloombox-user
-                  name="[[user.fullname]]"
-                  email="[[user.email]]"
-                  image$="[[user.image]]"
-                  display-mode="[[displayMode]]"></bloombox-user><!-- end bloombox-user -->
+                name="[[user.fullname]]"
+                email="[[user.email]]"
+                image$="[[user.image]]"
+                display-mode="[[displayMode]]"></bloombox-user><!-- end bloombox-user -->
 
                 <div class="help-button-container middle">
                   <paper-icon-button id="globalHelpButton" icon="help"></paper-icon-button><!-- end paper-icon-button#globalHelpButton -->
@@ -434,77 +438,93 @@
           <iron-pages role="main" selected="[[page]]" attr-for-selected="name" class="app-pages">
             <template strip-whitespace is="dom-if" if="[[_booted]]" restamp>
               <bloombox-page-home
-                name="home"
-                endpoint="[[endpoint]]"
-                partner="[[partner]]"
-                locations="[[locations]]"
-                storage="[[storage]]"
-                loading="{{loading}}"
-                read-key="[[partnerData.analytics.readKey]]"
-                environment="[[environment]]"
-                class="bloombox-page not-yet-loaded"></bloombox-page-home>
+              name="home"
+              endpoint="[[endpoint]]"
+              partner="[[partner]]"
+              locations="[[locations]]"
+              storage="[[storage]]"
+              loading="{{loading}}"
+              read-key="[[partnerData.analytics.readKey]]"
+              environment="[[environment]]"
+              class="bloombox-page not-yet-loaded"></bloombox-page-home>
               <bloombox-page-analytics
-                name="analytics"
-                endpoint="[[endpoint]]"
-                partner="[[partner]]"
-                location="{{location}}"
-                locations="[[locations]]"
-                storage="[[storage]]"
-                loading="{{loading}}"
-                read-key="[[partnerData.analytics.readKey]]"
-                environment="[[environment]]"
-                class="bloombox-page not-yet-loaded"></bloombox-page-analytics>
+              name="analytics"
+              endpoint="[[endpoint]]"
+              partner="[[partner]]"
+              location="{{location}}"
+              locations="[[locations]]"
+              storage="[[storage]]"
+              loading="{{loading}}"
+              read-key="[[partnerData.analytics.readKey]]"
+              environment="[[environment]]"
+              class="bloombox-page not-yet-loaded"></bloombox-page-analytics>
               <bloombox-page-menu
-                name="menu"
-                endpoint="[[endpoint]]"
-                partner="[[partner]]"
-                locations="[[locations]]"
-                location="{{location}}"
-                storage="[[storage]]"
-                loading="{{loading}}"
-                read-key="[[partnerData.analytics.readKey]]"
-                environment="[[environment]]"
-                class="bloombox-page not-yet-loaded"></bloombox-page-menu>
+              name="menu"
+              endpoint="[[endpoint]]"
+              partner="[[partner]]"
+              locations="[[locations]]"
+              location="{{location}}"
+              storage="[[storage]]"
+              loading="{{loading}}"
+              read-key="[[partnerData.analytics.readKey]]"
+              environment="[[environment]]"
+              class="bloombox-page not-yet-loaded"></bloombox-page-menu>
               <bloombox-page-profile
-                name="profile"
-                endpoint="[[endpoint]]"
-                partner="[[partner]]"
-                locations="[[locations]]"
-                location="{{location}}"
-                storage="[[storage]]"
-                loading="{{loading}}"
-                environment="[[environment]]"
-                supervisor="[[_adminOrSupervisor]]"
-                api-key="[[api.key]]"
-                read-key="[[partnerData.analytics.readKey]]"
-                class="bloombox-page not-yet-loaded"></bloombox-page-profile>
+              name="profile"
+              endpoint="[[endpoint]]"
+              partner="[[partner]]"
+              locations="[[locations]]"
+              location="{{location}}"
+              storage="[[storage]]"
+              loading="{{loading}}"
+              environment="[[environment]]"
+              supervisor="[[_adminOrSupervisor]]"
+              api-key="[[api.key]]"
+              read-key="[[partnerData.analytics.readKey]]"
+              class="bloombox-page not-yet-loaded"></bloombox-page-profile>
               <bloombox-page-account
-                name="account"
-                endpoint="[[endpoint]]"
-                partner="[[partner]]"
-                storage="[[storage]]"
-                loading="{{loading}}"
-                environment="[[environment]]"
-                read-key="[[partnerData.analytics.readKey]]"
-                class="bloombox-page not-yet-loaded"></bloombox-page-account>
-              <bloombox-page-settings
-                name="settings"
-                endpoint="[[endpoint]]"
-                partner="[[partner]]"
-                storage="[[storage]]"
-                loading="{{loading}}"
-                environment="[[environment]]"
-                read-key="[[partnerData.analytics.readKey]]"
-                class="bloombox-page not-yet-loaded"></bloombox-page-settings>
+              name="account"
+              endpoint="[[endpoint]]"
+              partner="[[partner]]"
+              storage="[[storage]]"
+              loading="{{loading}}"
+              environment="[[environment]]"
+              read-key="[[partnerData.analytics.readKey]]"
+              class="bloombox-page not-yet-loaded"></bloombox-page-account>
+              <bloombox-page-tv
+              name="tv"
+              endpoint="[[endpoint]]"
+              partner="[[partner]]"
+              locations="[[locations]]"
+              location="{{location}}"
+              storage="[[storage]]"
+              loading="{{loading}}"
+              read-key="[[partnerData.analytics.readKey]]"
+              environment="[[environment]]"
+              class="bloombox-page not-yet-loaded"></bloombox-page-tv>
+              <bloombox-page-orders 
+              endpoint="[[endpoint]]"
+              location="[[location]]"
+              name="orders" 
+              class="bloombox-page not-yet-loaded"></bloombox-page-orders>
+              <bloombox-page-setting
+              name="setting"
+              endpoint="[[endpoint]]"
+              partner="[[partner]]"
+              storage="[[storage]]"
+              loading="{{loading}}"
+              environment="[[environment]]"
+              read-key="[[partnerData.analytics.readKey]]"
+              class="bloombox-page not-yet-loaded"></bloombox-page-setting>
               <bloombox-page-admin
-                name="admin"
-                endpoint="[[endpoint]]"
-                partner="[[partner]]"
-                storage="[[storage]]"
-                loading="{{loading}}"
-                environment="[[environment]]"
-                read-key="[[partnerData.analytics.readKey]]"
-                class="bloombox-page not-yet-loaded"></bloombox-page-admin>
+              name="admin"
+              endpoint="[[endpoint]]"
+              partner="[[partner]]"
+              storage="[[storage]]"
+              loading="{{loading}}"
+              environment="[[environment]]"
+              read-key="[[partnerData.analytics.readKey]]"
+              class="bloombox-page not-yet-loaded"></bloombox-page-admin>
             </template>
           </iron-pages>
 
@@ -563,6 +583,8 @@
         home: "",
         analytics: "Analytics",
         menu: "Menu Manager",
+        tv: "TV Manager",
+        orders: "Order History",
         profile: "Dispensary Profile",
         account: "Account Settings",
         admin: "Platform Manager",
@@ -579,7 +601,7 @@
          * Global debug flag. Activates logging and other verbosity
          * features when `true`/truthy.
          */
-        _debug: {
+         _debug: {
           type: Boolean,
           value: function() {
             return window["__debug"] || false;
@@ -590,7 +612,7 @@
          * Boolean flag indicating that the dashboard has booted and is
          * currently running.
          */
-        _booted: {
+         _booted: {
           type: Boolean,
           notify: true
         },
@@ -599,7 +621,7 @@
          * Timestamp for when we last refreshed our user authorization
          * context.
          */
-        _lastAuthorized: {
+         _lastAuthorized: {
           type: Number,
           notify: true,
           readOnly: true
@@ -609,7 +631,7 @@
          * Private property that holds onto a reference to the main
          * loading overlay.
          */
-        _overlay: {
+         _overlay: {
           type: Object,
           readOnly: true
         },
@@ -619,7 +641,7 @@
          * state. `true` when the window width is less than the
          * `responsiveWidth`.
          */
-        _narrow: {
+         _narrow: {
           type: Boolean,
           notify: true
         },
@@ -628,7 +650,7 @@
          * Computes classes that should be injected in various places
          * when an admin is logged in vs. a regular user.
          */
-        _adminOnly: {
+         _adminOnly: {
           type: String,
           notify: true,
           computed: '_computeAdminOnly(user.admin)',
@@ -640,7 +662,7 @@
          * stops after finding the required properties `partner` and
          * `home`.
          */
-        _routeData: {
+         _routeData: {
           type: Object,
           notify: true
         },
@@ -650,7 +672,7 @@
          * This continues after `_routeData` to parse a `location`
          * name, if specified.
          */
-        _subrouteData: {
+         _subrouteData: {
           type: Object,
           notify: true
         },
@@ -658,7 +680,7 @@
         /**
          * Page title shown in the dashboard header.
          */
-        _pageTitle: {
+         _pageTitle: {
           type: String,
           notify: true,
           value: ""
@@ -667,7 +689,7 @@
         /**
          * Message displayed by the currently-active toast, if any.
          */
-        _toastMessage: {
+         _toastMessage: {
           type: String,
           notify: true,
           value: "Success!"
@@ -678,7 +700,7 @@
          * divvied up into its different components (such as `user`, `api`
          * and `credentials`).
          */
-        _context: {
+         _context: {
           type: Object,
           notify: true,
           observer: '_contextLoaded'
@@ -688,7 +710,7 @@
          * Computes whether the user has access to multiple partners. Used
          * to show/hide controls that deal with switching partner accounts.
          */
-        _multiplePartners: {
+         _multiplePartners: {
           type: Boolean,
           notify: true,
           computed: '_computeMultiplePartners(partners, page)'
@@ -698,7 +720,7 @@
          * Computes and returns the current display mode for widgets,
          * based on the current `narrow` state of the main UI.
          */
-        displayMode: {
+         displayMode: {
           type: String,
           notify: true,
           computed: '_computeDisplayMode(_narrow)'
@@ -708,7 +730,7 @@
          * Computes whether the current user has at least supervisor-level
          * rights, and may change account/partner-level stuff.
          */
-        _adminOrSupervisor: {
+         _adminOrSupervisor: {
           type: Boolean,
           notify: true,
           computed: '_computeAdminOrSupervisor(user, user.*)'
@@ -718,7 +740,7 @@
          * Computes an endpoint that retrieves server-injected context via
          * JSON/JSONp.
          */
-        _contextEndpoint: {
+         _contextEndpoint: {
           type: String,
           notify: true,
           value: function() {
@@ -730,7 +752,7 @@
         /**
          * Boolean flag indicating the dashboard is currently loading up.
          */
-        loading: {
+         loading: {
           type: Boolean,
           notify: true,
           reflectToAttribute: true,
@@ -742,7 +764,7 @@
          * Active page route. Holds parsed route info including the current
          * `page` and `partner`.
          */
-        route: {
+         route: {
           type: Object,
           notify: true,
           reflectToAttribute: false
@@ -752,7 +774,7 @@
          * Active page subroute. Holds parsed route info that was found in
          * addition to the standard/required `route` data.
          */
-        subroute: {
+         subroute: {
           type: Object,
           notify: true,
           reflectToAttribute: false
@@ -761,7 +783,7 @@
         /**
          * Active page name, such as `home` or `menu`.
          */
-        page: {
+         page: {
           type: String,
           notify: true,
           reflectToAttribute: true,
@@ -771,7 +793,7 @@
         /**
          * Currently logged-in user.
          */
-        user: {
+         user: {
           type: Object,
           notify: true,
           reflectToAttribute: false,
@@ -781,7 +803,7 @@
         /**
          * Transport settings provided by the server.
          */
-        transport: {
+         transport: {
           type: Object,
           notify: true,
           reflectToAttribute: false,
@@ -791,7 +813,7 @@
         /**
          * API configuration and manifest provided by the server.
          */
-        api: {
+         api: {
           type: Object,
           notify: true,
           reflectToAttribute: false,
@@ -803,7 +825,7 @@
          * Credential and authorization information for the current user,
          * provided by the server.
          */
-        credentials: {
+         credentials: {
           type: Object,
           notify: true,
           reflectToAttribute: false,
@@ -815,7 +837,7 @@
          * List of `partner` objects that the current user has access to,
          * and may switch to in the UI.
          */
-        partners: {
+         partners: {
           type: Array,
           notify: true,
           readOnly: true,
@@ -826,7 +848,7 @@
         /**
          * Active partner name, such as `mm` or `abatin`.
          */
-        partner: {
+         partner: {
           type: String,
           notify: true,
           reflectToAttribute: true,
@@ -836,7 +858,7 @@
         /**
          * Data backing the active partner.
          */
-        partnerData: {
+         partnerData: {
           type: Object,
           notify: true,
           readOnly: true,
@@ -848,7 +870,7 @@
         /**
          * Available locations for the currently-active partner.
          */
-        locations: {
+         locations: {
           type: Array,
           notify: true,
           observer: '_locationsLoaded'
@@ -857,7 +879,7 @@
         /**
          * Available locations for the currently-active partner.
          */
-        location: {
+         location: {
           type: String,
           notify: true
         },
@@ -865,7 +887,7 @@
         /**
          * Reference to the currently-active Firebase application.
          */
-        firebase: {
+         firebase: {
           type: Object,
           notify: true,
         },
@@ -873,7 +895,7 @@
         /**
          * Active database environment. Defaults to `sandbox`.
          */
-        environment: {
+         environment: {
           type: String,
           reflectToAttribute: true
         },
@@ -882,7 +904,7 @@
          * Computed property that generates a Firebase endpoint prefix for
          * subcomponents that are backed by persisted data.
          */
-        endpoint: {
+         endpoint: {
           type: String,
           notify: true,
           computed: '_computeEndpoint(environment, partner)'
@@ -892,7 +914,7 @@
          * Computed property that generates a Firebase storage prefix for
          * media upload and download.
          */
-        storage: {
+         storage: {
           type: String,
           notify: true,
           computed: '_computeStorage(environment, partner)'
@@ -902,7 +924,7 @@
          * Holds the revision string that we use for assets in this particular
          * deployed copy of the dashboard. Passed in at invocation time.
          */
-        revision: {
+         revision: {
           type: String,
           notify: true,
           value: "staging"
@@ -914,19 +936,19 @@
       },
 
       observers: [
-        '_routePageChanged(_routeData.page)',
-        '_routePartnerChanged(_routeData.partner)',
-        '_routeChanged(partner, page, location)',
-        '_transportLoaded(transport, firebase)',
-        '_bootDashboard(user, transport, api, partners, credentials, firebase, environment)'
+      '_routePageChanged(_routeData.page)',
+      '_routePartnerChanged(_routeData.partner)',
+      '_routeChanged(partner, page, location)',
+      '_transportLoaded(transport, firebase)',
+      '_bootDashboard(user, transport, api, partners, credentials, firebase, environment)'
       ],
 
       _showDialog: function(id) {
         var dialog = this.$[id],
-            node = Polymer.dom(dialog).node,
-            confirm = node.querySelector(".confirmButton"),
-            that = this,
-            innerComponent;
+        node = Polymer.dom(dialog).node,
+        confirm = node.querySelector(".confirmButton"),
+        that = this,
+        innerComponent;
         document.body.appendChild(dialog);  // @TODO(sgammon): fix positioning when using a backdrop
         dialog.style.marginBottom = "150px";
         dialog.style.marginTop = "150px";
@@ -945,8 +967,8 @@
 
       _contextLoaded: function(context) {
         var debug = window["__debug"] || false,
-            app = window["bloom"] = window["bloom"] || {},
-            that = this;
+        app = window["bloom"] = window["bloom"] || {},
+        that = this;
         app.config = context;  // mount config globally
 
         if (context != null) {
@@ -981,7 +1003,7 @@
 
       _transportLoaded: function(transport, app) {
         var debug = window["__debug"] || false,
-            firebase = window["firebase"];
+        firebase = window["firebase"];
 
         if (debug) {
           console.info("Loaded transport layer.", transport);
@@ -1015,7 +1037,7 @@
 
       _partnersLoaded: function(partners, oldValue) {
         var debug = window["__debug"] || false,
-            existingPartner = this.partner;
+        existingPartner = this.partner;
 
         // special case: if it's `admin`, it's not a partner
         if (partners === "admin") {
@@ -1032,10 +1054,10 @@
         }
 
         if (window.location.pathname == "" || window.location.pathname.length < 2 ||
-            window.location.pathname == "/home" || window.location.pathname == "/admin") {
+          window.location.pathname == "/home" || window.location.pathname == "/admin") {
           // start us off with the first partner the user has access to
-          this.partner = partners[0].key;
-        } else if (oldValue == null || oldValue == undefined) {
+        this.partner = partners[0].key;
+      } else if (oldValue == null || oldValue == undefined) {
           // we loaded the partner via a URL reference, so re-run our `_partnerChanged` observer
           this._partnerChanged(existingPartner, existingPartner);
         }
@@ -1078,16 +1100,16 @@
 
       _scheduleReauthorization: function(token, callback) {
         var defaultTokenLifetime = 3000,
-            parsedToken = JSON.parse(atob(token.split(".")[1])),
-            expiration = (parsedToken && parsedToken["exp"]) ? parseInt(parsedToken["exp"]) : parseInt((+ new Date()) / 1000) + defaultTokenLifetime,
+        parsedToken = JSON.parse(atob(token.split(".")[1])),
+        expiration = (parsedToken && parsedToken["exp"]) ? parseInt(parsedToken["exp"]) : parseInt((+ new Date()) / 1000) + defaultTokenLifetime,
             expirationInterval = expiration - parseInt((+new Date()) / 1000) - 60,  // one minute before JWT expiration, in seconds
             that = this;
 
-        if (expirationInterval > 0) {
-          this._set_lastAuthorized(+ new Date());
-          console.info("Scheduling reauthorization in " + expirationInterval + " seconds.");
+            if (expirationInterval > 0) {
+              this._set_lastAuthorized(+ new Date());
+              console.info("Scheduling reauthorization in " + expirationInterval + " seconds.");
 
-          setTimeout((function() {
+              setTimeout((function() {
             // reauthorize the user
             that._reauthorize();
           }), expirationInterval * 1000);
@@ -1147,10 +1169,10 @@
 
       _partnerChanged: function(partner, oldPartner) {
         var that = this,
-            newLocations = [],
-            partners = this.partners,
-            partnerKey = partner ? partner : null,
-            partnerSpec;
+        newLocations = [],
+        partners = this.partners,
+        partnerKey = partner ? partner : null,
+        partnerSpec;
 
         if (partners !== null && partners !== undefined) {
           if (partnerKey === null) {
@@ -1228,7 +1250,7 @@
 
       _confirmToast: function() {
         var callbackHandlesClose = false,
-            that = this;
+        that = this;
         if (typeof this._confirmCallback === "function") {
           callbackHandlesClose = this._confirmCallback(true, this.$.confirmToast);
         }
@@ -1241,7 +1263,7 @@
 
       _rejectToast: function() {
         var callbackHandlesClose = false,
-            that = this;
+        that = this;
         if (typeof this._confirmCallback === "function") {
           callbackHandlesClose = this._confirmCallback(false, this.$.confirmToast);
         }
@@ -1254,7 +1276,7 @@
 
       pageDidLoad: function(name) {
         var target = this.$$("bloombox-page-" + name),
-            that = this;
+        that = this;
         if (target && target.classList.contains("not-yet-loaded")) {
           this.async(function() {
             target.classList.remove("not-yet-loaded");
@@ -1264,7 +1286,7 @@
 
       authorize: function(token, environment) {
         var debug = window["__debug"] || false,
-            that = this;
+        that = this;
         firebase.auth().signInWithCustomToken(token).then(function() {
           // set environment now that we're logged in
           if (that.environment != environment) {
@@ -1281,8 +1303,8 @@
 
       navigate: function(event) {
         var partner = this.partner,
-            link = !event.target.hasAttribute("name") ? event.target.parentElement : event.target,
-            page = link.getAttribute("name");
+        link = !event.target.hasAttribute("name") ? event.target.parentElement : event.target,
+        page = link.getAttribute("name");
         if (page !== "admin") {
           this.partner = partner;
         }
@@ -1291,8 +1313,8 @@
 
       ready: function() {
         var overlay = this.$.loadingOverlay,
-            that = this,
-            bloom = window["bloom"];
+        that = this,
+        bloom = window["bloom"];
         this._set_overlay(overlay);
         console.info("Dashboard is ready to boot.");
 

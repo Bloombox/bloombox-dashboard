@@ -1,0 +1,204 @@
+
+<link rel="import" href="../components/polymer/polymer.html">
+<link rel="import" href="../components/iron-list/iron-list.html">
+<link rel="import" href="../components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../components/bloombox-styles/bloombox-styles.html">
+<link rel="import" href="../components/bloombox-orders/bloombox-orders.html">
+<link rel="import" href="./behaviors/bloombox-dashboard-page-behavior.html">
+<link rel="import" href="../components/polymerfire/polymerfire.html">
+<link rel="import" href="../components/moment-js/moment-js.html">
+<link rel="import" href="../components/paper-datatable/paper-datatable.html">
+
+<dom-module id="bloombox-page-orders">
+  <template strip-whitespace>
+    <style is="custom-style" include="bloombox-styles">
+      :host {
+        display: block;
+        padding: 10px;
+      }
+      #list {
+        float: left;
+        width: 60%;
+      }
+      #listDetailContainer {
+        float: left;
+        width: 34%;
+      }
+      #list {
+        margin-right: 1%;
+      }
+      #listDetailContainer {
+        border-left: 1px solid #999;
+        padding-left: 2%;
+        margin-left: 1%;
+      }
+      .item {
+        background: #fff;
+        border: 1px solid #eee;
+        margin-bottom: 0.3em; 
+        padding: 2em;
+      }
+      #items > ::content > * {
+        margin-bottom: 1em;
+      }
+    </style>
+
+     <firebase-document 
+      id="shopData"
+      path="/v1/partners/mm/locations/sacramento/orders"
+      data="{{shopData}}" hidden>
+    </firebase-document>
+
+    <firebase-document 
+      id="menuData"
+      path="/v1/partners/mm/locations/sacramento/menu"
+      data="{{menuData}}" hidden>
+    </firebase-document>
+
+    <h1>[[handleResponse]]</h1>
+
+
+    <!-- iron-list using the document scroll -->
+    <div id="list">
+      <paper-datatable data="[[_objToArr(shopData)]]" multi-selection id="datatable">
+        <paper-datatable-column header="Status" property="status" type="String">
+          <template>
+            <template is="dom-if" if="[[_computeOrderStatus(value)]]">
+              <strong>NEW</strong>
+            </template>
+            <template is="dom-if" if="[[!_computeOrderStatus(value)]]">
+              [[_capitalize(value)]]
+            </template>
+          </template>
+        </paper-datatable-column>
+         <paper-datatable-column header="Name" property="customer" type="String">
+          <template>
+          [[value.name.firstName]] [[value.name.lastName]]
+          </template>
+        </paper-datatable-column>
+        <paper-datatable-column header="Customer ID" type="String" property="customer">
+          <template>
+            [[value.foreignId]]
+          </template>
+        </paper-datatable-column>
+        
+        <paper-datatable-column header="Time" property="createdAt" type="String">
+         <template>
+          <moment-js date="[[_timestamp(value.time)]]" calendar-time="true"></moment-js>
+          </template>
+        </paper-datatable-column>
+      </paper-datatable>
+    </div>
+
+    <div id="listDetailContainer">
+      <bloombox-orders data="{{selectedOrder}}" endpoint="{{endpoint}}" location="{{location}}"></bloombox-orders>
+    </div>
+
+  </template>
+
+  <script>
+    var BloomboxPageOrders = Polymer.BloomboxPageOrders = Polymer({
+      is: "bloombox-page-orders",
+
+      behaviors: [
+        Polymer.BloomboxDashboardPageBehavior
+      ],
+
+      properties: {
+        shopData: {
+          type: Object,
+          notify: true,
+          observer:'_shopLoaded'
+        },
+        menuData: {
+          type: Object
+        },
+        selectedOrder: {
+          type: Object,
+          notify: true,
+          observer: '_orderUpdated'
+        },
+        orderKeys: {
+          type: Array,
+          notify: true
+        }
+      },
+
+      _shopLoaded: function(data) {
+        // Track Order Keys in Array
+        var a = []
+        for(let i in data) {
+          a.push(i)
+        }
+        this.orderKeys = a
+
+        // click first table on load
+        this.$.datatable.shadowRoot.querySelectorAll('tr')[0].click()
+      },
+
+      _loadSelectedOrder: function(d) {
+        d.productsInOrder = []
+        // Get Product Keys from Order Data
+        for(i=0; i < d.items.length; i++) {
+          var cat = d.items[i].key.kind
+          var id = d.items[i].key.id
+          var dataPass = this._searchProductMenu(cat, id)
+          d.productsInOrder.push(dataPass)
+        }
+
+        this.selectedOrder = d
+      },
+
+      _searchProductMenu: function(cat, id) {
+        // Search Product Menu by Category & ID
+        var searchCat = this.menuData[cat.toLowerCase()];
+        for(var key in searchCat) {
+          if(key === id) {
+            return searchCat[key]
+          }
+        } 
+      },
+
+      _orderUpdated: function(data) {
+        
+      },
+
+      _objToArr: function(obj) {
+        if(obj !== undefined) {
+         var arr = Object.keys(obj).map(function (key) {
+          var obitem = obj[key];
+          obitem.itemKey = key
+          return obitem
+         });
+         return arr;
+        }
+      },
+
+      _timestamp: function(iso) {
+        return new Date(iso);
+      },
+
+      _computeOrderStatus: function(status) {
+        return status === "PENDING"
+      },
+
+      _capitalize: function(text) {
+        return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+      },
+
+      ready: function() {
+        var that = this;
+        this.$.datatable.addEventListener('row-tap', function(event){
+          that._loadSelectedOrder(event.detail.item)
+        });
+      },
+
+      /**
+       * Lifecycle callback for DOM attachment event.
+       */
+      attached: function() {
+        bloom.app.pageDidLoad("orders");
+      }
+    });
+  </script>
+</dom-module>
