@@ -45,20 +45,16 @@
 
      <firebase-document 
       id="shopData"
-      path="/v1/partners/mm/locations/sacramento/orders"
+      path="[[_ordersEndpoint]]"
       data="{{shopData}}" hidden>
     </firebase-document>
 
     <firebase-document 
       id="menuData"
-      path="/v1/partners/mm/locations/sacramento/menu"
+      path="[[_menuEndpoint]]"
       data="{{menuData}}" hidden>
     </firebase-document>
 
-    <h1>[[handleResponse]]</h1>
-
-
-    <!-- iron-list using the document scroll -->
     <div id="list">
       <paper-datatable data="[[_objToArr(shopData)]]" multi-selection id="datatable">
         <paper-datatable-column header="Status" property="status" type="String">
@@ -113,6 +109,16 @@
         menuData: {
           type: Object
         },
+        _menuEndpoint: {
+          type: String,
+          notify: true,
+          computed: '_computeMenuEndpoint(endpoint, location)'
+        },
+        _ordersEndpoint: {
+          type: String,
+          notify: true,
+          computed: '_computeOrdersEndpoint(endpoint, location)'
+        },
         selectedOrder: {
           type: Object,
           notify: true,
@@ -125,13 +131,6 @@
       },
 
       _shopLoaded: function(data) {
-        // Track Order Keys in Array
-        var a = []
-        for(let i in data) {
-          a.push(i)
-        }
-        this.orderKeys = a
-
         // click first table on load
         this.$.datatable.shadowRoot.querySelectorAll('tr')[0].click()
       },
@@ -159,10 +158,6 @@
         } 
       },
 
-      _orderUpdated: function(data) {
-        
-      },
-
       _objToArr: function(obj) {
         if(obj !== undefined) {
          var arr = Object.keys(obj).map(function (key) {
@@ -180,6 +175,13 @@
 
       _computeOrderStatus: function(status) {
         return status === "PENDING"
+      },
+
+      _computeOrdersEndpoint: function(endpoint, location) {
+        return endpoint + "/locations/" + location + "/orders";
+      },
+      _computeMenuEndpoint: function(endpoint, location) {
+        return endpoint + "/locations/" + location + "/menu";
       },
 
       _capitalize: function(text) {
