@@ -43,16 +43,17 @@
       }
     </style>
 
+        <firebase-document 
+      id="menuData"
+      path="[[_menuEndpoint]]"
+      data="{{menuData}}" hidden>
+    </firebase-document>
+
+
      <firebase-document 
       id="shopData"
       path="[[_ordersEndpoint]]"
       data="{{shopData}}" hidden>
-    </firebase-document>
-
-    <firebase-document 
-      id="menuData"
-      path="[[_menuEndpoint]]"
-      data="{{menuData}}" hidden>
     </firebase-document>
 
     <div id="list">
@@ -121,8 +122,7 @@
         },
         selectedOrder: {
           type: Object,
-          notify: true,
-          observer: '_orderUpdated'
+          notify: true
         },
         orderKeys: {
           type: Array,
@@ -131,8 +131,23 @@
       },
 
       _shopLoaded: function(data) {
-        // click first table on load
-        this.$.datatable.shadowRoot.querySelectorAll('tr')[0].click()
+        // Store All Timestamps in Array
+        var arr = Object.keys(data).map(function ( key ) { 
+          return data[key].createdAt.time; 
+        });
+
+        // Get Max value from Array
+        var max = Math.max.apply(null, arr);
+
+        for(key in data) {
+          console.log(data[key])
+          if(data[key].createdAt.time === max) {
+            // click first table on load
+            this.$.datatable.fire('row-tap', {
+              item: data[key]
+            });
+          }
+        }
       },
 
       _loadSelectedOrder: function(d) {
@@ -162,7 +177,7 @@
         if(obj !== undefined) {
          var arr = Object.keys(obj).map(function (key) {
           var obitem = obj[key];
-          obitem.itemKey = key
+          obitem.orderKey = key
           return obitem
          });
          return arr;
