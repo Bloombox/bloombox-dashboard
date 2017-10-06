@@ -1,0 +1,180 @@
+
+<link rel="import" href="../components/polymer/polymer.html">
+<link rel="import" href="../components/iron-list/iron-list.html">
+<link rel="import" href="../components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../components/bloombox-styles/bloombox-styles.html">
+<link rel="import" href="../components/bloombox-orders/bloombox-orders.html">
+<link rel="import" href="../components/bloombox-orders/bloombox-order-list-item.html">
+<link rel="import" href="./behaviors/bloombox-dashboard-page-behavior.html">
+<link rel="import" href="../components/polymerfire/polymerfire.html">
+<link rel="import" href="../components/moment-js/moment-js.html">
+
+<dom-module id="bloombox-page-orders">
+  <template strip-whitespace>
+    <style is="custom-style" include="bloombox-styles">
+      :host {
+        display: block;
+        padding: 10px;
+      }
+      #list {
+        float: left;
+        width: 60%;
+      }
+      #listDetailContainer {
+        float: left;
+        width: 34%;
+      }
+      #list {
+        margin-right: 1%;
+      }
+      #listDetailContainer {
+        border-left: 1px solid #999;
+        padding-left: 2%;
+        margin-left: 1%;
+      }
+      .table-row {
+        border-bottom: 1px solid #999;
+        margin-bottom: 0; 
+        padding: 1em;
+
+      }
+
+      #items > ::content > * {
+        margin-bottom: 1em;
+      }
+      .table-head > div {
+        font-weight: 800;
+      }
+      .table-row {
+        display: flex;
+        flex-wrap: row;
+      }
+      .table-row > div {
+        width: 25%;
+      }
+    </style>
+
+    <firebase-document id="menuData" path="[[_menuEndpoint]]" data="{{menuData}}" hidden></firebase-document>
+    <firebase-document id="shopData" path="[[_ordersEndpoint]]" data="{{shopData}}" hidden></firebase-document>
+
+    <div id="list">
+      <div class="table-head table-row">
+        <div>Status</div>
+        <div>Name</div>
+        <div>Customer ID</div>
+        <div>Time</div>
+      </div>
+      <div class="table-body">
+        <template is="dom-repeat" items="[[_sortOrders(shopData)]]" id="datatable">
+          <bloombox-order-list-item data="{{item}}" on-tap="_loadSelectedOrder"></bloombox-order-list-item>
+        </template>
+      </div>
+    </div>
+
+    <div id="listDetailContainer">
+      <bloombox-orders data="{{selectedOrder}}" endpoint="{{endpoint}}" location="{{location}}"></bloombox-orders>
+    </div>
+  </template>
+
+  <script>
+    var BloomboxPageOrders = Polymer.BloomboxPageOrders = Polymer({
+      is: "bloombox-page-orders",
+
+      behaviors: [
+        Polymer.BloomboxDashboardPageBehavior
+      ],
+
+      properties: {
+        shopData: {
+          type: Object,
+          notify: true
+        },
+        menuData: {
+          type: Object
+        },
+        _menuEndpoint: {
+          type: String,
+          notify: true,
+          computed: '_computeMenuEndpoint(endpoint, location)'
+        },
+        _ordersEndpoint: {
+          type: String,
+          notify: true,
+          computed: '_computeOrdersEndpoint(endpoint, location)'
+        },
+        selectedOrder: {
+          type: Object,
+          notify: true
+        },
+        orderKeys: {
+          type: Array,
+          notify: true
+        }
+      },
+
+      _loadSelectedOrder: function(e) {
+        var d = e.model.item;
+        var row = e.currentTarget.shadowRoot.querySelector('.table-row')
+        var rows = this.shadowRoot.querySelectorAll('bloombox-order-list-item')
+
+        // UI for active items
+        for(i=0;i<rows.length;i++) {
+          rows[i].shadowRoot.querySelector('.table-row').className = 'table-row'
+        }
+        if(!row.classList.contains('active')) {
+          row.className += ' active'
+        } else {
+          row.className = 'table-row'
+        }
+        
+        // Load Selected Items
+        d.productsInOrder = []
+        // Get Product Keys from Order Data
+        for(i=0; i < d.items.length; i++) {
+          var cat = d.items[i].key.kind
+          var id = d.items[i].key.id
+          var dataPass = this._searchProductMenu(cat, id)
+          d.productsInOrder.push(dataPass)
+        }
+        this.selectedOrder = d
+      },
+
+      _searchProductMenu: function(cat, id) {
+        // Search Product Menu by Category & ID
+        var searchCat = this.menuData[cat.toLowerCase()];
+        for(var key in searchCat) {
+          if(key === id) {
+            return searchCat[key]
+          }
+        } 
+      },
+
+      _sortOrders: function(obj) {
+        if(obj !== undefined) {
+          var arr = Object.keys(obj).map(function (key) {
+            var obitem = obj[key];
+            obitem.orderKey = key
+            return obitem
+          });
+          return arr;
+        }
+      },
+
+      _computeOrdersEndpoint: function(endpoint, location) {
+        return endpoint + "/locations/" + location + "/orders";
+      },
+
+      _computeMenuEndpoint: function(endpoint, location) {
+        return endpoint + "/locations/" + location + "/menu";
+      },
+
+      ready: function() {
+
+      },
+
+      attached: function() {
+        bloom.app.pageDidLoad("orders");
+      }
+  });
+</script>
+</dom-module>

@@ -1,0 +1,436 @@
+
+<link rel="import" href="../components/polymer/polymer.html">
+<link rel="import" href="../components/bloombox-styles/bloombox-styles.html">
+<link rel="import" href="../components/bloombox-tv/bloombox-tv-sort.html">
+<link rel="import" href="../components/bloombox-tv/bloombox-tv-menu-item.html">
+<link rel="import" href="../components/bloombox-tv/bloombox-tv-featured.html">
+<link rel="import" href="../components/bloombox-tv/bloombox-tv-banner.html">
+<link rel="import" href="../components/bloombox-media/bloombox-media.html">
+<link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../components/polymer-quill/polymer-quill.html">
+<link rel="import" href="../components/polymerfire/polymerfire.html">
+<link rel="import" href="./behaviors/bloombox-dashboard-page-behavior.html">
+<link rel="import" href="../components/bloombox-styles/bloombox-styles.html">
+
+<dom-module id="bloombox-page-tv">
+  <template>
+    <style include="shared-styles">
+      :root {
+        --bloombox-media-height: 262px;
+        --bloombox-media-width: 100%;
+      }
+      :host {            
+        /* 
+          Styles for fullscreen menu 
+          ---------------       
+          display: flex;
+          flex-wrap: wrap;
+          padding: 10px;
+        */
+      }
+      :host .card.settings {
+        display: flex;
+      }
+      .card.settings {
+        flex-wrap: wrap;
+      }
+      .card-section.banner-edit {
+        width: calc(47% - 1em);
+        height: 50%;
+        margin-right: 3%;
+        margin-left: 1em;
+      }
+      .card-section {
+        position: relative;
+        margin-right: 1em;
+        margin-top: 1.2em;
+        width: calc(50% - 1em);
+      }
+      .banner-upload {
+        float: left;
+        width: 100%;
+        margin: 1.4em 0;
+      }
+      :host .btn {
+        margin: 2em 0 0 0;
+      }
+      #editor {
+        min-height: 450px;
+      }
+      .btn {
+        background: blue;
+        border: 0;
+        border-radius: 4px;
+        padding: 0.5em 0.75em;
+        color: #fff;
+        font-size: 1em;
+        float: left;
+      }
+      .btn:hover {
+        cursor: pointer;
+      }
+      .bottom-bar {
+        margin: 1em;
+        width: 100%;
+      }
+      .menu-preview {
+        display: flex;
+        flex-wrap: wrap;
+      }
+      .tabs {
+        list-style: none;
+        margin: 32px 24px 35px 24px;
+        padding: 0;
+        width: 100%;
+      }
+      .tabs li {
+        display: inline-block;
+        margin-right: 10px;
+
+      }
+      .tabs a {
+        background: #fff;
+        border-bottom: 3px solid red;
+        color: #888;
+        padding: 10px 24px;
+        text-decoration: none;
+      }
+      .tabs a:hover {
+        cursor: pointer;
+      }
+      .tabs a.active {
+        background: #a5a5a5;
+        color: #fff;
+      }
+      .tab-container {
+        width: 100%;
+      }
+      #menu-settings, #menu-featured {
+        display: none;
+      }
+    </style>
+
+     <firebase-document 
+      id="menuData"
+      path="[[tvSettingsEndpoint]]"
+      data="{{menuData}}" hidden>
+    </firebase-document>
+
+    <firebase-document
+      id="productData"
+      log$="[[debug]]"
+      path="[[_menuEndpoint]]"
+      data="{{productData}}" hidden></firebase-document> 
+
+    <ul class="tabs">
+      <li><a href="#menu-preview" class="active" on-click="showSettings">Preview</a></li>
+      <li><a href="#menu-settings" on-click="showSettings">Settings</a></li>
+      <li>        
+        <paper-dropdown-menu label="Location" noink no-label-float hidden$="[[!_hasMultipleLocations]]">
+          <paper-listbox class="dropdown-content" selected="{{location}}" attr-for-selected="key">
+            <template is="dom-repeat" items="[[locations]]">
+              <paper-item key="[[item.key]]">[[item.label]]</paper-item>
+            </template>
+          </paper-listbox>
+        </paper-dropdown-menu>
+      </li>
+    </ul>
+
+    <div class="tab-container" id="menu-settings"> 
+      <div class="card settings">
+        <div class="banner-edit card-section">
+          <h1>Banner Editor</h1>
+          <style include="quill-core quill-snow"></style>
+          <div id="editor"></div>
+          <div class="generate-image">
+            <div class="banner-upload">
+              <bloombox-media id="bannerUpload" enabled editable partner="[[partner]]" environment="[[environment]]" asset="[[bannerImage]]"></bloombox-media>
+            </div>
+          </div>
+        </div>
+        <div class="card-section">
+          <h1>Menu Sections</h1>
+          <bloombox-tv-sort id="tvSort" list-items="{{listItems}}"></bloombox-tv-sort>
+        </div>
+        <div class="bottom-bar">
+          <button class="save-settings btn" on-click="saveSettings">
+            Save Settings
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="menu-preview">
+      <div class="menu-preview" id="tabtwo">
+        <bloombox-tv-banner environment="[[environment]]" partner="[[partner]]" banner-data="{{bannerData}}"></bloombox-tv-banner>
+        <template is="dom-repeat" items="{{_maxItems(menuList, 4)}}">  
+          <bloombox-tv-menu-item menu-data="{{item}}" category="{{_getCategory(index)}}" menu-settings="{{_getSettings(index)}}"></bloombox-tv-menu-item>
+        </template>
+      </div>
+    </div>
+
+  </template>
+
+
+
+  <script>
+    BucketURL = 'https://storage.googleapis.com/bloombox-io.appspot.com'
+    var BloomboxPageTV = Polymer.BloomboxPageTV = Polymer({
+      is: "bloombox-page-tv",
+
+      behaviors: [
+        Polymer.BloomboxDashboardPageBehavior
+      ],
+
+      properties: {
+        tvSettingsEndpoint: {
+          type: String,
+          notify: true,
+          computed: '_computeTvSettings(endpoint, location)'
+        },
+        _menuEndpoint: {
+          type: String,
+          notify: true,
+          computed: '_computeMenuEndpoint(endpoint, location)'
+        },
+        productData: {
+          type: Object,
+          notify: true,
+          observer: '_buildFeaturedProducts'
+        },
+        featuredProducts: {
+          type: Object,
+          notify: true,
+          observer: '_buildSortedMenu'
+        },
+        bannerData: {
+          type: Object
+        },
+        endpoint: {
+          type: String,
+          notify: true
+        },
+        productTitles: {
+          type: Array
+        },
+        menuData: {
+          type: Object,
+          observer: '_ajaxReceived'
+        },
+        persistedData: {
+          type: Object,
+          observer: '_bindedData',
+        },
+        locations: {
+          type: Array,
+          notify: true
+        },
+        location: {
+          type: String,
+          notify: true
+        },
+        menuList: {
+          type: Array
+        },
+        menuSettings: {
+          type: Array
+        },
+        listItems: {
+          type: Array
+        },
+        listSettings: {
+          type: Array,
+          notify: true
+        },
+        _image: {
+          type: String,
+          notify: true
+        },
+        previewDisplay: {
+          type: Boolean,
+          value: false
+        },
+        storageRef: {
+          type: Object
+        },
+        bannerImage: {
+          type: String
+        },
+        bucketUrl: {
+          type: String,
+          value: this.endpoint + '/locations/' + this.location
+        }
+      },
+      showSettings: function(e) {
+        var clickId = '#' + e.target.href.split('#')[1]
+        if(e.target.className !== 'active') {
+          var allTabs = this.shadowRoot.querySelectorAll('.tabs a')
+          var activeTabs = this.shadowRoot.querySelectorAll('.active')
+          for(var i = 0; i<allTabs.length;i++) {
+            this.shadowRoot.querySelector(allTabs[i].hash).style.display = 'none' 
+          }
+          this.shadowRoot.querySelector(clickId).style.display = 'block' 
+          for(var i=0;i<activeTabs.length;i++) {
+            activeTabs[i].className = ''
+          }
+          e.target.className = 'active'
+        }
+      },
+      saveSettings: function() {
+        this.uploadBanner()
+        this.uploadMenuImages()
+        this.saveSort()
+        this.notifyPath('menuData.settings')
+      },
+      saveSort: function() {
+          var items = this.shadowRoot.querySelector('#tvSort').$.list.querySelectorAll('.sort-item')
+          var stU = BucketURL + '/' + this.environment + '/media/partners/' + this.partner + '/'
+          for(let i=0;i<items.length;i++) {
+            var key = this.menuData.settings[items[i].children[0].innerHTML.toLowerCase()]
+            var image = items[i].querySelector('.media-item').$.fileSelect.files
+            key.title = items[i].children[0].innerHTML
+            key.sort = i
+            if(image.length !== 0) {
+              key.image = stU + image[0].name
+            }
+          }
+      },
+      uploadBanner: function() {
+          var bannerUpload = this.shadowRoot.querySelector('#bannerUpload').shadowRoot.querySelector('#fileSelect')
+          if(bannerUpload.files.length !== 0) {
+            var file = bannerUpload.files[0]
+            var thisRef = this.storageRef.child(this.environment + '/media/partners/' + this.partner + '/' + file.name)
+            thisRef.put(file).then(function(snapshot) {
+              this.bannerImage = snapshot.metadata.name
+              this.menuData.banner.image = snapshot.metadata.name
+              this.notifyPath('menuData.banner')
+            }.bind(this))
+          } else {
+            this.notifyPath('menuData.banner')
+          }
+      },
+      uploadMenuImages: function() {
+        var images = this.shadowRoot.querySelector('#tvSort').shadowRoot.querySelectorAll('#mediaUpload')
+        for(var i = 0; i < images.length; i++) {
+          var fselect = images[i].$.fileSelect
+          if(fselect.files.length !== 0) {
+            var file = fselect.files[0]
+            var thisRef = this.storageRef.child(this.environment + '/media/partners/' + this.partner + '/' + file.name)
+            thisRef.put(file).then(function(snapshot) {
+
+            }.bind(this))
+          }
+        }
+      },
+      _ajaxReceived: function(data) {
+        this.storageRef = firebase.storage().ref()
+
+        if(Object.keys(data).length !== 0) {
+          var sortedMenu = []
+          var sortedHeaders = []
+          var sortedListItems = []
+          var listItems = []
+          var sortOrder = []
+          var sortedProductTitle = []
+          var products = this._objToArr(data.products)
+          var settings = this._objToArr(data.settings)
+          for(var key in settings) {
+            sortOrder.push(settings[key].sort)
+          }
+          for(var i = 0; i < products.length; i++) {
+            sortedProductTitle[sortOrder[i]] = this._objToKeys(data.products)[i]
+            sortedHeaders[sortOrder[i]] = settings[i]
+            sortedListItems[sortOrder[i]] = settings[i]
+          }
+          var pData = {
+            settings: sortedHeaders,
+            banner: data.banner
+          }
+          this.set("productTitles", sortedProductTitle)
+          this.set("persistedData", pData)
+          this.set("bannerImage", data.banner.image)
+        }
+      },
+      _buildFeaturedProducts: function(data) {
+        let pData = data
+        let arrSorted = []
+
+        // Sort Order 
+        if(Object.keys(data).length !== 0) {
+          var sortOrder = []
+          var settings = this.menuData.settings
+          for(var key in settings) {
+            sortOrder.push(settings[key].sort)
+          }
+        }
+
+        // Filter Through Data and Remove Nonfeatured Items
+        for(var key in pData) {
+          for(var keytwo in pData[key]) {
+            if(typeof pData[key][keytwo].flags === 'undefined' || pData[key][keytwo].flags.featured !== true) {
+              delete pData[key][keytwo]
+            }
+          }
+        }
+
+        // Convert Filtered Object to an Array
+        let arrD = this._objToArr(pData)
+
+        // Set Sort ORder
+        for(let i = 0; i < arrD.length; i++) {
+          arrSorted[sortOrder[i]] = arrD[i]
+        }
+
+        // Set Products to New Filtered Data
+        this.set("featuredProducts", arrSorted)
+      },
+      _buildSortedMenu: function(newValue, oldValue) {
+        this.set("menuList", newValue)
+      },
+      _bindedData: function(newValue, oldValue) {
+        this.set("bannerData", newValue.banner)         
+        this.set("menuSettings", newValue.settings)
+        this.set("listItems", newValue.settings)
+        this.editor.container.firstChild.innerHTML = this.bannerData.bannerText
+        
+      },
+      _maxItems: function(data, number) {
+        return data.slice(0, number)
+      },
+      _objToArr: function(obj) {
+        if(obj !== undefined) {
+          return Object.keys(obj).map(key => obj[key])
+        }
+      },
+      _objToKeys: function(obj) {
+        if(obj !== undefined) {
+          return Object.keys(obj).map(key => key)
+        }
+      },
+      _getSettings: function(index) {
+        return this.menuSettings[index]
+      },
+      _getCategory: function(index) {
+        return this.productTitles[index]
+      },
+      _computeTvSettings: function(endpoint, location) {
+        return endpoint + "/locations/" + location + "/settings/tv";
+      },
+      _computeMenuEndpoint: function(endpoint, location) {
+        return endpoint + "/locations/" + location + "/menu";
+      },
+      ready: function() {
+        this.editor = new Quill(this.$.editor, {
+          theme: 'snow',
+          placeholder: 'Enter your banner text here...'
+        })
+        this.editor.on('text-change', function(delta, source) {
+          this.bannerData.bannerText = this.editor.container.firstChild.innerHTML
+        }.bind(this))
+      },
+      attached: function() {
+        bloom.app.pageDidLoad("tv");
+      }
+    });
+  </script>
+</dom-module>

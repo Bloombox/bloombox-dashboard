@@ -507,6 +507,7 @@
         <bloombox-menutools
           instock="{{instock}}"
           sale="{{onsale}}"
+          isfeatured="{{isfeatured}}"
           display-mode="{{_menuDisplayMode}}"
           locations="[[locations]]"
           location="{{location}}"
@@ -538,6 +539,7 @@
           selected-items="{{_selected}}"
           search="{{search}}"
           instock-only="[[instock]]"
+          isfeatured-only="[[isfeatured]]"
           sale-only="[[onsale]]"
           has-tests-only="[[hasTests]]"
           multiselect="{{multiselect}}"
@@ -586,6 +588,7 @@
               sale$="[[selectedItem.value.flags.sale]]"
               bogo$="[[selectedItem.value.flags.bogo]]"
               lastchance$="[[selectedItem.value.flags.lastchance]]"
+              featured$="[[selectedItem.value.flags.featured]]"
               premium$="[[selectedItem.value.flags.premium]]"
               photos$="[[_processMedia(selectedItem.value)]]"
               hidden$="[[!selectedItem]]"
@@ -612,6 +615,7 @@
               sale$="[[selectedItem.value.flags.sale]]"
               bogo$="[[selectedItem.value.flags.bogo]]"
               lastchance$="[[selectedItem.value.flags.lastchance]]"
+              featured$="[[selectedItem.value.flags.featured]]"
               premium$="[[selectedItem.value.flags.premium]]"
               vegan$="[[selectedItem.value.flags.vegan]]"
               organic$="[[selectedItem.value.flags.organic]]"
@@ -640,6 +644,7 @@
               sale$="[[selectedItem.value.flags.sale]]"
               bogo$="[[selectedItem.value.flags.bogo]]"
               lastchance$="[[selectedItem.value.flags.lastchance]]"
+              featured$="[[selectedItem.value.flags.featured]]"
               premium$="[[selectedItem.value.flags.premium]]"
               photos$="[[selectedItem.value.photos]]"
               hidden$="[[!selectedItem]]"
@@ -665,6 +670,7 @@
               sale$="[[selectedItem.value.flags.sale]]"
               bogo$="[[selectedItem.value.flags.bogo]]"
               lastchance$="[[selectedItem.value.flags.lastchance]]"
+              featured$="[[selectedItem.value.flags.featured]]"
               premium$="[[selectedItem.value.flags.premium]]"
               photos$="[[selectedItem.value.photos]]"
               hidden$="[[!selectedItem]]"
@@ -691,6 +697,7 @@
               sale$="[[selectedItem.value.flags.sale]]"
               bogo$="[[selectedItem.value.flags.bogo]]"
               lastchance$="[[selectedItem.value.flags.lastchance]]"
+              featured$="[[selectedItem.value.flags.featured]]"
               premium$="[[selectedItem.value.flags.premium]]"
               photos$="[[selectedItem.value.photos]]"
               hidden$="[[!selectedItem]]"
@@ -715,6 +722,7 @@
               sale$="[[selectedItem.value.flags.sale]]"
               bogo$="[[selectedItem.value.flags.bogo]]"
               lastchance$="[[selectedItem.value.flags.lastchance]]"
+              featured$="[[selectedItem.value.flags.featured]]"
               premium$="[[selectedItem.value.flags.premium]]"
               photos$="[[selectedItem.value.photos]]"
               hidden$="[[!selectedItem]]"
@@ -739,6 +747,7 @@
               sale$="[[selectedItem.value.flags.sale]]"
               bogo$="[[selectedItem.value.flags.bogo]]"
               lastchance$="[[selectedItem.value.flags.lastchance]]"
+              featured$="[[selectedItem.value.flags.featured]]"
               premium$="[[selectedItem.value.flags.premium]]"
               photos$="[[selectedItem.value.photos]]"
               hidden$="[[!selectedItem]]"
@@ -898,6 +907,12 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
           value: false,
           notify: true,
           reflectToAttribute: true
+        },
+
+        isfeatured: {
+          type: Boolean,
+          value: false,
+          notify: true
         },
 
         instock: {
@@ -1523,6 +1538,7 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
       saveEditsForEntry: function(schema, key, previous, entry, callback) {
         var debug = window["__debug"] || false,
             that = this;
+
         if (debug) {
           console.info("Saving edits for item of type '" + schema + "' at key: '" + key + "'.", entry);
         }
@@ -1804,6 +1820,7 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
             that = this,
             instock = this.instock,
             onsale = this.onsale,
+            isfeatured = this.isfeatured,
             hasTests = this.hasTests,
             respectFilters = settings.filterMode === "respect",
             k, s, el;
@@ -1866,6 +1883,7 @@ PCFkb2N0eXBlIEhUTUw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4K
                 filteredProducts = products.filter(function(product) {
                   return that.$.productList._enforceFilters(that.instock,
                                                             that.onsale,
+                                                            that.isfeatured,
                                                             that.hasTests,
                                                             product);
                 });
