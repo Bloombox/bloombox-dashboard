@@ -146,7 +146,7 @@
         </div>
         <div class="card-section">
           <h1>Menu Sections</h1>
-          <bloombox-tv-sort id="tvSort" list-items="{{listItems}}""></bloombox-tv-sort>
+          <bloombox-tv-sort id="tvSort" list-items="{{listItems}}"></bloombox-tv-sort>
         </div>
         <div class="bottom-bar">
           <button class="save-settings btn" on-click="saveSettings">
@@ -296,7 +296,6 @@
           if(bannerUpload.files.length !== 0) {
             var file = bannerUpload.files[0]
             var thisRef = this.storageRef.child(this.environment + '/media/partners/' + this.partner + '/' + file.name)
-            console.log(this.environment + '/media/partners/'+ this.partner + '/' + file.name);
             thisRef.put(file).then(function(snapshot) {
               this.bannerImage = snapshot.metadata.name
               this.menuData.banner.image = snapshot.metadata.name
@@ -313,16 +312,14 @@
           if(fselect.files.length !== 0) {
             var file = fselect.files[0]
             var thisRef = this.storageRef.child(this.environment + '/media/partners/' + this.partner + '/' + file.name)
-            console.log(BucketURL + this.environment + '/media/partners/' + this.partner + '/' + file.name)
             thisRef.put(file).then(function(snapshot) {
-              console.log(snapshot)
+
             }.bind(this))
           }
         }
       },
       _ajaxReceived: function(data) {
         window.note++
-        console.log('AJAX RECEIVED ' + window.note + ' time')
         this.storageRef = firebase.storage().ref()
 
         if(Object.keys(data).length !== 0) {
@@ -362,7 +359,6 @@
           for(var key in settings) {
             sortOrder.push(settings[key].sort)
           }
-          console.log(sortOrder)
         }
 
         // Filter Through Data and Remove Nonfeatured Items

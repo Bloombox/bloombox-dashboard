@@ -113,30 +113,6 @@
         }
       },
 
-      _shopLoaded: function(data) {
-        console.log(document.querySelector('#' + data.orderKey))
-        // Store All Timestamps in Array
-        // var that = this;
-        // console.log(that.shadowRoot.querySelectorAll('bloombox-order-list-item'))
-        // var arr = Object.keys(data).map(function ( key ) { 
-        //   return data[key].createdAt.time; 
-        // });
-
-        // // Get Max value from Array
-        // var max = Math.max.apply(null, arr);
-
-        // for(key in data) {
-        //   if(data[key].createdAt.time === max) {
-        //     this._loadSelectedOrder({
-        //       currentTarget: that.shadowRoot.querySelectorAll('bloombox-order-list-item')[0],
-        //       model: {
-        //         item: data[key]
-        //       }
-        //     })
-        //   }
-        // }
-      },
-
       _loadSelectedOrder: function(e) {
         var d = e.model.item;
         var row = e.currentTarget.shadowRoot.querySelector('.table-row')
