@@ -1,7 +1,7 @@
 {
   "name": "bloombox-dashboard",
   "description": "Bloombox Dashboard UI code and logic.",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "authors": [
     "Sam Gammon <sam@momentum.io"
   ],
