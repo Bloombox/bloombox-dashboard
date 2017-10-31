@@ -59,12 +59,17 @@
     "paper-toggle-button": "PolymerElements/paper-toggle-button#^1.0.0",
     "paper-toolbar": "PolymerElements/paper-toolbar#^1.0.0",
     "paper-tooltip": "PolymerElements/paper-tooltip#^1.0.0",
-    "marked-element": "PolymerElements/marked-element#^1.4.1"
+    "marked-element": "PolymerElements/marked-element#^1.4.1",
+    "sortable": "git@github.com:RubaXa/sortable.git",
+    "polymer-quill": "git@github.com:chuckh/polymer-quill.git"
   },
   "resolution": {
     "paper-radio-group": "master"
   },
   "resolutions": {
-    "bloombox-styles": "0.0.4"
+    "bloombox-styles": "0.0.4",
+    "paper-radio-group": "master",
+    "polymerfire": "^0.9.3",
+    "app-storage": "^0.9.0"
   }
 }
