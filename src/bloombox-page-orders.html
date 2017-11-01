@@ -117,12 +117,12 @@
 
       _loadSelectedOrder: function(e) {
         var d = e.model.item;
-        var row = e.currentTarget.shadowRoot.querySelector('.table-row')
-        var rows = this.shadowRoot.querySelectorAll('bloombox-order-list-item')
+        var row = e.currentTarget.querySelector('.table-row')
+        var rows = this.querySelectorAll('bloombox-order-list-item')
 
         // UI for active items
         for(i=0;i<rows.length;i++) {
-          rows[i].shadowRoot.querySelector('.table-row').className = 'table-row'
+          rows[i].querySelector('.table-row').className = 'table-row'
         }
         if(!row.classList.contains('active')) {
           row.className += ' active'
