@@ -262,16 +262,16 @@
       showSettings: function(e) {
         var clickId = '#' + e.target.href.split('#')[1]
         if(e.target.className !== 'active') {
-          var allTabs = this.shadowRoot.querySelectorAll('.tabs a')
-          var activeTabs = this.shadowRoot.querySelectorAll('.active')
+          var allTabs = this.querySelectorAll('.tabs a');
+          var activeTabs = this.querySelectorAll('.active');
           for(var i = 0; i<allTabs.length;i++) {
-            this.shadowRoot.querySelector(allTabs[i].hash).style.display = 'none' 
+            this.querySelector(allTabs[i].hash).style.display = 'none' ;
           }
-          this.shadowRoot.querySelector(clickId).style.display = 'block' 
+          this.querySelector(clickId).style.display = 'block' ;
           for(var i=0;i<activeTabs.length;i++) {
-            activeTabs[i].className = ''
+            activeTabs[i].className = '';
           }
-          e.target.className = 'active'
+          e.target.className = 'active';
         }
       },
       saveSettings: function() {
@@ -281,8 +281,8 @@
         this.notifyPath('menuData.settings')
       },
       saveSort: function() {
-          var items = this.shadowRoot.querySelector('#tvSort').$.list.querySelectorAll('.sort-item')
-          var stU = BucketURL + '/' + this.environment + '/media/partners/' + this.partner + '/'
+          var items = this.querySelector('#tvSort').$.list.querySelectorAll('.sort-item');
+          var stU = BucketURL + '/' + this.environment + '/media/partners/' + this.partner + '/';
           for(let i=0;i<items.length;i++) {
             var key = this.menuData.settings[items[i].children[0].innerHTML.toLowerCase()]
             var image = items[i].querySelector('.media-item').$.fileSelect.files
@@ -294,7 +294,7 @@
           }
       },
       uploadBanner: function() {
-          var bannerUpload = this.shadowRoot.querySelector('#bannerUpload').shadowRoot.querySelector('#fileSelect')
+          var bannerUpload = this.querySelector('#bannerUpload').querySelector('#fileSelect');
           if(bannerUpload.files.length !== 0) {
             var file = bannerUpload.files[0]
             var thisRef = this.storageRef.child(this.environment + '/media/partners/' + this.partner + '/' + file.name)
@@ -308,7 +308,7 @@
           }
       },
       uploadMenuImages: function() {
-        var images = this.shadowRoot.querySelector('#tvSort').shadowRoot.querySelectorAll('#mediaUpload')
+        var images = this.querySelector('#tvSort').querySelectorAll('#mediaUpload');
         for(var i = 0; i < images.length; i++) {
           var fselect = images[i].$.fileSelect
           if(fselect.files.length !== 0) {
