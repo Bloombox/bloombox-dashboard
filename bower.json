@@ -61,7 +61,7 @@
     "paper-tooltip": "PolymerElements/paper-tooltip#^1.0.0",
     "marked-element": "PolymerElements/marked-element#^1.4.1",
     "sortable": "git@github.com:RubaXa/sortable.git",
-    "polymer-quill": "git@github.com:chuckh/polymer-quill.git",
+    "polymer-quill": "git@github.com:chuckh/polymer-quill.git#master",
     "moment": "git@github.com:moment/moment#^2.2.1"
   },
   "resolution": {
