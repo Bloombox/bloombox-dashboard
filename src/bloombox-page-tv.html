@@ -260,14 +260,17 @@
         }
       },
       showSettings: function(e) {
+        var isLocal = document.location.href.indexOf("localhost") !== -1;
+        let target = isLocal ? this.shadowRoot : this;
+
         var clickId = '#' + e.target.href.split('#')[1];
         if (e.target.className !== 'active') {
-          var allTabs = this.querySelectorAll('.tabs a');
-          var activeTabs = this.querySelectorAll('.active');
+          var allTabs = target.querySelectorAll('.tabs a');
+          var activeTabs = target.querySelectorAll('.active');
           for(var i = 0; i<allTabs.length; i++) {
-            this.querySelector(allTabs[i].hash).style.display = 'none';
+            target.querySelector(allTabs[i].hash).style.display = 'none';
           }
-          this.querySelector(clickId).style.display = 'block';
+          target.querySelector(clickId).style.display = 'block';
           for(var i=0;i<activeTabs.length;i++) {
             activeTabs[i].className = '';
           }
