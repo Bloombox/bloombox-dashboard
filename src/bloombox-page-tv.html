@@ -260,14 +260,14 @@
         }
       },
       showSettings: function(e) {
-        var clickId = '#' + e.target.href.split('#')[1]
-        if(e.target.className !== 'active') {
+        var clickId = '#' + e.target.href.split('#')[1];
+        if (e.target.className !== 'active') {
           var allTabs = this.querySelectorAll('.tabs a');
           var activeTabs = this.querySelectorAll('.active');
-          for(var i = 0; i<allTabs.length;i++) {
-            this.querySelector(allTabs[i].hash).style.display = 'none' ;
+          for(var i = 0; i<allTabs.length; i++) {
+            this.querySelector(allTabs[i].hash).style.display = 'none';
           }
-          this.querySelector(clickId).style.display = 'block' ;
+          this.querySelector(clickId).style.display = 'block';
           for(var i=0;i<activeTabs.length;i++) {
             activeTabs[i].className = '';
           }
@@ -275,90 +275,90 @@
         }
       },
       saveSettings: function() {
-        this.uploadBanner()
-        this.uploadMenuImages()
-        this.saveSort()
-        this.notifyPath('menuData.settings')
+        this.uploadBanner();
+        this.uploadMenuImages();
+        this.saveSort();
+        this.notifyPath('menuData.settings');
       },
       saveSort: function() {
           var items = this.querySelector('#tvSort').$.list.querySelectorAll('.sort-item');
           var stU = BucketURL + '/' + this.environment + '/media/partners/' + this.partner + '/';
           for(let i=0;i<items.length;i++) {
-            var key = this.menuData.settings[items[i].children[0].innerHTML.toLowerCase()]
-            var image = items[i].querySelector('.media-item').$.fileSelect.files
-            key.title = items[i].children[0].innerHTML
-            key.sort = i
+            var key = this.menuData.settings[items[i].children[0].innerHTML.toLowerCase()];
+            var image = items[i].querySelector('.media-item').$.fileSelect.files;
+            key.title = items[i].children[0].innerHTML;
+            key.sort = i;
             if(image.length !== 0) {
-              key.image = stU + image[0].name
+              key.image = stU + image[0].name;
             }
           }
       },
       uploadBanner: function() {
           var bannerUpload = this.querySelector('#bannerUpload').querySelector('#fileSelect');
           if(bannerUpload.files.length !== 0) {
-            var file = bannerUpload.files[0]
-            var thisRef = this.storageRef.child(this.environment + '/media/partners/' + this.partner + '/' + file.name)
+            var file = bannerUpload.files[0];
+            var thisRef = this.storageRef.child(this.environment + '/media/partners/' + this.partner + '/' + file.name);
             thisRef.put(file).then(function(snapshot) {
-              this.bannerImage = snapshot.metadata.name
-              this.menuData.banner.image = snapshot.metadata.name
-              this.notifyPath('menuData.banner')
+              this.bannerImage = snapshot.metadata.name;
+              this.menuData.banner.image = snapshot.metadata.name;
+              this.notifyPath('menuData.banner');
             }.bind(this))
           } else {
-            this.notifyPath('menuData.banner')
+            this.notifyPath('menuData.banner');
           }
       },
       uploadMenuImages: function() {
         var images = this.querySelector('#tvSort').querySelectorAll('#mediaUpload');
         for(var i = 0; i < images.length; i++) {
-          var fselect = images[i].$.fileSelect
+          var fselect = images[i].$.fileSelect;
           if(fselect.files.length !== 0) {
-            var file = fselect.files[0]
-            var thisRef = this.storageRef.child(this.environment + '/media/partners/' + this.partner + '/' + file.name)
+            var file = fselect.files[0];
+            var thisRef = this.storageRef.child(this.environment + '/media/partners/' + this.partner + '/' + file.name);
             thisRef.put(file).then(function(snapshot) {
 
-            }.bind(this))
+            }.bind(this));
           }
         }
       },
       _ajaxReceived: function(data) {
-        this.storageRef = firebase.storage().ref()
+        this.storageRef = firebase.storage().ref();
 
         if(Object.keys(data).length !== 0) {
-          var sortedMenu = []
-          var sortedHeaders = []
-          var sortedListItems = []
-          var listItems = []
-          var sortOrder = []
-          var sortedProductTitle = []
-          var products = this._objToArr(data.products)
-          var settings = this._objToArr(data.settings)
+          var sortedMenu = [];
+          var sortedHeaders = [];
+          var sortedListItems = [];
+          var listItems = [];
+          var sortOrder = [];
+          var sortedProductTitle = [];
+          var products = this._objToArr(data.products);
+          var settings = this._objToArr(data.settings);
           for(var key in settings) {
-            sortOrder.push(settings[key].sort)
+            sortOrder.push(settings[key].sort);
           }
           for(var i = 0; i < products.length; i++) {
-            sortedProductTitle[sortOrder[i]] = this._objToKeys(data.products)[i]
-            sortedHeaders[sortOrder[i]] = settings[i]
-            sortedListItems[sortOrder[i]] = settings[i]
+            sortedProductTitle[sortOrder[i]] = this._objToKeys(data.products)[i];
+            sortedHeaders[sortOrder[i]] = settings[i];
+            sortedListItems[sortOrder[i]] = settings[i];
           }
           var pData = {
             settings: sortedHeaders,
             banner: data.banner
-          }
-          this.set("productTitles", sortedProductTitle)
-          this.set("persistedData", pData)
-          this.set("bannerImage", data.banner.image)
+          };
+          this.set("productTitles", sortedProductTitle);
+          this.set("persistedData", pData);
+          this.set("bannerImage", data.banner.image);
         }
       },
       _buildFeaturedProducts: function(data) {
-        let pData = data
-        let arrSorted = []
+        let pData = data;
+        let arrSorted = [];
 
         // Sort Order 
         if(Object.keys(data).length !== 0) {
-          var sortOrder = []
-          var settings = this.menuData.settings
+          var sortOrder = [];
+          var settings = this.menuData.settings;
           for(var key in settings) {
-            sortOrder.push(settings[key].sort)
+            sortOrder.push(settings[key].sort);
           }
         }
 
@@ -366,50 +366,50 @@
         for(var key in pData) {
           for(var keytwo in pData[key]) {
             if(typeof pData[key][keytwo].flags === 'undefined' || pData[key][keytwo].flags.featured !== true) {
-              delete pData[key][keytwo]
+              delete pData[key][keytwo];
             }
           }
         }
 
         // Convert Filtered Object to an Array
-        let arrD = this._objToArr(pData)
+        let arrD = this._objToArr(pData);
 
         // Set Sort ORder
         for(let i = 0; i < arrD.length; i++) {
-          arrSorted[sortOrder[i]] = arrD[i]
+          arrSorted[sortOrder[i]] = arrD[i];
         }
 
         // Set Products to New Filtered Data
-        this.set("featuredProducts", arrSorted)
+        this.set("featuredProducts", arrSorted);
       },
       _buildSortedMenu: function(newValue, oldValue) {
-        this.set("menuList", newValue)
+        this.set("menuList", newValue);
       },
       _bindedData: function(newValue, oldValue) {
-        this.set("bannerData", newValue.banner)         
-        this.set("menuSettings", newValue.settings)
-        this.set("listItems", newValue.settings)
-        this.editor.container.firstChild.innerHTML = this.bannerData.bannerText
+        this.set("bannerData", newValue.banner);
+        this.set("menuSettings", newValue.settings);
+        this.set("listItems", newValue.settings);
+        this.editor.container.firstChild.innerHTML = this.bannerData.bannerText;
         
       },
       _maxItems: function(data, number) {
-        return data.slice(0, number)
+        return data.slice(0, number);
       },
       _objToArr: function(obj) {
         if(obj !== undefined) {
-          return Object.keys(obj).map(key => obj[key])
+          return Object.keys(obj).map(key => obj[key]);
         }
       },
       _objToKeys: function(obj) {
         if(obj !== undefined) {
-          return Object.keys(obj).map(key => key)
+          return Object.keys(obj).map(key => key);
         }
       },
       _getSettings: function(index) {
-        return this.menuSettings[index]
+        return this.menuSettings[index];
       },
       _getCategory: function(index) {
-        return this.productTitles[index]
+        return this.productTitles[index];
       },
       _computeTvSettings: function(endpoint, location) {
         return endpoint + "/locations/" + location + "/settings/tv";
@@ -421,10 +421,10 @@
         this.editor = new Quill(this.$.editor, {
           theme: 'snow',
           placeholder: 'Enter your banner text here...'
-        })
+        });
         this.editor.on('text-change', function(delta, source) {
           this.bannerData.bannerText = this.editor.container.firstChild.innerHTML
-        }.bind(this))
+        }.bind(this));
       },
       attached: function() {
         bloom.app.pageDidLoad("tv");
