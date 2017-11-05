@@ -121,12 +121,14 @@
 
         var d = e.model.item;
         var row = (isLocal ? e.currentTarget.shadowRoot : e.currentTarget).querySelector('.table-row');
+        var rowClass = row.className;
         var rows = target.querySelectorAll('bloombox-order-list-item');
 
         // UI for active items
         for(i=0;i<rows.length;i++) {
-          (isLocal ? (rows[i].shadowRoot || rows[i]) : rows[i]).querySelector('.table-row').className = 'table-row';
+          (isLocal ? (rows[i].shadowRoot || rows[i]) : rows[i]).querySelector('.table-row').className = rowClass;
         }
+        
         if(!row.classList.contains('active')) {
           row.className += ' active'
         } else {
