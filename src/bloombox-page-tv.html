@@ -141,7 +141,9 @@
         <div class="banner-edit card-section">
           <h1>Banner Editor</h1>
           <style include="quill-core quill-snow"></style>
-          <div id="editor"></div>
+          <div id="loadquill">
+            <div id="editor"></div>
+          </div>
           <div class="generate-image">
             <div class="banner-upload">
               <bloombox-media id="bannerUpload" enabled editable partner="[[partner]]" environment="[[environment]]" asset="[[bannerImage]]"></bloombox-media>
@@ -274,7 +276,7 @@
           for(var i=0;i<activeTabs.length;i++) {
             activeTabs[i].className = '';
           }
-          e.target.className = 'active';
+          e.target.className += ' active';
         }
       },
       saveSettings: function() {
@@ -428,6 +430,7 @@
         this.editor.on('text-change', function(delta, source) {
           this.bannerData.bannerText = this.editor.container.firstChild.innerHTML
         }.bind(this));
+        this.scopeSubtree(this.$.loadquill, true);
       },
       attached: function() {
         bloom.app.pageDidLoad("tv");
