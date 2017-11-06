@@ -264,6 +264,7 @@
       showSettings: function(e) {
         var isLocal = document.location.href.indexOf("localhost") !== -1;
         let target = isLocal ? this.shadowRoot : this;
+        let tClass = e.target.className;
 
         var clickId = '#' + e.target.href.split('#')[1];
         if (e.target.className !== 'active') {
@@ -274,7 +275,7 @@
           }
           target.querySelector(clickId).style.display = 'block';
           for(var i=0;i<activeTabs.length;i++) {
-            activeTabs[i].className = '';
+            activeTabs[i].className = tClass;
           }
           e.target.className += ' active';
         }
