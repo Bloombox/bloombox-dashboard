@@ -10,7 +10,7 @@ TARGET ?= build/
 CREDENTIALS ?=1
 COMPONENTS_PATH ?= components/
 VERBOSE ?= 0
-VERSION ?= 0.0.14
+VERSION ?= 0.0.15
 POLYMER_BUILD_FLAGS ?= --sw-precache-config ./sw-precache-config.js
 POLYMER_RELEASE_FLAGS ?= --sw-precache-config ./sw-precache-config.js
 
