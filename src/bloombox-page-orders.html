@@ -41,7 +41,6 @@
         padding: 1em;
 
       }
-
       #items > ::content > * {
         margin-bottom: 1em;
       }
@@ -68,7 +67,7 @@
         <div>Time</div>
       </div>
       <div class="table-body">
-        <template is="dom-repeat" items="[[_sortOrders(shopData)]]" id="datatable">
+        <template is="dom-repeat" items="[[_sortOrders(shopData)]]" id="datatable" sort="_sort">
           <bloombox-order-list-item data="{{item}}" on-tap="_loadSelectedOrder"></bloombox-order-list-item>
         </template>
       </div>
@@ -126,13 +125,15 @@
 
         // UI for active items
         for(i=0;i<rows.length;i++) {
-          (isLocal ? (rows[i].shadowRoot || rows[i]) : rows[i]).querySelector('.table-row').className = rowClass;
+           if(!row.classList.contains('active')) {
+            (isLocal ? (rows[i].shadowRoot || rows[i]) : rows[i]).querySelector('.table-row').className = rowClass;
+          }
         }
         
         if(!row.classList.contains('active')) {
           row.className += ' active'
         } else {
-          row.className = 'table-row'
+          row.className = rowClass;
         }
         
         // Load Selected Items
@@ -155,6 +156,11 @@
             return searchCat[key]
           }
         } 
+      },
+
+      _sort: function(a, b) {
+        // Sort by Timestamp
+        return a.createdAt.time < b.createdAt.time ? 1 : -1;
       },
 
       _sortOrders: function(obj) {
