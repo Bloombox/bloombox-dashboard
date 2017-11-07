@@ -38,8 +38,7 @@
       .table-row {
         border-bottom: 1px solid #999;
         margin-bottom: 0; 
-        padding: 1em;
-
+        padding: 1em 1em 1em 3em;
       }
       #items > ::content > * {
         margin-bottom: 1em;
@@ -51,8 +50,17 @@
         display: flex;
         flex-wrap: row;
       }
-      .table-row > div {
-        width: 25%;
+      :host .table-row > div:nth-child(1) {
+        width: 20%;
+      }
+      :host .table-row > div:nth-child(2) {
+        width: 30%;
+      }
+      :host .table-row > div:nth-child(3) {
+        width: 22%;
+      }
+      :host .table-row > div:nth-child(4) {
+        width: 28%;
       }
     </style>
 
@@ -63,7 +71,7 @@
       <div class="table-head table-row">
         <div>Status</div>
         <div>Name</div>
-        <div>Customer ID</div>
+        <div>Type</div>
         <div>Time</div>
       </div>
       <div class="table-body">
