@@ -5,6 +5,7 @@
 <link rel="import" href="../components/bloombox-styles/bloombox-styles.html">
 <link rel="import" href="../components/bloombox-orders/bloombox-orders.html">
 <link rel="import" href="../components/bloombox-orders/bloombox-order-list-item.html">
+<link rel="import" href="../components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="./behaviors/bloombox-dashboard-page-behavior.html">
 <link rel="import" href="../components/polymerfire/polymerfire.html">
 
@@ -38,10 +39,8 @@
       .table-row {
         border-bottom: 1px solid #999;
         margin-bottom: 0; 
-        padding: 1em;
-
+        padding: 1em 1em 1em 3em;
       }
-
       #items > ::content > * {
         margin-bottom: 1em;
       }
@@ -52,8 +51,70 @@
         display: flex;
         flex-wrap: row;
       }
-      .table-row > div {
-        width: 25%;
+      :host .table-row > div:nth-child(1) {
+        width: 20%;
+      }
+      :host .table-row > div:nth-child(2) {
+        width: 30%;
+      }
+      :host .table-row > div:nth-child(3) {
+        width: 22%;
+      }
+      :host .table-row > div:nth-child(4) {
+        width: 28%;
+      }
+      .sw {
+        float: left;
+        width: 100%;
+        height: 50px;
+        padding: 0;
+        align-items: center;
+        box-shadow: 0 2px 0 0px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1em;
+        margin-right: 10px;
+        margin-top: 2px;
+      }
+      .sw form {
+        float: left;
+        width: 100%;
+        height: 50px;
+        display: flex;
+        align-items: center;
+      }
+      .filters {
+        display: none;
+        float: left;
+        width: 40%;
+      }
+      .filters paper-dropdown-menu {
+        margin: 0 10px;
+        width: calc(50% - 40px);
+      }
+      .sw .search {
+        flex: 1 1 auto;
+        order: 2;
+        outline: none;
+        border: none;
+        border-radius: 0;
+        background: #fff;
+        padding: 10px;
+        font-family: 'Roboto', sans-serif;
+        height: 50px;
+        transition: all 0.05s ease-in-out;
+        -webkit-appearance: none;
+        font-size: 17px;
+      }
+      .order-table {
+        float: left;
+        width: 100%;
+      }
+      @media(max-width: 1440px) {
+        #listDetailContainer {
+          width: 25%;
+        }
+        #list {
+          width: 70%;
+        }
       }
     </style>
 
@@ -61,16 +122,38 @@
     <firebase-document id="shopData" path="[[_ordersEndpoint]]" data="{{shopData}}" hidden></firebase-document>
 
     <div id="list">
-      <div class="table-head table-row">
-        <div>Status</div>
-        <div>Name</div>
-        <div>Customer ID</div>
-        <div>Time</div>
+      <div class="sw">
+        <form>
+          <input id="search" type="search" class="search" placeholder="Search for an order..." value="{{filterVal::input}}" />
+        </form>
       </div>
-      <div class="table-body">
-        <template is="dom-repeat" items="[[_sortOrders(shopData)]]" id="datatable">
-          <bloombox-order-list-item data="{{item}}" on-tap="_loadSelectedOrder"></bloombox-order-list-item>
-        </template>
+      <div class="filters">
+        <paper-dropdown-menu label="Status" on-iron-select="_itemSelected">
+          <paper-listbox class="dropdown-content">
+            <paper-item>Pending</paper-item>
+            <paper-item>Approved</paper-item>
+            <paper-item>Rejected</paper-item>
+          </paper-listbox>
+        </paper-dropdown-menu>
+        <paper-dropdown-menu label="Type" on-iron-select="_itemSelected">
+          <paper-listbox class="dropdown-content">
+            <paper-item>Pickup</paper-item>
+            <paper-item>Delivery</paper-item>
+          </paper-listbox>
+        </paper-dropdown-menu>
+      </div>
+      <div class="order-table">
+        <div class="table-head table-row">
+          <div>Status</div>
+          <div>Name</div>
+          <div>Type</div>
+          <div>Time</div>
+        </div>
+        <div class="table-body">
+          <template is="dom-repeat" items="[[_sortOrders(shopData)]]" id="datatable" sort="_sort" filter="{{_filter(filterVal)}}">
+            <bloombox-order-list-item data="{{item}}" on-tap="_loadSelectedOrder"></bloombox-order-list-item>
+          </template>
+        </div>
       </div>
     </div>
 
@@ -84,7 +167,7 @@
       is: "bloombox-page-orders",
 
       behaviors: [
-        Polymer.BloomboxDashboardPageBehavior
+      Polymer.BloomboxDashboardPageBehavior
       ],
 
       properties: {
@@ -126,15 +209,17 @@
 
         // UI for active items
         for(i=0;i<rows.length;i++) {
+         if(!row.classList.contains('active')) {
           (isLocal ? (rows[i].shadowRoot || rows[i]) : rows[i]).querySelector('.table-row').className = rowClass;
         }
-        
-        if(!row.classList.contains('active')) {
-          row.className += ' active'
-        } else {
-          row.className = 'table-row'
-        }
-        
+      }
+
+      if(!row.classList.contains('active')) {
+        row.className += ' active'
+      } else {
+        row.className = rowClass;
+      }
+
         // Load Selected Items
         d.productsInOrder = []
         // Get Product Keys from Order Data
@@ -155,6 +240,22 @@
             return searchCat[key]
           }
         } 
+      },
+
+      _sort: function(a, b) {
+        // Sort by Timestamp
+        return a.createdAt.time < b.createdAt.time ? 1 : -1;
+      },
+
+      _filter: function(val, val2) {
+        return function(d) {
+          if (!val) return true;
+          if (!d) return false;
+          return (d.customer.name.firstName && ~d.customer.name.firstName.toLowerCase().indexOf(val.toLowerCase())) ||
+                 (d.customer.name.lastName && ~d.customer.name.lastName.toLowerCase().indexOf(val.toLowerCase())) ||
+                 (d.type && ~d.type.toLowerCase().indexOf(val.toLowerCase())) ||
+                 (d.status && ~d.status.toLowerCase().indexOf(val.toLowerCase()));
+        };
       },
 
       _sortOrders: function(obj) {
@@ -183,6 +284,6 @@
       attached: function() {
         bloom.app.pageDidLoad("orders");
       }
-  });
-</script>
+    });
+  </script>
 </dom-module>
