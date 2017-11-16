@@ -1,10 +1,10 @@
-
 <link rel="import" href="../components/polymer/polymer.html">
 <link rel="import" href="../components/iron-list/iron-list.html">
 <link rel="import" href="../components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../components/bloombox-styles/bloombox-styles.html">
 <link rel="import" href="../components/bloombox-orders/bloombox-orders.html">
 <link rel="import" href="../components/bloombox-orders/bloombox-order-list-item.html">
+<link rel="import" href="../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="./behaviors/bloombox-dashboard-page-behavior.html">
 <link rel="import" href="../components/polymerfire/polymerfire.html">
@@ -17,27 +17,34 @@
         display: block;
         padding: 10px;
       }
+      .card {
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+        padding: 16px;
+        margin: 24px;
+        border-radius: 5px;
+        background-color: #fff;
+        color: #757575;
+      }
+      .order-table.card {
+        width: 99%;
+      }
       #list {
         float: left;
-        width: 60%;
-      }
-      #listDetailContainer {
-        float: left;
-        width: 34%;
-      }
-      #list {
-        margin-right: 1%;
+        width: 59%;
         max-height: 100%;
-        overflow: hidden;
         overflow-y: scroll;
+        margin: 0;
+        padding: 0;
+        padding-right: 3%;
       }
       #listDetailContainer {
-        border-left: 1px solid #999;
-        padding-left: 2%;
-        margin-left: 1%;
+        float: left;
+        width: 36%;
+      }
+      #listDetailContainer {
+        padding-left: 1%;
       }
       .table-row {
-        border-bottom: 1px solid #999;
         display: flex;
         margin-bottom: 0; 
         padding: 1em 1em 1em 3em;
@@ -62,14 +69,12 @@
       }
       .sw {
         float: left;
-        width: 100%;
+        margin-bottom: 0;
+        width: 102.5%;
         height: 50px;
         padding: 0;
         align-items: center;
         box-shadow: 0 2px 0 0px rgba(0, 0, 0, 0.1);
-        margin-bottom: 1em;
-        margin-right: 10px;
-        margin-top: 2px;
       }
       .sw form {
         float: left;
@@ -94,7 +99,7 @@
         border: none;
         border-radius: 0;
         background: #fff;
-        padding: 10px;
+        padding: 10px 10px 10px 0;
         font-family: 'Roboto', sans-serif;
         height: 50px;
         transition: all 0.05s ease-in-out;
@@ -119,8 +124,9 @@
     <firebase-document id="shopData" path="[[_ordersEndpoint]]" data="{{shopData}}" hidden></firebase-document>
 
     <div id="list">
-      <div class="sw">
+      <div class="sw card">
         <form>
+          <paper-icon-button id="editButton" on-tap="edit" icon="search"></paper-icon-button>
           <input id="search" type="search" class="search" placeholder="Search for an order..." value="{{filterVal::input}}" />
         </form>
       </div>
@@ -139,7 +145,7 @@
           </paper-listbox>
         </paper-dropdown-menu>
       </div>
-      <div class="order-table">
+      <div class="order-table card">
         <div class="table-head table-row">
           <div>Status</div>
           <div>Name</div>
