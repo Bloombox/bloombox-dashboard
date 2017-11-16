@@ -28,23 +28,32 @@
           padding: 10px;
         */
       }
+      .card {
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+        padding: 16px;
+        margin: 24px;
+        border-radius: 5px;
+        background-color: #fff;
+        color: #757575;
+      }
       :host .card.settings {
         display: flex;
       }
       .card.settings {
         flex-wrap: wrap;
       }
+      .card.settings .card-section:first-child {
+        padding-right: 2em;
+      }
+      .card.settings .card-section:last-child {
+        padding-left: 2em;
+      }
       .card-section.banner-edit {
-        width: calc(47% - 1em);
         height: 50%;
-        margin-right: 3%;
-        margin-left: 1em;
       }
       .card-section {
-        position: relative;
-        margin-right: 1em;
-        margin-top: 1.2em;
-        width: calc(50% - 1em);
+        box-sizing: border-box;
+        width: 50%;
       }
       .banner-upload {
         float: left;
@@ -55,12 +64,19 @@
         margin: 2em 0 0 0;
       }
       #editor {
+        background: #000;
+        color: #fff;
         min-height: 450px;
       }
-      .btn {
+      :host paper-dropdown-menu {
+        position: relative;
+        top: 6px;
+      }
+      :host .btn {
         background: blue;
         border: 0;
         border-radius: 4px;
+        margin: 0;
         padding: 0.5em 0.75em;
         color: #fff;
         font-size: 1em;
@@ -70,7 +86,6 @@
         cursor: pointer;
       }
       .bottom-bar {
-        margin: 1em;
         width: 100%;
       }
       .menu-preview {
@@ -79,7 +94,7 @@
       }
       .tabs {
         list-style: none;
-        margin: 32px 24px 35px 24px;
+        margin: 28px 24px 24px 24px;
         padding: 0;
         width: 100%;
       }
@@ -90,7 +105,7 @@
       }
       .tabs a {
         background: #fff;
-        border-bottom: 3px solid red;
+        border-bottom: 2px solid red;
         color: #888;
         padding: 10px 24px;
         text-decoration: none;
@@ -163,7 +178,7 @@
     </div>
 
     <div id="menu-preview">
-      <div class="menu-preview" id="tabtwo">
+      <div class="menu-preview card" id="tabtwo">
         <bloombox-tv-banner environment="[[environment]]" partner="[[partner]]" banner-data="{{bannerData}}"></bloombox-tv-banner>
         <template is="dom-repeat" items="{{_maxItems(menuList, 4)}}">  
           <bloombox-tv-menu-item menu-data="{{item}}" category="{{_getCategory(index)}}" menu-settings="{{_getSettings(index)}}"></bloombox-tv-menu-item>
