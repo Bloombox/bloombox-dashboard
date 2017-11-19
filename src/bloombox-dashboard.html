@@ -388,11 +388,11 @@
             <a name="home" on-tap="navigate"><iron-icon icon="home"></iron-icon><span class="nav-label">Home</span></a>
             <a name="analytics" on-tap="navigate"><iron-icon icon="timeline"></iron-icon><span class="nav-label">Analytics</span></a>
             <a name="menu" on-tap="navigate"><iron-icon icon="store"></iron-icon><span class="nav-label">Menu Manager</span></a>
-            <a name="tv" on-tap="navigate"><iron-icon icon="hardware:tv"></iron-icon><span class="nav-label">TV Manager</span></a>
-            <a name="orders" on-tap="navigate"><iron-icon icon="shopping-cart"></iron-icon><span class="nav-label">Orders</span></a>
+            <a name="tv" on-tap="navigate" class$="[[_tvEnabled]]"><iron-icon icon="hardware:tv"></iron-icon><span class="nav-label">TV Manager</span></a>
+            <a name="orders" on-tap="navigate" class$="[[_ordersEnabled]]"><iron-icon icon="shopping-cart"></iron-icon><span class="nav-label">Orders</span></a>
             <a name="profile" on-tap="navigate"><iron-icon icon="room"></iron-icon><span class="nav-label">Club Profile</span></a>
-            <a name="account" on-tap="navigate" class$="[[_adminOnly]]"><iron-icon icon="fingerprint"></iron-icon><span class="nav-label" class$="[[_adminOnly]]">Account</span></a>
-            <a name="settings" on-tap="navigate" class$="[[_adminOnly]]"><iron-icon icon="settings"></iron-icon><span class="nav-label" class$="[[_adminOnly]]">Settings</span></a>
+            <a name="account" on-tap="navigate" class$="[[_adminOnly]]"><iron-icon icon="fingerprint"></iron-icon><span class="nav-label">Account</span></a>
+            <a name="settings" on-tap="navigate" class$="[[_adminOnly]]"><iron-icon icon="settings"></iron-icon><span class="nav-label">Settings</span></a>
             <template is="dom-if" if="[[_adminOnly]]">
               <a name="admin" on-tap="navigate"><iron-icon icon="weekend"></iron-icon><span class="nav-label">Admin</span></a>
             </template>
@@ -734,6 +734,25 @@
           notify: true,
           computed: '_computeAdminOrSupervisor(user, user.*)'
         },
+
+        /**
+         * Classes to apply to TV-related stuff, depending on permission state.
+         */
+        _tvEnabled: {
+          type: String,
+          notify: true,
+          computed: '_computePermission("tv", partner)'
+        },
+
+        /**
+         * Classes to apply to order-related stuff, depending on permission state.
+         */
+        _ordersEnabled: {
+          type: String,
+          notify: true,
+          computed: '_computePermission("orders", partner)'
+        },
+
 
         /**
          * Computes an endpoint that retrieves server-injected context via
@@ -1095,6 +1114,16 @@
 
       _computeAdminOrSupervisor: function(user, data) {
         return (user.admin === true || user.supervisor === true);
+      },
+
+      _computePermission: function(section, partner) {
+        if (partner === "mm")
+          // enable momentum, regardless of item
+          return "";
+        if ((section === "orders" || section === "tv") && partner === "caliva")
+          // enable order management and TV for caliva
+          return "";
+        return "admin-only hidden";  // otherwise, disable
       },
 
       _scheduleReauthorization: function(token, callback) {
