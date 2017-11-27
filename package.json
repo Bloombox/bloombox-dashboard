@@ -1,6 +1,6 @@
 {
   "name": "bloombox-dashboard",
-  "version": "0.0.22",
+  "version": "0.0.23",
   "description": "Bloombox Dashboard UI code and logic.",
   "main": "index.html",
   "repository": {
