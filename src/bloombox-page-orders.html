@@ -227,10 +227,10 @@
         d.productsInOrder = []
         // Get Product Keys from Order Data
         for(i=0; i < d.item.length; i++) {
-          var cat = d.item[i].key.kind
-          var id = d.item[i].key.id
-          var dataPass = this._searchProductMenu(cat, id)
-          d.productsInOrder.push(dataPass)
+          var cat = d.item[i].key.kind || "FLOWERS";
+          var id = d.item[i].key.id;
+          var dataPass = this._searchProductMenu(cat, id);
+          d.productsInOrder.push(dataPass);
         }
         this.selectedOrder = d
       },
@@ -256,8 +256,8 @@
           if (!d) return false;
           return (d.customer.name.firstName && ~d.customer.name.firstName.toLowerCase().indexOf(val.toLowerCase())) ||
                  (d.customer.name.lastName && ~d.customer.name.lastName.toLowerCase().indexOf(val.toLowerCase())) ||
-                 (d.type && ~d.type.toLowerCase().indexOf(val.toLowerCase())) ||
-                 (d.status && ~d.status.toLowerCase().indexOf(val.toLowerCase()));
+                 ((d.type || "PICKUP") && ~(d.type || "PICKUP").toLowerCase().indexOf(val.toLowerCase())) ||
+                 ((d.status || "PENDING") && ~(d.status || "PENDING").toLowerCase().indexOf(val.toLowerCase()));
         };
       },
 
