@@ -4,7 +4,7 @@
 <link rel="import" href="../components/bloombox-styles/bloombox-styles.html">
 <link rel="import" href="../components/bloombox-orders/bloombox-orders.html">
 <link rel="import" href="../components/bloombox-orders/bloombox-order-list-item.html">
-<link rel="import" href="../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="./behaviors/bloombox-dashboard-page-behavior.html">
 <link rel="import" href="../components/polymerfire/polymerfire.html">
@@ -229,6 +229,10 @@
         for(i=0; i < d.item.length; i++) {
           var cat = d.item[i].key.kind || "FLOWERS";
           var id = d.item[i].key.id;
+          if (!d.status)
+            d.status = "PENDING";
+          if (!d.type)
+            d.type = "PICKUP";
           var dataPass = this._searchProductMenu(cat, id);
           d.productsInOrder.push(dataPass);
         }
@@ -254,8 +258,8 @@
         return function(d) {
           if (!val) return true;
           if (!d) return false;
-          return (d.customer.name.firstName && ~d.customer.name.firstName.toLowerCase().indexOf(val.toLowerCase())) ||
-                 (d.customer.name.lastName && ~d.customer.name.lastName.toLowerCase().indexOf(val.toLowerCase())) ||
+          return (d.customer.person.name.firstName && ~d.customer.person.name.firstName.toLowerCase().indexOf(val.toLowerCase())) ||
+                 (d.customer.person.name.lastName && ~d.customer.person.name.lastName.toLowerCase().indexOf(val.toLowerCase())) ||
                  ((d.type || "PICKUP") && ~(d.type || "PICKUP").toLowerCase().indexOf(val.toLowerCase())) ||
                  ((d.status || "PENDING") && ~(d.status || "PENDING").toLowerCase().indexOf(val.toLowerCase()));
         };
