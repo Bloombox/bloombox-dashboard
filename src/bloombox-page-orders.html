@@ -226,9 +226,9 @@
         // Load Selected Items
         d.productsInOrder = []
         // Get Product Keys from Order Data
-        for(i=0; i < d.items.length; i++) {
-          var cat = d.items[i].key.kind
-          var id = d.items[i].key.id
+        for(i=0; i < d.item.length; i++) {
+          var cat = d.item[i].key.kind
+          var id = d.item[i].key.id
           var dataPass = this._searchProductMenu(cat, id)
           d.productsInOrder.push(dataPass)
         }
@@ -247,7 +247,7 @@
 
       _sort: function(a, b) {
         // Sort by Timestamp
-        return a.createdAt.time < b.createdAt.time ? 1 : -1;
+        return a.createdAt.timestamp < b.createdAt.timestamp ? 1 : -1;
       },
 
       _filter: function(val, val2) {
