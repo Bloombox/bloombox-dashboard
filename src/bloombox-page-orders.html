@@ -223,30 +223,39 @@
         row.className = rowClass;
       }
 
+      if (!d.status)
+        d.status = "PENDING";
+      if (!d.type)
+        d.type = "PICKUP";
+
         // Load Selected Items
         d.productsInOrder = []
+        let newProducts = [];
         // Get Product Keys from Order Data
         for(i=0; i < d.item.length; i++) {
-          var cat = d.item[i].key.kind || "FLOWERS";
           var id = d.item[i].key.id;
-          if (!d.status)
-            d.status = "PENDING";
-          if (!d.type)
-            d.type = "PICKUP";
-          var dataPass = this._searchProductMenu(cat, id);
+          var dataPass = this._searchProductMenu(id);
+          if (dataPass) {
+            if (!d.item[i].name)
+              d.item[i].name = dataPass.name;
+            if (!d.item[i].brand)
+              d.item[i].brand = dataPass.brand;
+          }
           d.productsInOrder.push(dataPass);
+          newProducts.push(dataPass);
         }
         this.selectedOrder = d
       },
 
-      _searchProductMenu: function(cat, id) {
+      _searchProductMenu: function(id) {
         // Search Product Menu by Category & ID
-        var searchCat = this.menuData[cat.toLowerCase()];
-        for(var key in searchCat) {
-          if(key === id) {
-            return searchCat[key]
+        var searchCat = this.menuData;
+        for(var section in searchCat) {
+          if (searchCat[section]) {
+            if (searchCat[section][id])
+              return searchCat[section][id];
           }
-        } 
+        }
       },
 
       _sort: function(a, b) {
