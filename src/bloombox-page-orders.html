@@ -214,37 +214,39 @@
         for(i=0;i<rows.length;i++) {
          if(!row.classList.contains('active')) {
           (isLocal ? (rows[i].shadowRoot || rows[i]) : rows[i]).querySelector('.table-row').className = rowClass;
+          }
         }
-      }
 
-      if(!row.classList.contains('active')) {
-        row.className += ' active'
-      } else {
-        row.className = rowClass;
-      }
+        if(!row.classList.contains('active')) {
+          row.className += ' active'
+        } else {
+          row.className = rowClass;
+        }
 
-      if (!d.status)
-        d.status = "PENDING";
-      if (!d.type)
-        d.type = "PICKUP";
+        if (!d.status)
+          d.status = "PENDING";
+        if (!d.type)
+          d.type = "PICKUP";
 
         // Load Selected Items
         d.productsInOrder = []
         let newProducts = [];
         // Get Product Keys from Order Data
-        for(i=0; i < d.item.length; i++) {
-          var id = d.item[i].key.id;
-          var dataPass = this._searchProductMenu(id);
-          if (dataPass) {
-            if (!d.item[i].name)
-              d.item[i].name = dataPass.name;
-            if (!d.item[i].brand)
-              d.item[i].brand = dataPass.brand;
+        if(d.item) {
+          for(i=0; i < d.item.length; i++) {
+            var id = d.item[i].key.id;
+            var dataPass = this._searchProductMenu(id);
+            if (dataPass) {
+              if (!d.item[i].name)
+                d.item[i].name = dataPass.name;
+              if (!d.item[i].brand)
+                d.item[i].brand = dataPass.brand;
+            }
+            d.productsInOrder.push(dataPass);
+            newProducts.push(dataPass);
           }
-          d.productsInOrder.push(dataPass);
-          newProducts.push(dataPass);
         }
-        this.selectedOrder = d
+        this.selectedOrder = d;
       },
 
       _searchProductMenu: function(id) {
