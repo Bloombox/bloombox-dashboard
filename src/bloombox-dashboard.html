@@ -38,7 +38,6 @@
 
 <link rel="import" href="bloombox-loader.html">
 
-
 <dom-module id="bloombox-dashboard">
   <template strip-whitespace>
     <style is="custom-style" include="bloombox-styles">
@@ -388,12 +387,14 @@
             <a name="home" on-tap="navigate"><iron-icon icon="home"></iron-icon><span class="nav-label">Home</span></a>
             <a name="analytics" on-tap="navigate"><iron-icon icon="timeline"></iron-icon><span class="nav-label">Analytics</span></a>
             <a name="menu" on-tap="navigate"><iron-icon icon="store"></iron-icon><span class="nav-label">Menu Manager</span></a>
+            <a name="lobby" on-tap="navigate" class$="[[_ordersEnabled]]"><iron-icon icon="update"></iron-icon><span class="nav-label">Lobby</span></a>
             <a name="tv" on-tap="navigate" class$="[[_tvEnabled]]"><iron-icon icon="hardware:tv"></iron-icon><span class="nav-label">TV Manager</span></a>
             <a name="orders" on-tap="navigate" class$="[[_ordersEnabled]]"><iron-icon icon="shopping-cart"></iron-icon><span class="nav-label">Orders</span></a>
             <a name="profile" on-tap="navigate"><iron-icon icon="room"></iron-icon><span class="nav-label">Club Profile</span></a>
             <a name="account" on-tap="navigate" class$="[[_adminOnly]]"><iron-icon icon="fingerprint"></iron-icon><span class="nav-label">Account</span></a>
             <a name="settings" on-tap="navigate" class$="[[_adminOnly]]"><iron-icon icon="settings"></iron-icon><span class="nav-label">Settings</span></a>
             <template is="dom-if" if="[[_adminOnly]]">
+              <a name="customers" on-tap="navigate" class$="[[_ordersEnabled]]"><iron-icon icon="account-box"></iron-icon><span class="nav-label">Customers</span></a>
               <a name="admin" on-tap="navigate"><iron-icon icon="weekend"></iron-icon><span class="nav-label">Admin</span></a>
             </template>
           </iron-selector>
@@ -506,6 +507,16 @@
               location="[[location]]"
               name="orders" 
               class="bloombox-page not-yet-loaded"></bloombox-page-orders>
+              <bloombox-page-customers 
+              endpoint="[[endpoint]]"
+              location="[[location]]"
+              name="customers" 
+              class="bloombox-page not-yet-loaded"></bloombox-page-customers>
+              <bloombox-page-lobby 
+              endpoint="[[endpoint]]"
+              location="[[location]]"
+              name="lobby" 
+              class="bloombox-page not-yet-loaded"></bloombox-page-lobby>
               <bloombox-page-setting
               name="setting"
               endpoint="[[endpoint]]"
@@ -584,6 +595,8 @@
         menu: "Menu Manager",
         tv: "TV Manager",
         orders: "Order History",
+        customers: "Customers",
+        lobby: "Lobby",
         profile: "Dispensary Profile",
         account: "Account Settings",
         admin: "Platform Manager",
