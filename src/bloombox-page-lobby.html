@@ -1,0 +1,284 @@
+<link rel="import" href="../components/polymer/polymer.html">
+<link rel="import" href="../components/iron-list/iron-list.html">
+<link rel="import" href="../components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../components/bloombox-styles/bloombox-styles.html">
+<link rel="import" href="../components/bloombox-lobby/bloombox-lobby-detail.html">
+<link rel="import" href="../components/bloombox-lobby/bloombox-lobby-list-item.html">
+<link rel="import" href="../components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="./behaviors/bloombox-dashboard-page-behavior.html">
+<link rel="import" href="../components/polymerfire/polymerfire.html">
+
+
+<dom-module id="bloombox-page-lobby">
+  <template strip-whitespace>
+    <style is="custom-style" include="bloombox-styles">
+      :host {
+        display: block;
+        padding: 10px;
+      }
+      .card {
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+        padding: 16px;
+        margin: 24px;
+        border-radius: 5px;
+        background-color: #fff;
+        color: #757575;
+      }
+      .order-table.card {
+        box-sizing: border-box;
+        width: 100%;
+      }
+      #list {
+        float: left;
+        width: 59%;
+        max-height: 100%;
+        overflow-y: scroll;
+        margin: 0;
+        padding: 0;
+        padding-right: 3%;
+      }
+      #listDetailContainer {
+        float: left;
+        width: 36%;
+      }
+      #listDetailContainer h1 {
+        text-align: center;
+        color: gray;
+        text-decoration: underline;
+      }
+      #listDetailContainer {
+        padding-left: 1%;
+      }
+      .table-row {
+        display: flex;
+        margin-bottom: 0; 
+        padding: 1em 1em 1em 3em;
+      }
+      #items > ::content > * {
+        margin-bottom: 1em;
+      }
+      .table-head {
+        border-bottom: 1px solid #999;
+      }
+      .table-head > div {
+        font-weight: 800;
+      }
+      :host .table-row > div:nth-child(1) {
+        width: 20%;
+      }
+      :host .table-row > div:nth-child(2) {
+        width: 50%;
+      }
+      :host .table-row > div:nth-child(3) {
+        width: 30%;
+      }
+      .sw {
+        float: left;
+        margin-bottom: 0;
+        width: 100%;
+        height: 50px;
+        padding: 0;
+        align-items: center;
+        box-shadow: 0 2px 0 0px rgba(0, 0, 0, 0.1);
+      }
+      .sw form {
+        float: left;
+        width: 100%;
+        height: 50px;
+        display: flex;
+        align-items: center;
+      }
+      .filters {
+        display: none;
+        float: left;
+        width: 40%;
+      }
+      .filters paper-dropdown-menu {
+        margin: 0 10px;
+        width: calc(50% - 40px);
+      }
+      .sw .search {
+        flex: 1 1 auto;
+        order: 2;
+        outline: none;
+        border: none;
+        border-radius: 0;
+        background: #fff;
+        padding: 10px 10px 10px 0;
+        font-family: 'Roboto', sans-serif;
+        height: 50px;
+        transition: all 0.05s ease-in-out;
+        -webkit-appearance: none;
+        font-size: 17px;
+      }
+      .order-table {
+        float: left;
+        width: 100%;
+      }
+      .currentlyShopping {
+        margin: 8px 0;
+      }
+      @media(max-width: 1440px) {
+        #listDetailContainer {
+          width: 25%;
+        }
+        #list {
+          width: 70%;
+        }
+      }
+    </style>
+
+
+    <firebase-document id="usersData" path="/v1/users" data="{{usersData}}" hidden></firebase-document>
+    <firebase-document id="customerData" path="[[_customerEndpoint]]" data="{{customerData}}" hidden></firebase-document>
+
+    <div id="list">
+      <div class="sw card">
+        <form>
+          <paper-icon-button id="editButton" on-tap="edit" icon="search"></paper-icon-button>
+          <input id="search" type="search" class="search" placeholder="Search lobby..." value="{{filterVal::input}}" />
+        </form>
+      </div>
+      <div class="filters">
+        <paper-dropdown-menu label="Status" on-iron-select="_itemSelected">
+          <paper-listbox class="dropdown-content">
+            <paper-item>Pending</paper-item>
+            <paper-item>Approved</paper-item>
+            <paper-item>Rejected</paper-item>
+          </paper-listbox>
+        </paper-dropdown-menu>
+        <paper-dropdown-menu label="Type" on-iron-select="_itemSelected">
+          <paper-listbox class="dropdown-content">
+            <paper-item>Pickup</paper-item>
+            <paper-item>Delivery</paper-item>
+          </paper-listbox>
+        </paper-dropdown-menu>
+      </div>
+      <div class="order-table card">
+        <div class="table-head table-row">
+          <div>Name</div>
+          <div>Queued</div>
+          <div>Approve / Reject</div>
+        </div>
+        <div class="table-body">
+          <template is="dom-repeat" items="[[members]]" id="datatable" filter="{{_filter(filterVal)}}">
+            <bloombox-lobby-list-item endpoint="[[endpoint]]" location="[[location]]" data="{{item}}"></bloombox-lobby-list-item>
+          </template>
+        </div>
+      </div>
+    </div>
+
+    <div id="listDetailContainer">
+      <h1>Currently Shopping {{currentShoppingCount}}</h1>
+      <div class="order-table card currentlyShopping">
+        <div class="table-head table-row">
+          <div>Name</div>
+          <div>Started Shopping</div>
+        </div>
+        <div class="table-body">
+          <template is="dom-repeat" items="[[currentlyShopping]]">
+            <bloombox-lobby-list-item data="{{item}}" hide-tools></bloombox-lobby-list-item>
+          </template>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    var BloomboxPageLobby = Polymer.BloomboxPageLobby = Polymer({
+      is: "bloombox-page-lobby",
+
+      behaviors: [
+      Polymer.BloomboxDashboardPageBehavior
+      ],
+
+      properties: {
+        usersData: {
+          type: Object
+        },
+        customerData: {
+          type: Object,
+          notify: true
+        },
+        members: {
+          type: Array,
+          computed: "_filterMembers(usersData, customerData.queue)",
+        },
+        currentlyShopping: {
+          type: Array,
+          computed: "_filterMembers(usersData, customerData.currentlyShopping)"
+        },
+        currentShoppingCount: {
+          type: String,
+          computed: "_countShopping(customerData.currentlyShopping)"
+        },
+        _customerEndpoint: {
+          type: String,
+          notify: true,
+          computed: '_computeCustomerEndpoint(endpoint, location)'
+        },
+        selectedOrder: {
+          type: Object,
+          notify: true
+        },
+        orderKeys: {
+          type: Array,
+          notify: true
+        }
+      },
+
+      _countShopping(users) {
+        if(users)
+          return "(" + Object.keys(users).length + ")";
+      },
+
+      _sort: function(a, b) {
+        // Sort by Timestamp
+        return a.createdAt.timestamp < b.createdAt.timestamp ? 1 : -1;
+      },
+
+      _filter: function(val, val2) {
+        return function(d) {
+          if (!val) return true;
+          if (!d) return false;
+          return (d.person.name.firstName && ~d.person.name.firstName.toLowerCase().indexOf(val.toLowerCase())) ||
+                 (d.person.name.lastName && ~d.person.name.lastName.toLowerCase().indexOf(val.toLowerCase()));
+        };
+      },
+
+      _filterMembers: function(users, members) {
+        if(users != null && members != null) {
+          let filteredKeys = [];
+          let filteredMembers = [];
+
+          for(let memberId in members) {
+            filteredKeys.push(memberId);
+          }
+
+          for(let i = 0; i < filteredKeys.length; i++) {
+            let member = filteredKeys[i];
+            let timestamp = members[member];
+
+            if(users[member] != null) {
+              let user = users[member];
+              user.joinedQueue = timestamp;
+              user.key = member;
+              filteredMembers.push(users[member]);
+            }
+          }
+
+          return filteredMembers;
+        }
+      },
+
+      _computeCustomerEndpoint: function(endpoint, location) {
+        return endpoint + "/locations/" + location + "/lobby";
+      },
+
+      attached: function() {
+        bloom.app.pageDidLoad("lobby");
+      }
+    });
+  </script>
+</dom-module>
