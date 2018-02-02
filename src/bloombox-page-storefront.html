@@ -6,7 +6,10 @@
 <link rel="import" href="../components/iron-icons/communication-icons.html">
 <link rel="import" href="../components/iron-icons/image-icons.html">
 <link rel="import" href="../components/iron-pages/iron-pages.html">
+<link rel="import" href="../components/iron-ajax/iron-ajax.html">
 
+
+<link rel="import" href="../components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../components/paper-tabs/paper-tab.html">
 <link rel="import" href="../components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../components/paper-toolbar/paper-toolbar.html">
@@ -303,10 +306,23 @@ section[name="hours"] .table-body {
   margin: 0 1%;
 }
 
+#overlay {
+    position: fixed;
+    background: rgba(0,0,0,0.7);
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 99;
+}
+
 </style>
 
 <firebase-document id="storefrontData" path$="[[_storefrontEndpoint]]" data="{{settings}}" hidden></firebase-document>
+<iron-ajax id="getBackup" handle-as="json" url$="https://bloombox-io.firebaseio.com[[_storefrontEndpoint]].json" last-response="{{backup}}"></iron-ajax>
 
+
+<div id="overlay" hidden></div>
 <main>
   <header>
     <paper-tabs selected="{{selectedTab}}" attr-for-selected="name">
@@ -382,8 +398,8 @@ section[name="hours"] .table-body {
       </div>
     </div>
 
-
-    <paper-button on-tap="_saveChanges"><iron-icon icon="save"></iron-icon>Save Changes</paper-button>
+    <paper-button on-tap="_revertToLastBackup"><iron-icon icon="undo"></iron-icon></paper-button>
+    <paper-button on-tap="_popSaveChanges"><iron-icon icon="save"></iron-icon>Save Changes</paper-button>
 
   </div>
 
@@ -446,6 +462,17 @@ section[name="hours"] .table-body {
 </iron-pages>
 </main>
 
+<paper-dialog id="saveChangesModal"  on-iron-overlay-opened="_openSaveModal" on-iron-overlay-closed="_closeSaveModal">
+  <h2>Please confirm these changes.</h2>
+  <paper-dialog-scrollable>
+    Don't worry - we'll save a copy of your prior changes in case you need to revert.
+  </paper-dialog-scrollable>
+  <div class="buttons">
+    <paper-button dialog-dismiss>Cancel</paper-button>
+    <paper-button dialog-confirm autofocus>Accept</paper-button>
+  </div>
+</paper-dialog>
+
 </template>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
@@ -468,33 +495,50 @@ var BloomboxPageStorefront = Polymer.BloomboxPageStorefront = Polymer({
       observer: '_settingsReceived',
       notify: true
     },
-    days: {
-      type: Array,
-      value: function() {
-        return ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-      }
-    },
     selectedTab: {
       value: "general"
     },
     sortable: {
       type: Object
+    },
+    persistedSettings: {
+      type: Object
     }
   },
 
-  observers: ['_hoursUpdated(settings.hours.regular)'],
-
+  observers: [],
 
   _computeStorefrontEndpoint: function(endpoint, location) {
     return endpoint + "/locations/" + location + "/settings/shop";
   },
 
-  _hoursUpdated: function(hours) {
-
+  _popSaveChanges: function() {
+    this.$.overlay.hidden = false;
+    this.$.saveChangesModal.open();
   },
 
   _saveChanges: function() {
-    console.log(this.persistedSettings)
+    let self = this;
+    let request = this.$.getBackup.generateRequest();
+    let newData = this.get("persistedSettings");
+    let settings = this.settings;
+
+    request.completes.then(function(req){
+      // Backup Complete, save data
+
+      newData.lastBackup = self.backup;
+      self.set("settings", {});
+      self.set("settings", newData);
+    }, function(rejected){
+      console.log(rejected);
+    });
+  },
+
+  _revertToLastBackup: function() {
+    let backup = this.persistedSettings.lastBackup;
+    if(backup) {
+      this.set("persistedSettings", backup);
+    }
   },
 
   ready: function() {
@@ -512,8 +556,19 @@ var BloomboxPageStorefront = Polymer.BloomboxPageStorefront = Polymer({
     });
 
     this.addEventListener('delete', function(e){
-     self.splice("persistedSettings.hours.regular", e.detail.item.index, 1);
-   });
+       self.splice("persistedSettings.hours.regular", e.detail.item.index, 1);
+    });
+  },
+
+  _openSaveModal: function() {
+    this.$.overlay.hidden = false;
+  },
+
+  _closeSaveModal: function() {
+    this.$.overlay.hidden = true;
+
+    if(this.$.saveChangesModal.closingReason.confirmed)
+      this._saveChanges();
   },
 
   _addRule: function() {
@@ -531,9 +586,18 @@ var BloomboxPageStorefront = Polymer.BloomboxPageStorefront = Polymer({
       mode: "DELIVERY_ONLY"
     });
   },
-
   _settingsReceived: function(settings) {
+    console.log(settings)
     this.set("persistedSettings", settings);
+  },
+
+  _isEmptyObj: function(obj) {
+    for(var prop in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, prop)) {
+        return false;
+      }
+    }
+    return true;
   },
 
   attached: function() {
