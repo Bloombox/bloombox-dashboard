@@ -1,0 +1,491 @@
+<link rel="import" href="../components/polymer/polymer.html">
+<link rel="import" href="../components/iron-list/iron-list.html">
+<link rel="import" href="../components/iron-icon/iron-icon.html">
+<link rel="import" href="../components/iron-icons/iron-icons.html">
+<link rel="import" href="../components/iron-icons/editor-icons.html">
+<link rel="import" href="../components/iron-icons/image-icons.html">
+<link rel="import" href="../components/iron-pages/iron-pages.html">
+
+<link rel="import" href="../components/paper-tabs/paper-tab.html">
+<link rel="import" href="../components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../components/paper-toolbar/paper-toolbar.html">
+<link rel="import" href="../components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../components/paper-input/paper-input.html">
+<link rel="import" href="../components/paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../components/paper-button/paper-button.html">
+
+
+<link rel="import" href="../components/bloombox-styles/bloombox-styles.html">
+
+<link rel="import" href="./behaviors/bloombox-dashboard-page-behavior.html">
+<link rel="import" href="../components/polymerfire/polymerfire.html">
+<link rel="import" href="../components/bloombox-storeconfig/bloombox-storeconfig-rule.html">
+
+
+<dom-module id="bloombox-page-storefront">
+<template strip-whitespace>
+  <style is="custom-style" include="bloombox-styles">
+  :host {
+    color: var(--bloombox-theme-foreground);
+  }
+
+  :host main {
+    height: 100%;
+  }
+
+  /** -- Sections -- **/
+  :host iron-pages,
+  :host iron-pages section {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  :host iron-pages section {
+    width: 100%;
+  }
+
+  :host main iron-pages section div.chart-tools {
+    width: 100%;
+    margin: 20px 0;
+  }
+
+  :host main iron-pages section div.chart-content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+  }
+
+  :host main header,
+  :host main header paper-tabs {
+    background: white;
+    color: var(--bloombox-theme-foreground);
+  }
+
+  :host main header paper-tabs paper-tab {
+    color: var(--bloombox-theme-foreground);
+  }
+
+  :host main paper-toolbar {
+    height: 50px;
+    margin-bottom: 5px;
+    color: #444;
+    width: 100%;
+  }
+
+  :host main iron-pages section paper-toolbar bloombox-admin-chart-controls {
+    color: var(--bloombox-theme-foreground);
+    --bloombox-controls-color: var(--bloombox-theme-foreground);
+  }
+
+  :host main iron-pages section paper-toolbar span.title {
+    height: 50px;
+    display: flex;
+    margin-left: 44px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+  }
+
+  :host main iron-pages section paper-toolbar span.title h3 {
+    margin: 0;
+    -webkit-margin-before: 0;
+    -webkit-margin-after: 0;
+    -webkit-margin-start: 0;
+    -webkit-margin-end: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .hours {
+    display: flex;
+    flex-wrap: wrap;
+    width: 20%;
+  }
+
+  .card {
+   box-shadow: 0 2px 2px 0 rgba(0,0,0,.14), 0 3px 1px -2px rgba(0,0,0,.2), 0 1px 5px 0 rgba(0,0,0,.12);
+   background: #fff;
+   padding: 1em;
+   box-sizing: border-box;
+   margin-bottom: 1em;
+ }
+
+ .tile {
+  display: flex;
+  flex: 0 0 100%;
+  background: #eee;
+  margin-bottom: 10px;
+  padding: 1em;
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+  padding: 16px;
+  border-radius: 5px;
+  background-color: #fff;
+}
+
+.tile paper-toggle-button, .tile > div {
+  display: flex;
+  flex: 0 0 50%;
+}
+
+section {
+  padding: 1.5em;
+  box-sizing: border-box;
+}
+
+.setting {
+  display: flex;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.fp {
+  width: 50%;
+}
+
+.setting .half {
+  width: 50%;
+}
+
+.theme-form {
+  display: flex;
+  flex-wrap: wrap;
+  flex: 0 0 74%;
+  margin-left: 1%;
+}
+
+.theme-form paper-input {
+  flex: 0 0 calc(50% - 2em);
+  padding: 0 1em;
+}
+
+paper-button {
+  background: var(--app-primary-color);
+  color: white;
+  text-transform: initial;
+}
+
+.theme-form paper-button {
+  margin-top: 2em;
+}
+
+
+section[name="hours"] .table-head,
+section[name="hours"] .table-body {
+  display: flex;
+  width: 100%;
+  margin-bottom: 1em;
+}
+
+section[name="hours"] .table-head > div {
+  flex: 0 0 20%;
+}
+
+section[name="hours"] .table-body {
+ flex-wrap: wrap;
+}
+
+
+.tools {
+  margin-top: 1em;
+  width: 100%;
+}
+
+.tools paper-button {
+  margin-right: 10px;
+}
+
+.floated-label-placeholder {
+  display: none;
+}
+
+.input-icon {
+  padding-right: 10px;
+}
+
+#hoursList {
+  width: 100%;
+}
+
+.menuOrder {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  margin-bottom: 2em;
+}
+
+.menuOrder div {
+  flex: 0 0 auto;
+  background: var(--bloombox-green-primary);
+  color: white;
+  border-radius: 8px;
+  padding: 0.2em 0.5em;
+  margin: 0 10px;
+  text-transform: capitalize;
+}
+.menuOrder div iron-icon {
+  color: white;
+  fill: white;
+}
+.appearance-switches {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: start;
+  flex: 0 0 25%;
+}
+
+.appearance-switches h3,
+.theme-form h1 {
+  width: 100%;
+  text-align: center;
+}
+
+.appearance-switches paper-toggle-button {
+  flex: 0 0 50%;
+  height: 40px;
+}
+
+.flex-row {
+  display: flex;
+    flex: 0 0 100%;
+}
+
+.setting {
+  display: flex;
+  flex-wrap: wrap;
+}
+.setting > div {
+  flex: 0 0 50%;
+}
+
+</style>
+
+<firebase-document id="storefrontData" path$="[[_storefrontEndpoint]]" data="{{settings}}" hidden></firebase-document>
+
+<main>
+  <header>
+    <paper-tabs selected="{{selectedTab}}" attr-for-selected="name">
+    <paper-tab name="general">General</paper-tab>
+    <paper-tab name="hours" on-tap="_loadHours">Hours</paper-tab>
+    <paper-tab name="theme">Appearance</paper-tab>
+  </paper-tabs>
+</header>
+
+<iron-pages selected="{{selectedTab}}" attr-for-selected="name">
+<section name="general">
+  <!-- BUSINESS INFO -->
+
+  <div class="setting">
+    <div class="card">
+      <h2>Business Info</h2>
+      <paper-input value="{{settings.businessInfo.name}}" label="Name"></paper-input>
+      <paper-input value="{{settings.businessInfo.email}}" label="Email"></paper-input>
+      <paper-input value="{{settings.businessInfo.phone}}" label="Phone"></paper-input>
+      <paper-input value="{{settings.businessInfo.address.firstLine}}" label="Address"></paper-input>
+      <paper-input value="{{settings.businessInfo.address.secondLine}}" label="Suite #"></paper-input>
+      <paper-input value="{{settings.businessInfo.address.city}}" label="City"></paper-input>
+      <paper-input value="{{settings.businessInfo.address.state}}" label="State"></paper-input>
+      <paper-input value="{{settings.businessInfo.address.zip}}" label="Zip"></paper-input>
+      <h2>Social Media Links</h2>
+      <paper-input value="{{settings.businessInfo.socialMedia.facebook}}" label="Facebook"></paper-input>
+      <paper-input value="{{settings.businessInfo.socialMedia.instagram}}" label="Instagram"></paper-input>
+      <paper-input value="{{settings.businessInfo.socialMedia.twitter}}" label="Twitter"></paper-input>
+    </div>
+
+    <div>
+      <div class="appearance-switches card">
+        <h3>Store Settings</h3>
+        <paper-toggle-button>Pickup</paper-toggle-button>
+        <paper-toggle-button>Delivery</paper-toggle-button>
+        <paper-toggle-button>Medical</paper-toggle-button>
+        <paper-toggle-button>Recreational</paper-toggle-button>
+      </div>
+
+      <div class="appearance-switches card">
+        <h3>ID Settings</h3>
+        <paper-toggle-button>Driver's License</paper-toggle-button>
+        <paper-toggle-button>Passport</paper-toggle-button>
+        <paper-toggle-button>Bloombox Card</paper-toggle-button>
+      </div>
+
+      <div class="appearance-switches card">
+        <h3>Promo Codes</h3>
+        <div class="promos">
+          <div>
+            <div>PROMO23</div>
+            <div>40%</div>
+            <div><iron-icon icon="delete-forever"></iron-icon>
+        </div>
+
+        <div>
+          <paper-button><iron-icon icon="add"></iron-icon>Add Promo</paper-button>
+        </div>
+      </div>
+    </div>
+
+
+  </div>
+
+  <!-- DELIVERY/PICKUP/HOURS/ZIP -->
+
+
+</section>
+
+<section name="hours" id="hours">
+  <div class="table-head">
+    <div>Status</div>
+    <div>Span</div>
+    <div>Begin</div>
+    <div>End</div>
+    <div>Enabled</div>
+  </div>
+
+  <div class="table-body" id="hourRules">
+    <iron-list items="{{settings.hours.regular}}" as="hours" id="hoursList">
+    <template>
+      <bloombox-storeconfig-rule draggable="true" index="[[index]]" hours="{{hours}}"></bloombox-store-config-rule>
+    </template>
+  </iron-list>
+</div>
+
+<div class="tools">
+  <paper-button on-tap="_addRule"><iron-icon icon="add"></iron-icon>Add Rule</paper-button>
+</div>
+</section>
+
+<section name="theme" class="theme">
+  <h1>Drag and drop to change your navigation order:</h1>
+  <div class="menuOrder">
+     <template is="dom-repeat" items="{{settings.menuOrder}}" as="category">
+      <div draggable="true"><iron-icon icon="editor:drag-handle"></iron-icon> [[category]], [[index]]</div>
+    </template>
+  </div>
+ <div class="flex-row">
+   <div class="appearance-switches card">
+    <h3>Enable/Disable Filters</h3>
+    <paper-toggle-button>Price</paper-toggle-button>
+    <paper-toggle-button>THC</paper-toggle-button>
+    <paper-toggle-button>CBD</paper-toggle-button>
+    <paper-toggle-button>Dietary</paper-toggle-button>
+    <paper-toggle-button>Brands</paper-toggle-button>
+    <paper-toggle-button>Species</paper-toggle-button>
+    <paper-toggle-button>Grow</paper-toggle-button>
+  </div>
+  
+  <div class="theme-form card">
+    <h1>Custom Styles</h1>
+    <template is="dom-repeat" items="{{settings.theme}}" as="option">
+      <paper-input always-float-label value="[[option.value]]" label="[[option.name]]">
+      <iron-icon class="input-icon" icon="[[option.icon]]" prefix></iron-icon>
+    </paper-input>
+    </template>
+  </div>
+ </div>
+</section>
+</iron-pages>
+</main>
+
+</template>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+
+var BloomboxPageStorefront = Polymer.BloomboxPageStorefront = Polymer({
+  is: "bloombox-page-storefront",
+
+  behaviors: [
+  Polymer.BloomboxDashboardPageBehavior
+  ],
+
+  properties: {
+    _storefrontEndpoint: {
+      type: String,
+      notify: true,
+      computed: '_computeStorefrontEndpoint(endpoint, location)'
+    },
+    settings: {
+      type: Object,
+      observer: '_settingsReceived',
+      notify: true
+    },
+    days: {
+      type: Array,
+      value: function() {
+        return ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+      }
+    },
+    selectedTab: {
+      value: "general"
+    },
+    sortable: {
+      type: Object
+    }
+  },
+
+  observers: ['_hoursUpdated(settings.hours.regular)'],
+
+
+  _computeStorefrontEndpoint: function(endpoint, location) {
+    return endpoint + "/locations/" + location + "/settings/shop";
+  },
+
+  _hoursUpdated: function(hours) {
+
+  },
+
+  ready: function() {
+    var self = this;
+
+    this.addEventListener('setRuleDragOver', function(e){
+      self.set("dragOver", e.detail.index);
+    });
+
+    this.addEventListener('moveHourItem', function(e){
+      let oldItem = self.get(["settings.hours.regular", e.detail.item]);
+      self.splice("settings.hours.regular", e.detail.item, 1);
+      self.splice("settings.hours.regular", self.get("dragOver"), 0, oldItem);
+      self.$.hoursList.notifyResize();
+    });
+
+    this.addEventListener('delete', function(e){
+     self.splice("settings.hours.regular", e.detail.item.index, 1);
+   });
+  },
+
+  _arraymove: function(arr, fromIndex, toIndex) {
+    console.log(arr, fromIndex, toIndex);
+    var element = arr[fromIndex];
+    arr.splice(fromIndex, 1);
+    arr.splice(toIndex, 0, element);
+    console.log(arr);
+    return arr;
+  },
+
+  _addRule: function() {
+    this.push('settings.hours.regular', {
+      enabled: false,
+      bounds: {
+        begin: {
+          hour: 9
+        },
+        end: {
+          hour: 17
+        },
+        span: "EVERYDAY"
+      },
+      mode: "DELIVERY_ONLY"
+    });
+  },
+
+  _settingsReceived: function(settings) {
+    console.log(settings)
+  },
+
+  attached: function() {
+    bloom.app.pageDidLoad("storefront");
+  }
+});
+</script>
+</dom-module>
