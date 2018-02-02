@@ -3,6 +3,7 @@
 <link rel="import" href="../components/iron-icon/iron-icon.html">
 <link rel="import" href="../components/iron-icons/iron-icons.html">
 <link rel="import" href="../components/iron-icons/editor-icons.html">
+<link rel="import" href="../components/iron-icons/communication-icons.html">
 <link rel="import" href="../components/iron-icons/image-icons.html">
 <link rel="import" href="../components/iron-pages/iron-pages.html">
 
@@ -109,7 +110,7 @@
   .card {
    box-shadow: 0 2px 2px 0 rgba(0,0,0,.14), 0 3px 1px -2px rgba(0,0,0,.2), 0 1px 5px 0 rgba(0,0,0,.12);
    background: #fff;
-   padding: 1em;
+   padding: 2em 1em;
    box-sizing: border-box;
    margin-bottom: 1em;
  }
@@ -237,12 +238,6 @@ section[name="hours"] .table-body {
   flex: 0 0 25%;
 }
 
-.appearance-switches h3,
-.theme-form h1 {
-  width: 100%;
-  text-align: center;
-}
-
 .appearance-switches paper-toggle-button {
   flex: 0 0 50%;
   height: 40px;
@@ -257,8 +252,55 @@ section[name="hours"] .table-body {
   display: flex;
   flex-wrap: wrap;
 }
-.setting > div {
+.setting > div.half {
   flex: 0 0 50%;
+}
+
+.setting > div.quarter {
+  margin-left: 1%;
+  flex: 0 0 25%;
+}
+
+.half-inputs {
+  display: flex;
+  flex-wrap: wrap;
+}
+.half-inputs paper-input {
+  margin: 0 0.5em;
+  flex: 0 0 calc(50% - 1em);
+}
+
+:host h2 iron-icon {
+  top: -3px;
+  left: -10px;
+}
+
+:host h2 {
+  text-align: center;
+  width: 100%;
+}
+
+.promos {
+  display: flex;
+  flex: 0 0 100%;
+}
+
+.promos > div {
+  display: flex;
+  flex: 0 0 100%;
+}
+
+.promos > div > div {
+  flex: 0 0 33%;
+}
+
+.threight {
+  flex: 0 0 37.5%;
+}
+
+.third {
+  flex: 0 0 29.25%;
+  margin: 0 1%;
 }
 
 </style>
@@ -268,8 +310,8 @@ section[name="hours"] .table-body {
 <main>
   <header>
     <paper-tabs selected="{{selectedTab}}" attr-for-selected="name">
-    <paper-tab name="general">General</paper-tab>
-    <paper-tab name="hours" on-tap="_loadHours">Hours</paper-tab>
+    <paper-tab name="general">General Settings</paper-tab>
+    <paper-tab name="hours">Store Hours</paper-tab>
     <paper-tab name="theme">Appearance</paper-tab>
   </paper-tabs>
 </header>
@@ -279,25 +321,31 @@ section[name="hours"] .table-body {
   <!-- BUSINESS INFO -->
 
   <div class="setting">
-    <div class="card">
-      <h2>Business Info</h2>
-      <paper-input value="{{settings.businessInfo.name}}" label="Name"></paper-input>
-      <paper-input value="{{settings.businessInfo.email}}" label="Email"></paper-input>
-      <paper-input value="{{settings.businessInfo.phone}}" label="Phone"></paper-input>
-      <paper-input value="{{settings.businessInfo.address.firstLine}}" label="Address"></paper-input>
-      <paper-input value="{{settings.businessInfo.address.secondLine}}" label="Suite #"></paper-input>
-      <paper-input value="{{settings.businessInfo.address.city}}" label="City"></paper-input>
-      <paper-input value="{{settings.businessInfo.address.state}}" label="State"></paper-input>
-      <paper-input value="{{settings.businessInfo.address.zip}}" label="Zip"></paper-input>
-      <h2>Social Media Links</h2>
-      <paper-input value="{{settings.businessInfo.socialMedia.facebook}}" label="Facebook"></paper-input>
-      <paper-input value="{{settings.businessInfo.socialMedia.instagram}}" label="Instagram"></paper-input>
-      <paper-input value="{{settings.businessInfo.socialMedia.twitter}}" label="Twitter"></paper-input>
+    <div class="threight">
+      
+      <div class="card half-inputs">
+        <h2><iron-icon icon="icons:info"></iron-icon>Business Info</h2>
+        <paper-input value="{{persistedSettings.businessInfo.name}}" label="Name"></paper-input>
+        <paper-input value="{{persistedSettings.businessInfo.email}}" label="Email"></paper-input>
+        <paper-input value="{{persistedSettings.businessInfo.phone}}" label="Phone"></paper-input>
+        <paper-input value="{{persistedSettings.businessInfo.address.firstLine}}" label="Address"></paper-input>
+        <paper-input value="{{persistedSettings.businessInfo.address.secondLine}}" label="Suite #"></paper-input>
+        <paper-input value="{{persistedSettings.businessInfo.address.city}}" label="City"></paper-input>
+        <paper-input value="{{persistedSettings.businessInfo.address.state}}" label="State"></paper-input>
+        <paper-input value="{{persistedSettings.businessInfo.address.zip}}" label="Zip"></paper-input>
+      </div>
+      
+      <div class="card">
+        <h2><iron-icon icon="social:share"></iron-icon>Social Media Links</h2>
+        <paper-input value="{{persistedSettings.businessInfo.socialMedia.facebook}}" label="Facebook"></paper-input>
+        <paper-input value="{{persistedSettings.businessInfo.socialMedia.instagram}}" label="Instagram"></paper-input>
+        <paper-input value="{{persistedSettings.businessInfo.socialMedia.twitter}}" label="Twitter"></paper-input>
+      </div>
     </div>
 
-    <div>
+    <div class="third">
       <div class="appearance-switches card">
-        <h3>Store Settings</h3>
+        <h2><iron-icon icon="settings-applications"></iron-icon>Store Settings</h2>
         <paper-toggle-button>Pickup</paper-toggle-button>
         <paper-toggle-button>Delivery</paper-toggle-button>
         <paper-toggle-button>Medical</paper-toggle-button>
@@ -305,27 +353,37 @@ section[name="hours"] .table-body {
       </div>
 
       <div class="appearance-switches card">
-        <h3>ID Settings</h3>
+        <h2><iron-icon icon="credit-card"></iron-icon>ID Settings</h2>
         <paper-toggle-button>Driver's License</paper-toggle-button>
         <paper-toggle-button>Passport</paper-toggle-button>
         <paper-toggle-button>Bloombox Card</paper-toggle-button>
       </div>
 
       <div class="appearance-switches card">
-        <h3>Promo Codes</h3>
+        <h2><iron-icon icon="redeem"></iron-icon>Promo Codes</h2>
         <div class="promos">
-          <div>
-            <div>PROMO23</div>
-            <div>40%</div>
-            <div><iron-icon icon="delete-forever"></iron-icon>
+          <template is="dom-repeat" items="{{persistedSettings.promos}}" as="promo">
+            <div>
+              <div>[[promo.name]]</div>
+              <div>[[promo.discount]]</div>
+              <div><iron-icon icon="delete-forever"></iron-icon></div>
+            </div>
+          </template>
         </div>
-
         <div>
-          <paper-button><iron-icon icon="add"></iron-icon>Add Promo</paper-button>
+          <paper-button on-tap="_addRule"><iron-icon icon="add"></iron-icon>Add Promo</paper-button>
         </div>
       </div>
     </div>
+    
+    <div class="third">
+      <div class="card">
+        <h2><iron-icon icon="communication:location-on"></iron-icon>Zipcode Minimums</h2>
+      </div>
+    </div>
 
+
+    <paper-button on-tap="_saveChanges"><iron-icon icon="save"></iron-icon>Save Changes</paper-button>
 
   </div>
 
@@ -344,7 +402,7 @@ section[name="hours"] .table-body {
   </div>
 
   <div class="table-body" id="hourRules">
-    <iron-list items="{{settings.hours.regular}}" as="hours" id="hoursList">
+    <iron-list items="{{persistedSettings.hours.regular}}" as="hours" id="hoursList">
     <template>
       <bloombox-storeconfig-rule draggable="true" index="[[index]]" hours="{{hours}}"></bloombox-store-config-rule>
     </template>
@@ -359,13 +417,13 @@ section[name="hours"] .table-body {
 <section name="theme" class="theme">
   <h1>Drag and drop to change your navigation order:</h1>
   <div class="menuOrder">
-     <template is="dom-repeat" items="{{settings.menuOrder}}" as="category">
+     <template is="dom-repeat" items="{{persistedSettings.menuOrder}}" as="category">
       <div draggable="true"><iron-icon icon="editor:drag-handle"></iron-icon> [[category]], [[index]]</div>
     </template>
   </div>
  <div class="flex-row">
    <div class="appearance-switches card">
-    <h3>Enable/Disable Filters</h3>
+    <h2><iron-icon icon="sort"></iron-icon> Enable/Disable Filters</h2>
     <paper-toggle-button>Price</paper-toggle-button>
     <paper-toggle-button>THC</paper-toggle-button>
     <paper-toggle-button>CBD</paper-toggle-button>
@@ -376,8 +434,8 @@ section[name="hours"] .table-body {
   </div>
   
   <div class="theme-form card">
-    <h1>Custom Styles</h1>
-    <template is="dom-repeat" items="{{settings.theme}}" as="option">
+    <h2><iron-icon icon="code"></iron-icon>Custom Styles</h2>
+    <template is="dom-repeat" items="{{persistedSettings.theme}}" as="option">
       <paper-input always-float-label value="[[option.value]]" label="[[option.name]]">
       <iron-icon class="input-icon" icon="[[option.icon]]" prefix></iron-icon>
     </paper-input>
@@ -435,6 +493,10 @@ var BloomboxPageStorefront = Polymer.BloomboxPageStorefront = Polymer({
 
   },
 
+  _saveChanges: function() {
+    console.log(this.persistedSettings)
+  },
+
   ready: function() {
     var self = this;
 
@@ -443,28 +505,19 @@ var BloomboxPageStorefront = Polymer.BloomboxPageStorefront = Polymer({
     });
 
     this.addEventListener('moveHourItem', function(e){
-      let oldItem = self.get(["settings.hours.regular", e.detail.item]);
-      self.splice("settings.hours.regular", e.detail.item, 1);
-      self.splice("settings.hours.regular", self.get("dragOver"), 0, oldItem);
+      let oldItem = self.get(["persistedSettings.hours.regular", e.detail.index]);
+      self.splice("persistedSettings.hours.regular", e.detail.index, 1);
+      self.splice("persistedSettings.hours.regular", self.get("dragOver"), 0, oldItem);
       self.$.hoursList.notifyResize();
     });
 
     this.addEventListener('delete', function(e){
-     self.splice("settings.hours.regular", e.detail.item.index, 1);
+     self.splice("persistedSettings.hours.regular", e.detail.item.index, 1);
    });
   },
 
-  _arraymove: function(arr, fromIndex, toIndex) {
-    console.log(arr, fromIndex, toIndex);
-    var element = arr[fromIndex];
-    arr.splice(fromIndex, 1);
-    arr.splice(toIndex, 0, element);
-    console.log(arr);
-    return arr;
-  },
-
   _addRule: function() {
-    this.push('settings.hours.regular', {
+    this.push('persistedSettings.hours.regular', {
       enabled: false,
       bounds: {
         begin: {
@@ -480,7 +533,7 @@ var BloomboxPageStorefront = Polymer.BloomboxPageStorefront = Polymer({
   },
 
   _settingsReceived: function(settings) {
-    console.log(settings)
+    this.set("persistedSettings", settings);
   },
 
   attached: function() {
