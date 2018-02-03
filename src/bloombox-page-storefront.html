@@ -24,6 +24,7 @@
 <link rel="import" href="./behaviors/bloombox-dashboard-page-behavior.html">
 <link rel="import" href="../components/polymerfire/polymerfire.html">
 <link rel="import" href="../components/bloombox-storeconfig/bloombox-storeconfig-rule.html">
+<link rel="import" href="../components/bloombox-storeconfig/bloombox-storeconfig-list.html">
 
 
 <dom-module id="bloombox-page-storefront">
@@ -314,8 +315,23 @@ section[name="hours"] .table-body {
     bottom: 0;
     left: 0;
     z-index: 99;
-}
+} 
 
+.no-left-margin {
+  margin-left: 0;
+}
+.static-toolbar {
+      padding: 1%;
+    background: white;
+    border-top: 1px solid #eee;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+iron-pages {
+  position: relative;
+}
 </style>
 
 <firebase-document id="storefrontData" path$="[[_storefrontEndpoint]]" data="{{settings}}" hidden></firebase-document>
@@ -337,6 +353,30 @@ section[name="hours"] .table-body {
   <!-- BUSINESS INFO -->
 
   <div class="setting">
+
+    <div class="third no-left-margin">
+      <div class="appearance-switches card">
+        <h2><iron-icon icon="settings-applications"></iron-icon>Store Settings</h2>
+        <paper-toggle-button checked="{{persistedSettings.services.pickup}}">Pickup</paper-toggle-button>
+        <paper-toggle-button checked="{{persistedSettings.services.delivery}}">Delivery</paper-toggle-button>
+        <paper-toggle-button checked="{{persistedSettings.services.medical}}">Medical</paper-toggle-button>
+        <paper-toggle-button checked="{{persistedSettings.services.recreational}}">Recreational</paper-toggle-button>
+         <paper-toggle-button checked="{{persistedSettings.enrollment.on}}">Accepting Patients</paper-toggle-button>
+      </div>
+
+      <div class="appearance-switches card" hidden="[[!persistedSettings.enrollment.on]]">
+        <h2><iron-icon icon="credit-card"></iron-icon>ID Settings</h2>
+        <paper-toggle-button checked="{{persistedSettings.enrollment.acceptedIds.dl}}">Driver's License</paper-toggle-button>
+        <paper-toggle-button checked="{{persistedSettings.enrollment.acceptedIds.passport}}">Passport</paper-toggle-button>
+        <paper-toggle-button checked="{{persistedSettings.enrollment.acceptedIds.bloomboxcard}}">Bloombox Card</paper-toggle-button>
+      </div>
+
+      <div class="appearance-switches card">
+        <h2><iron-icon icon="redeem"></iron-icon>Promo Codes</h2>
+        <bloombox-storeconfig-list items="{{persistedSettings.promos}}" type="promo" button="Add Promo"></bloombox-storeconfig-list>
+      </div>
+    </div>
+
     <div class="threight">
       
       <div class="card half-inputs">
@@ -351,55 +391,22 @@ section[name="hours"] .table-body {
         <paper-input value="{{persistedSettings.businessInfo.address.zip}}" label="Zip"></paper-input>
       </div>
       
-      <div class="card">
-        <h2><iron-icon icon="social:share"></iron-icon>Social Media Links</h2>
+      <div class="card half-inputs">
+        <h2><iron-icon icon="social:share"></iron-icon>Website &amp; Social</h2>
+        <paper-input value="{{persistedSettings.businessInfo.website}}" label="Website"></paper-input>
         <paper-input value="{{persistedSettings.businessInfo.socialMedia.facebook}}" label="Facebook"></paper-input>
         <paper-input value="{{persistedSettings.businessInfo.socialMedia.instagram}}" label="Instagram"></paper-input>
         <paper-input value="{{persistedSettings.businessInfo.socialMedia.twitter}}" label="Twitter"></paper-input>
       </div>
     </div>
-
-    <div class="third">
-      <div class="appearance-switches card">
-        <h2><iron-icon icon="settings-applications"></iron-icon>Store Settings</h2>
-        <paper-toggle-button>Pickup</paper-toggle-button>
-        <paper-toggle-button>Delivery</paper-toggle-button>
-        <paper-toggle-button>Medical</paper-toggle-button>
-        <paper-toggle-button>Recreational</paper-toggle-button>
-      </div>
-
-      <div class="appearance-switches card">
-        <h2><iron-icon icon="credit-card"></iron-icon>ID Settings</h2>
-        <paper-toggle-button>Driver's License</paper-toggle-button>
-        <paper-toggle-button>Passport</paper-toggle-button>
-        <paper-toggle-button>Bloombox Card</paper-toggle-button>
-      </div>
-
-      <div class="appearance-switches card">
-        <h2><iron-icon icon="redeem"></iron-icon>Promo Codes</h2>
-        <div class="promos">
-          <template is="dom-repeat" items="{{persistedSettings.promos}}" as="promo">
-            <div>
-              <div>[[promo.name]]</div>
-              <div>[[promo.discount]]</div>
-              <div><iron-icon icon="delete-forever"></iron-icon></div>
-            </div>
-          </template>
-        </div>
-        <div>
-          <paper-button on-tap="_addRule"><iron-icon icon="add"></iron-icon>Add Promo</paper-button>
-        </div>
-      </div>
-    </div>
     
     <div class="third">
-      <div class="card">
-        <h2><iron-icon icon="communication:location-on"></iron-icon>Zipcode Minimums</h2>
+      <div class="card" hidden="[[!persistedSettings.services.delivery]]">
+        <h2><iron-icon icon="communication:location"></iron-icon>Zipcode Minimums</h2>
+        <paper-input value="{{persistedSettings.storefront.delivery.globalMinimum}}" label="Global Minimum"></paper-input>
+        <bloombox-storeconfig-list items="{{persistedSettings.storefront.delivery.zipcodes}}" type="zip" button="Add Zip"></bloombox-storeconfig-list>
       </div>
     </div>
-
-    <paper-button on-tap="_revertToLastBackup"><iron-icon icon="undo"></iron-icon></paper-button>
-    <paper-button on-tap="_popSaveChanges"><iron-icon icon="save"></iron-icon>Save Changes</paper-button>
 
   </div>
 
@@ -459,9 +466,15 @@ section[name="hours"] .table-body {
   </div>
  </div>
 </section>
-</iron-pages>
-</main>
 
+</main>
+</iron-pages>
+
+<div class="static-toolbar" id="toolbar">
+ <paper-button on-tap="_revertToLastBackup"><iron-icon icon="undo"></iron-icon>Revert to Last Backup</paper-button>
+    <paper-button on-tap="_popSaveChanges"><iron-icon icon="save"></iron-icon>Save Changes</paper-button>
+
+</div>
 <paper-dialog id="saveChangesModal"  on-iron-overlay-opened="_openSaveModal" on-iron-overlay-closed="_closeSaveModal">
   <h2>Please confirm these changes.</h2>
   <paper-dialog-scrollable>
@@ -502,7 +515,8 @@ var BloomboxPageStorefront = Polymer.BloomboxPageStorefront = Polymer({
       type: Object
     },
     persistedSettings: {
-      type: Object
+      type: Object,
+      notify: true
     }
   },
 
@@ -557,6 +571,23 @@ var BloomboxPageStorefront = Polymer.BloomboxPageStorefront = Polymer({
 
     this.addEventListener('delete', function(e){
        self.splice("persistedSettings.hours.regular", e.detail.item.index, 1);
+    });
+
+    this.addEventListener('addNewPromo', function(e){
+      let item = e.detail.item;
+      let pushPath = "persistedSettings.promos." + item.name;
+
+      //TODO: Notify paths to update this.persistedSettings.promos
+      if(self.get("persistedSettings.promos") == null) {
+        self.set("persistedSettings.promos", {});
+      }
+      
+      self.set(pushPath, {
+        discount: item.discount,
+        enabled: item.enabled
+      });
+
+      self.notifyPath("persistedSettings");
     });
   },
 
