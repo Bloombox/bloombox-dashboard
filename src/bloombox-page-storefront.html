@@ -459,8 +459,8 @@ iron-pages {
   <div class="theme-form card">
     <h2><iron-icon icon="code"></iron-icon>Custom Styles</h2>
     <template is="dom-repeat" items="{{persistedSettings.theme}}" as="option">
-      <paper-input always-float-label value="[[option.value]]" label="[[option.name]]">
-      <iron-icon class="input-icon" icon="[[option.icon]]" prefix></iron-icon>
+      <paper-input always-float-label value="{{option.value}}" label="{{option.name}}">
+      <iron-icon class="input-icon" icon="{{option.icon}}" prefix></iron-icon>
     </paper-input>
     </template>
   </div>
