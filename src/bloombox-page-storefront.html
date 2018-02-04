@@ -349,7 +349,7 @@ iron-pages {
 </header>
 
 <iron-pages selected="{{selectedTab}}" attr-for-selected="name">
-<section name="general">
+<section name="general" id="general">
   <!-- BUSINESS INFO -->
 
   <div class="setting">
@@ -573,21 +573,41 @@ var BloomboxPageStorefront = Polymer.BloomboxPageStorefront = Polymer({
        self.splice("persistedSettings.hours.regular", e.detail.item.index, 1);
     });
 
-    this.addEventListener('addNewPromo', function(e){
-      let item = e.detail.item;
-      let pushPath = "persistedSettings.promos." + item.name;
+    this.addEventListener('deleteListItem', function(e) {
+      let name = e.detail.name;
+      let isPromo = e.detail.isPromo;
+      let pushPath = isPromo ? "persistedSettings.promos" : "persistedSettings.storefront.delivery.zipcodes";
+      let listItem = self.get(pushPath);
 
-      //TODO: Notify paths to update this.persistedSettings.promos
-      if(self.get("persistedSettings.promos") == null) {
-        self.set("persistedSettings.promos", {});
-      }
-      
-      self.set(pushPath, {
+      delete listItem[name];
+
+      self.set(pushPath, {});
+      self.set(pushPath, listItem);
+    });
+
+    this.addEventListener('addNewListItem', function(e){
+      let item = e.detail.item;
+      let pushPath =  e.detail.type ==="promo" ? "persistedSettings.promos" : "persistedSettings.storefront.delivery.zipcodes";
+      let listItem = self.get(pushPath);
+      let newPromo = {
         discount: item.discount,
         enabled: item.enabled
-      });
+      }
+      let newZip = {
+        deliveryMinimum: item.deliveryMinimum,
+        enabled: item.enabled
+      }
 
-      self.notifyPath("persistedSettings");
+      let toPush = e.detail.type ==="promo" ? newPromo : newZip;
+
+      if(listItem == null) {
+        self.set(pushPath, {});
+      }
+
+      listItem[item.name] = toPush;
+
+      self.set(pushPath, {});
+      self.set(pushPath, listItem);
     });
   },
 
