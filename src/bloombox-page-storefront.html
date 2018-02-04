@@ -145,6 +145,7 @@ section {
   display: flex;
   width: 100%;
   box-sizing: border-box;
+  padding-bottom: 4em;
 }
 
 .fp {
@@ -324,13 +325,19 @@ section[name="hours"] .table-body {
       padding: 1%;
     background: white;
     border-top: 1px solid #eee;
-    position: absolute;
+    position: fixed;
     left: 0;
     right: 0;
     bottom: 0;
 }
 iron-pages {
   position: relative;
+}
+
+@media (min-width: 1240px) {
+  .static-toolbar {
+    padding: 1% 260px;
+  }
 }
 </style>
 
@@ -349,125 +356,123 @@ iron-pages {
 </header>
 
 <iron-pages selected="{{selectedTab}}" attr-for-selected="name">
-<section name="general" id="general">
-  <!-- BUSINESS INFO -->
+  <section name="general" id="general">
+    <!-- BUSINESS INFO -->
 
-  <div class="setting">
+    <div class="setting">
 
-    <div class="third no-left-margin">
-      <div class="appearance-switches card">
-        <h2><iron-icon icon="settings-applications"></iron-icon>Store Settings</h2>
-        <paper-toggle-button checked="{{persistedSettings.services.pickup}}">Pickup</paper-toggle-button>
-        <paper-toggle-button checked="{{persistedSettings.services.delivery}}">Delivery</paper-toggle-button>
-        <paper-toggle-button checked="{{persistedSettings.services.medical}}">Medical</paper-toggle-button>
-        <paper-toggle-button checked="{{persistedSettings.services.recreational}}">Recreational</paper-toggle-button>
-         <paper-toggle-button checked="{{persistedSettings.enrollment.on}}">Accepting Patients</paper-toggle-button>
+      <div class="third no-left-margin">
+        <div class="appearance-switches card">
+          <h2><iron-icon icon="settings-applications"></iron-icon>Store Settings</h2>
+          <paper-toggle-button checked="{{persistedSettings.services.pickup}}">Pickup</paper-toggle-button>
+          <paper-toggle-button checked="{{persistedSettings.services.delivery}}">Delivery</paper-toggle-button>
+          <paper-toggle-button checked="{{persistedSettings.services.medical}}">Medical</paper-toggle-button>
+          <paper-toggle-button checked="{{persistedSettings.services.recreational}}">Recreational</paper-toggle-button>
+           <paper-toggle-button checked="{{persistedSettings.enrollment.on}}">Accepting Patients</paper-toggle-button>
+        </div>
+
+        <div class="appearance-switches card" hidden="[[!persistedSettings.enrollment.on]]">
+          <h2><iron-icon icon="credit-card"></iron-icon>ID Settings</h2>
+          <paper-toggle-button checked="{{persistedSettings.enrollment.acceptedIds.dl}}">Driver's License</paper-toggle-button>
+          <paper-toggle-button checked="{{persistedSettings.enrollment.acceptedIds.passport}}">Passport</paper-toggle-button>
+          <paper-toggle-button checked="{{persistedSettings.enrollment.acceptedIds.bloomboxcard}}">Bloombox Card</paper-toggle-button>
+        </div>
+
+        <div class="appearance-switches card">
+          <h2><iron-icon icon="redeem"></iron-icon>Promo Codes</h2>
+          <bloombox-storeconfig-list items="{{persistedSettings.promos}}" type="promo" button="Add Promo"></bloombox-storeconfig-list>
+        </div>
       </div>
 
-      <div class="appearance-switches card" hidden="[[!persistedSettings.enrollment.on]]">
-        <h2><iron-icon icon="credit-card"></iron-icon>ID Settings</h2>
-        <paper-toggle-button checked="{{persistedSettings.enrollment.acceptedIds.dl}}">Driver's License</paper-toggle-button>
-        <paper-toggle-button checked="{{persistedSettings.enrollment.acceptedIds.passport}}">Passport</paper-toggle-button>
-        <paper-toggle-button checked="{{persistedSettings.enrollment.acceptedIds.bloomboxcard}}">Bloombox Card</paper-toggle-button>
+      <div class="threight">
+        
+        <div class="card half-inputs">
+          <h2><iron-icon icon="icons:info"></iron-icon>Business Info</h2>
+          <paper-input value="{{persistedSettings.businessInfo.name}}" label="Name"></paper-input>
+          <paper-input value="{{persistedSettings.businessInfo.email}}" label="Email"></paper-input>
+          <paper-input value="{{persistedSettings.businessInfo.phone}}" label="Phone"></paper-input>
+          <paper-input value="{{persistedSettings.businessInfo.address.firstLine}}" label="Address"></paper-input>
+          <paper-input value="{{persistedSettings.businessInfo.address.secondLine}}" label="Suite #"></paper-input>
+          <paper-input value="{{persistedSettings.businessInfo.address.city}}" label="City"></paper-input>
+          <paper-input value="{{persistedSettings.businessInfo.address.state}}" label="State"></paper-input>
+          <paper-input value="{{persistedSettings.businessInfo.address.zip}}" label="Zip"></paper-input>
+        </div>
+        
+        <div class="card half-inputs">
+          <h2><iron-icon icon="social:share"></iron-icon>Website &amp; Social</h2>
+          <paper-input value="{{persistedSettings.businessInfo.website}}" label="Website"></paper-input>
+          <paper-input value="{{persistedSettings.businessInfo.socialMedia.facebook}}" label="Facebook"></paper-input>
+          <paper-input value="{{persistedSettings.businessInfo.socialMedia.instagram}}" label="Instagram"></paper-input>
+          <paper-input value="{{persistedSettings.businessInfo.socialMedia.twitter}}" label="Twitter"></paper-input>
+        </div>
+      </div>
+      
+      <div class="third">
+        <div class="card" hidden="[[!persistedSettings.services.delivery]]">
+          <h2><iron-icon icon="communication:location"></iron-icon>Zipcode Minimums</h2>
+          <paper-input value="{{persistedSettings.storefront.delivery.globalMinimum}}" label="Global Minimum"></paper-input>
+          <bloombox-storeconfig-list items="{{persistedSettings.storefront.delivery.zipcodes}}" type="zip" button="Add Zip"></bloombox-storeconfig-list>
+        </div>
       </div>
 
-      <div class="appearance-switches card">
-        <h2><iron-icon icon="redeem"></iron-icon>Promo Codes</h2>
-        <bloombox-storeconfig-list items="{{persistedSettings.promos}}" type="promo" button="Add Promo"></bloombox-storeconfig-list>
-      </div>
     </div>
 
-    <div class="threight">
-      
-      <div class="card half-inputs">
-        <h2><iron-icon icon="icons:info"></iron-icon>Business Info</h2>
-        <paper-input value="{{persistedSettings.businessInfo.name}}" label="Name"></paper-input>
-        <paper-input value="{{persistedSettings.businessInfo.email}}" label="Email"></paper-input>
-        <paper-input value="{{persistedSettings.businessInfo.phone}}" label="Phone"></paper-input>
-        <paper-input value="{{persistedSettings.businessInfo.address.firstLine}}" label="Address"></paper-input>
-        <paper-input value="{{persistedSettings.businessInfo.address.secondLine}}" label="Suite #"></paper-input>
-        <paper-input value="{{persistedSettings.businessInfo.address.city}}" label="City"></paper-input>
-        <paper-input value="{{persistedSettings.businessInfo.address.state}}" label="State"></paper-input>
-        <paper-input value="{{persistedSettings.businessInfo.address.zip}}" label="Zip"></paper-input>
-      </div>
-      
-      <div class="card half-inputs">
-        <h2><iron-icon icon="social:share"></iron-icon>Website &amp; Social</h2>
-        <paper-input value="{{persistedSettings.businessInfo.website}}" label="Website"></paper-input>
-        <paper-input value="{{persistedSettings.businessInfo.socialMedia.facebook}}" label="Facebook"></paper-input>
-        <paper-input value="{{persistedSettings.businessInfo.socialMedia.instagram}}" label="Instagram"></paper-input>
-        <paper-input value="{{persistedSettings.businessInfo.socialMedia.twitter}}" label="Twitter"></paper-input>
-      </div>
+    <!-- DELIVERY/PICKUP/HOURS/ZIP -->
+
+
+  </section>
+
+  <section name="hours" id="hours">
+    <div class="table-head">
+      <div>Status</div>
+      <div>Span</div>
+      <div>Begin</div>
+      <div>End</div>
+      <div>Enabled</div>
+    </div>
+
+    <div class="table-body" id="hourRules">
+      <iron-list items="{{persistedSettings.hours.regular}}" as="hours" id="hoursList">
+      <template>
+        <bloombox-storeconfig-rule draggable="true" index="[[index]]" hours="{{hours}}"></bloombox-store-config-rule>
+      </template>
+    </iron-list>
+  </div>
+
+  <div class="tools">
+    <paper-button on-tap="_addRule"><iron-icon icon="add"></iron-icon>Add Rule</paper-button>
+  </div>
+  </section>
+
+  <section name="theme" class="theme">
+    <h1>Drag and drop to change your navigation order:</h1>
+    <div class="menuOrder">
+       <template is="dom-repeat" items="{{persistedSettings.menuOrder}}" as="category">
+        <div draggable="true"><iron-icon icon="editor:drag-handle"></iron-icon> [[category]], [[index]]</div>
+      </template>
+    </div>
+   <div class="flex-row">
+     <div class="appearance-switches card">
+      <h2><iron-icon icon="sort"></iron-icon> Enable/Disable Filters</h2>
+      <paper-toggle-button>Price</paper-toggle-button>
+      <paper-toggle-button>THC</paper-toggle-button>
+      <paper-toggle-button>CBD</paper-toggle-button>
+      <paper-toggle-button>Dietary</paper-toggle-button>
+      <paper-toggle-button>Brands</paper-toggle-button>
+      <paper-toggle-button>Species</paper-toggle-button>
+      <paper-toggle-button>Grow</paper-toggle-button>
     </div>
     
-    <div class="third">
-      <div class="card" hidden="[[!persistedSettings.services.delivery]]">
-        <h2><iron-icon icon="communication:location"></iron-icon>Zipcode Minimums</h2>
-        <paper-input value="{{persistedSettings.storefront.delivery.globalMinimum}}" label="Global Minimum"></paper-input>
-        <bloombox-storeconfig-list items="{{persistedSettings.storefront.delivery.zipcodes}}" type="zip" button="Add Zip"></bloombox-storeconfig-list>
-      </div>
+    <div class="theme-form card">
+      <h2><iron-icon icon="code"></iron-icon>Custom Styles</h2>
+      <template is="dom-repeat" items="{{persistedSettings.theme}}" as="option">
+        <paper-input always-float-label value="{{option.value}}" label="{{option.name}}">
+        <iron-icon class="input-icon" icon="{{option.icon}}" prefix></iron-icon>
+      </paper-input>
+      </template>
     </div>
-
-  </div>
-
-  <!-- DELIVERY/PICKUP/HOURS/ZIP -->
-
-
-</section>
-
-<section name="hours" id="hours">
-  <div class="table-head">
-    <div>Status</div>
-    <div>Span</div>
-    <div>Begin</div>
-    <div>End</div>
-    <div>Enabled</div>
-  </div>
-
-  <div class="table-body" id="hourRules">
-    <iron-list items="{{persistedSettings.hours.regular}}" as="hours" id="hoursList">
-    <template>
-      <bloombox-storeconfig-rule draggable="true" index="[[index]]" hours="{{hours}}"></bloombox-store-config-rule>
-    </template>
-  </iron-list>
-</div>
-
-<div class="tools">
-  <paper-button on-tap="_addRule"><iron-icon icon="add"></iron-icon>Add Rule</paper-button>
-</div>
-</section>
-
-<section name="theme" class="theme">
-  <h1>Drag and drop to change your navigation order:</h1>
-  <div class="menuOrder">
-     <template is="dom-repeat" items="{{persistedSettings.menuOrder}}" as="category">
-      <div draggable="true"><iron-icon icon="editor:drag-handle"></iron-icon> [[category]], [[index]]</div>
-    </template>
-  </div>
- <div class="flex-row">
-   <div class="appearance-switches card">
-    <h2><iron-icon icon="sort"></iron-icon> Enable/Disable Filters</h2>
-    <paper-toggle-button>Price</paper-toggle-button>
-    <paper-toggle-button>THC</paper-toggle-button>
-    <paper-toggle-button>CBD</paper-toggle-button>
-    <paper-toggle-button>Dietary</paper-toggle-button>
-    <paper-toggle-button>Brands</paper-toggle-button>
-    <paper-toggle-button>Species</paper-toggle-button>
-    <paper-toggle-button>Grow</paper-toggle-button>
-  </div>
-  
-  <div class="theme-form card">
-    <h2><iron-icon icon="code"></iron-icon>Custom Styles</h2>
-    <template is="dom-repeat" items="{{persistedSettings.theme}}" as="option">
-      <paper-input always-float-label value="{{option.value}}" label="{{option.name}}">
-      <iron-icon class="input-icon" icon="{{option.icon}}" prefix></iron-icon>
-    </paper-input>
-    </template>
-  </div>
- </div>
-</section>
-
-</main>
+   </div>
+  </section>
 </iron-pages>
 
 <div class="static-toolbar" id="toolbar">
@@ -475,6 +480,8 @@ iron-pages {
     <paper-button on-tap="_popSaveChanges"><iron-icon icon="save"></iron-icon>Save Changes</paper-button>
 
 </div>
+</main>
+
 <paper-dialog id="saveChangesModal"  on-iron-overlay-opened="_openSaveModal" on-iron-overlay-closed="_closeSaveModal">
   <h2>Please confirm these changes.</h2>
   <paper-dialog-scrollable>
