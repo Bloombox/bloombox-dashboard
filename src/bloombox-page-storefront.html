@@ -443,13 +443,13 @@ iron-pages {
    <div class="flex-row">
      <div class="appearance-switches card">
       <h2><iron-icon icon="sort"></iron-icon> Enable/Disable Filters</h2>
-      <paper-toggle-button>Price</paper-toggle-button>
-      <paper-toggle-button>THC</paper-toggle-button>
-      <paper-toggle-button>CBD</paper-toggle-button>
-      <paper-toggle-button>Dietary</paper-toggle-button>
-      <paper-toggle-button>Brands</paper-toggle-button>
-      <paper-toggle-button>Species</paper-toggle-button>
-      <paper-toggle-button>Grow</paper-toggle-button>
+      <paper-toggle-button checked="{{persistedSettings.filters.price}}">Price</paper-toggle-button>
+      <paper-toggle-button checked="{{persistedSettings.filters.THC}}">THC</paper-toggle-button>
+      <paper-toggle-button checked="{{persistedSettings.filters.CBD}}">CBD</paper-toggle-button>
+      <paper-toggle-button checked="{{persistedSettings.filters.dietary}}">Dietary</paper-toggle-button>
+      <paper-toggle-button checked="{{persistedSettings.filters.brands}}">Brands</paper-toggle-button>
+      <paper-toggle-button checked="{{persistedSettings.filters.species}}">Species</paper-toggle-button>
+      <paper-toggle-button checked="{{persistedSettings.filters.grow}}">Grow</paper-toggle-button>
     </div>
     
     <div class="theme-form card">
