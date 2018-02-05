@@ -25,6 +25,7 @@
 <link rel="import" href="../components/polymerfire/polymerfire.html">
 <link rel="import" href="../components/bloombox-storeconfig/bloombox-storeconfig-rule.html">
 <link rel="import" href="../components/bloombox-storeconfig/bloombox-storeconfig-list.html">
+<link rel="import" href="../components/bloombox-storeconfig/bloombox-storeconfig-menu-order.html">
 
 
 <dom-module id="bloombox-page-storefront">
@@ -104,6 +105,14 @@
     justify-content: center;
     align-items: center;
   }
+
+  .menuOrder {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 2em;
+  }
+
 
   .hours {
     display: flex;
@@ -216,26 +225,6 @@ section[name="hours"] .table-body {
   width: 100%;
 }
 
-.menuOrder {
-  display: flex;
-  width: 100%;
-  justify-content: center;
-  margin-bottom: 2em;
-}
-
-.menuOrder div {
-  flex: 0 0 auto;
-  background: var(--bloombox-green-primary);
-  color: white;
-  border-radius: 8px;
-  padding: 0.2em 0.5em;
-  margin: 0 10px;
-  text-transform: capitalize;
-}
-.menuOrder div iron-icon {
-  color: white;
-  fill: white;
-}
 .appearance-switches {
   display: flex;
   flex-wrap: wrap;
@@ -434,7 +423,7 @@ iron-pages {
     <div class="table-body" id="hourRules">
       <iron-list items="{{persistedSettings.hours.regular}}" as="hours" id="hoursList">
       <template>
-        <bloombox-storeconfig-rule draggable="true" index="[[index]]" hours="{{hours}}"></bloombox-store-config-rule>
+        <bloombox-storeconfig-rule draggable="true" index="[[index]]" hours="{{hours}}"></bloombox-storeconfig-rule>
       </template>
     </iron-list>
   </div>
@@ -446,9 +435,9 @@ iron-pages {
 
   <section name="theme" class="theme">
     <h1>Drag and drop to change your navigation order:</h1>
-    <div class="menuOrder">
+    <div class="menuOrder" id="menuOrder">
        <template is="dom-repeat" items="{{persistedSettings.menuOrder}}" as="category">
-        <div draggable="true"><iron-icon icon="editor:drag-handle"></iron-icon> [[category]], [[index]]</div>
+        <bloombox-storeconfig-menu-order draggable="true" category="{{category}}" index="{{index}}"></bloombox-store-config-menu-order>
       </template>
     </div>
    <div class="flex-row">
@@ -569,6 +558,18 @@ var BloomboxPageStorefront = Polymer.BloomboxPageStorefront = Polymer({
       self.set("dragOver", e.detail.index);
     });
 
+    this.addEventListener('setMenuDragOver', function(e){
+      self.set("menuDragOver", e.detail.index);
+    });
+
+    this.addEventListener('moveMenuOrder', function(e){
+      let menuOrder = self.get("persistedSettings.menuOrder");
+      let oldItem = menuOrder[e.detail.index];
+      menuOrder.splice(self.get("menuDragOver"), 0, menuOrder.splice(e.detail.index, 1)[0]);
+      self.set("persistedSettings.menuOrder", []);
+      self.set("persistedSettings.menuOrder", menuOrder);
+    });
+
     this.addEventListener('moveHourItem', function(e){
       let oldItem = self.get(["persistedSettings.hours.regular", e.detail.index]);
       self.splice("persistedSettings.hours.regular", e.detail.index, 1);
@@ -645,7 +646,6 @@ var BloomboxPageStorefront = Polymer.BloomboxPageStorefront = Polymer({
     });
   },
   _settingsReceived: function(settings) {
-    console.log(settings)
     this.set("persistedSettings", settings);
   },
 
