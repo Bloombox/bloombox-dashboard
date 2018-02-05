@@ -392,7 +392,7 @@
             <a name="orders" on-tap="navigate" class$="[[_ordersEnabled]]"><iron-icon icon="shopping-cart"></iron-icon><span class="nav-label">Orders</span></a>
             <a name="profile" on-tap="navigate"><iron-icon icon="room"></iron-icon><span class="nav-label">Club Profile</span></a>
             <a name="account" on-tap="navigate" class$="[[_adminOnly]]"><iron-icon icon="fingerprint"></iron-icon><span class="nav-label">Account</span></a>
-            <a name="storefront" on-tap="navigate" class$="[[_adminOnly]]"><iron-icon icon="shopping-cart"></iron-icon><span class="nav-label">Storefront</span></a>
+            <a name="storefront" on-tap="navigate"><iron-icon icon="shopping-cart"></iron-icon><span class="nav-label">Storefront</span></a>
             <a name="settings" on-tap="navigate" class$="[[_adminOnly]]"><iron-icon icon="settings"></iron-icon><span class="nav-label">Settings</span></a>
             <template is="dom-if" if="[[_adminOnly]]">
               <a name="customers" on-tap="navigate" class$="[[_ordersEnabled]]"><iron-icon icon="account-box"></iron-icon><span class="nav-label">Customers</span></a>
