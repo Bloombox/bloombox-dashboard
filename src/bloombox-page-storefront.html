@@ -200,6 +200,7 @@ section[name="hours"] .table-head > div {
 }
 
 section[name="hours"] .table-body {
+  width: 100%;
  flex-wrap: wrap;
 }
 
@@ -272,6 +273,7 @@ section[name="hours"] .table-body {
 :host h2 {
   text-align: center;
   width: 100%;
+  margin-top: 0;
 }
 
 .promos {
@@ -421,11 +423,9 @@ iron-pages {
     </div>
 
     <div class="table-body" id="hourRules">
-      <iron-list items="{{persistedSettings.hours.regular}}" as="hours" id="hoursList">
-      <template>
+      <template is="dom-repeat" items="{{persistedSettings.hours.regular}}" as="hours" id="hoursList"> 
         <bloombox-storeconfig-rule draggable="true" index="[[index]]" hours="{{hours}}"></bloombox-storeconfig-rule>
       </template>
-    </iron-list>
   </div>
 
   <div class="tools">
@@ -564,17 +564,16 @@ var BloomboxPageStorefront = Polymer.BloomboxPageStorefront = Polymer({
 
     this.addEventListener('moveMenuOrder', function(e){
       let menuOrder = self.get("persistedSettings.menuOrder");
-      let oldItem = menuOrder[e.detail.index];
       menuOrder.splice(self.get("menuDragOver"), 0, menuOrder.splice(e.detail.index, 1)[0]);
       self.set("persistedSettings.menuOrder", []);
       self.set("persistedSettings.menuOrder", menuOrder);
     });
 
     this.addEventListener('moveHourItem', function(e){
-      let oldItem = self.get(["persistedSettings.hours.regular", e.detail.index]);
-      self.splice("persistedSettings.hours.regular", e.detail.index, 1);
-      self.splice("persistedSettings.hours.regular", self.get("dragOver"), 0, oldItem);
-      self.$.hoursList.notifyResize();
+      let hours = self.get("persistedSettings.hours.regular");
+      hours.splice(self.get("dragOver"), 0, hours.splice(e.detail.index, 1)[0]);
+      self.set("persistedSettings.hours.regular", []);
+      self.set("persistedSettings.hours.regular", hours);
     });
 
     this.addEventListener('delete', function(e){
