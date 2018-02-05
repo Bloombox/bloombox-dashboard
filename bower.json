@@ -18,6 +18,8 @@
   "dependencies": {
     "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.0.0",
     "bloombox-elements": "git@github.com:Bloombox/bloombox-elements.git#^0.0.17",
+    "bloombox-styles": "git@github.com:Bloombox/bloombox-styles#^0.0.6",
+    "bloombox-storeconfig": "git@github.com:Bloombox/bloombox-storeconfig",
     "polymer": "polymer/polymer#^1.5.0",
     "polymerfire": "firebase/polymerfire#^0.9.3",
     "iron-elements": "PolymerElements/iron-elements#^1.0.10",

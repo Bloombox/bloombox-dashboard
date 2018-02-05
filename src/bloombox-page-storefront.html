@@ -1,0 +1,665 @@
+<link rel="import" href="../components/polymer/polymer.html">
+<link rel="import" href="../components/iron-list/iron-list.html">
+<link rel="import" href="../components/iron-icon/iron-icon.html">
+<link rel="import" href="../components/iron-icons/iron-icons.html">
+<link rel="import" href="../components/iron-icons/editor-icons.html">
+<link rel="import" href="../components/iron-icons/communication-icons.html">
+<link rel="import" href="../components/iron-icons/image-icons.html">
+<link rel="import" href="../components/iron-pages/iron-pages.html">
+<link rel="import" href="../components/iron-ajax/iron-ajax.html">
+
+
+<link rel="import" href="../components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../components/paper-tabs/paper-tab.html">
+<link rel="import" href="../components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../components/paper-toolbar/paper-toolbar.html">
+<link rel="import" href="../components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../components/paper-input/paper-input.html">
+<link rel="import" href="../components/paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../components/paper-button/paper-button.html">
+
+
+<link rel="import" href="../components/bloombox-styles/bloombox-styles.html">
+
+<link rel="import" href="./behaviors/bloombox-dashboard-page-behavior.html">
+<link rel="import" href="../components/polymerfire/polymerfire.html">
+<link rel="import" href="../components/bloombox-storeconfig/bloombox-storeconfig-rule.html">
+<link rel="import" href="../components/bloombox-storeconfig/bloombox-storeconfig-list.html">
+<link rel="import" href="../components/bloombox-storeconfig/bloombox-storeconfig-menu-order.html">
+
+
+<dom-module id="bloombox-page-storefront">
+<template strip-whitespace>
+  <style is="custom-style" include="bloombox-styles">
+  :host {
+    color: var(--bloombox-theme-foreground);
+  }
+
+  :host main {
+    height: 100%;
+  }
+
+  /** -- Sections -- **/
+  :host iron-pages,
+  :host iron-pages section {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  :host iron-pages section {
+    width: 100%;
+  }
+
+  :host main iron-pages section div.chart-tools {
+    width: 100%;
+    margin: 20px 0;
+  }
+
+  :host main iron-pages section div.chart-content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+  }
+
+  :host main header,
+  :host main header paper-tabs {
+    background: white;
+    color: var(--bloombox-theme-foreground);
+  }
+
+  :host main header paper-tabs paper-tab {
+    color: var(--bloombox-theme-foreground);
+  }
+
+  :host main paper-toolbar {
+    height: 50px;
+    margin-bottom: 5px;
+    color: #444;
+    width: 100%;
+  }
+
+  :host main iron-pages section paper-toolbar bloombox-admin-chart-controls {
+    color: var(--bloombox-theme-foreground);
+    --bloombox-controls-color: var(--bloombox-theme-foreground);
+  }
+
+  :host main iron-pages section paper-toolbar span.title {
+    height: 50px;
+    display: flex;
+    margin-left: 44px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+  }
+
+  :host main iron-pages section paper-toolbar span.title h3 {
+    margin: 0;
+    -webkit-margin-before: 0;
+    -webkit-margin-after: 0;
+    -webkit-margin-start: 0;
+    -webkit-margin-end: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .menuOrder {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 2em;
+  }
+
+
+  .hours {
+    display: flex;
+    flex-wrap: wrap;
+    width: 20%;
+  }
+
+  .card {
+   box-shadow: 0 2px 2px 0 rgba(0,0,0,.14), 0 3px 1px -2px rgba(0,0,0,.2), 0 1px 5px 0 rgba(0,0,0,.12);
+   background: #fff;
+   padding: 2em 1em;
+   box-sizing: border-box;
+   margin-bottom: 1em;
+ }
+
+ .tile {
+  display: flex;
+  flex: 0 0 100%;
+  background: #eee;
+  margin-bottom: 10px;
+  padding: 1em;
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+  padding: 16px;
+  border-radius: 5px;
+  background-color: #fff;
+}
+
+.tile paper-toggle-button, .tile > div {
+  display: flex;
+  flex: 0 0 50%;
+}
+
+section {
+  padding: 1.5em;
+  box-sizing: border-box;
+}
+
+.setting {
+  display: flex;
+  width: 100%;
+  box-sizing: border-box;
+  padding-bottom: 4em;
+}
+
+.fp {
+  width: 50%;
+}
+
+.setting .half {
+  width: 50%;
+}
+
+.theme-form {
+  display: flex;
+  flex-wrap: wrap;
+  flex: 0 0 74%;
+  margin-left: 1%;
+}
+
+.theme-form paper-input {
+  flex: 0 0 calc(50% - 2em);
+  padding: 0 1em;
+}
+
+paper-button {
+  background: var(--app-primary-color);
+  color: white;
+  text-transform: initial;
+}
+
+.theme-form paper-button {
+  margin-top: 2em;
+}
+
+
+section[name="hours"] .table-head,
+section[name="hours"] .table-body {
+  display: flex;
+  width: 100%;
+  margin-bottom: 1em;
+}
+
+section[name="hours"] .table-head > div {
+  flex: 0 0 20%;
+}
+
+section[name="hours"] .table-body {
+  width: 100%;
+ flex-wrap: wrap;
+}
+
+
+.tools {
+  margin-top: 1em;
+  width: 100%;
+}
+
+.tools paper-button {
+  margin-right: 10px;
+}
+
+.floated-label-placeholder {
+  display: none;
+}
+
+.input-icon {
+  padding-right: 10px;
+}
+
+#hoursList {
+  width: 100%;
+}
+
+.appearance-switches {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: start;
+  flex: 0 0 25%;
+}
+
+.appearance-switches paper-toggle-button {
+  flex: 0 0 50%;
+  height: 40px;
+}
+
+.flex-row {
+  display: flex;
+    flex: 0 0 100%;
+}
+
+.setting {
+  display: flex;
+  flex-wrap: wrap;
+}
+.setting > div.half {
+  flex: 0 0 50%;
+}
+
+.setting > div.quarter {
+  margin-left: 1%;
+  flex: 0 0 25%;
+}
+
+.half-inputs {
+  display: flex;
+  flex-wrap: wrap;
+}
+.half-inputs paper-input {
+  margin: 0 0.5em;
+  flex: 0 0 calc(50% - 1em);
+}
+
+:host h2 iron-icon {
+  top: -3px;
+  left: -10px;
+}
+
+:host h2 {
+  text-align: center;
+  width: 100%;
+  margin-top: 0;
+}
+
+.promos {
+  display: flex;
+  flex: 0 0 100%;
+}
+
+.promos > div {
+  display: flex;
+  flex: 0 0 100%;
+}
+
+.promos > div > div {
+  flex: 0 0 33%;
+}
+
+.threight {
+  flex: 0 0 37.5%;
+}
+
+.third {
+  flex: 0 0 29.25%;
+  margin: 0 1%;
+}
+
+#overlay {
+    position: fixed;
+    background: rgba(0,0,0,0.7);
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 99;
+} 
+
+.no-left-margin {
+  margin-left: 0;
+}
+.static-toolbar {
+      padding: 1%;
+    background: white;
+    border-top: 1px solid #eee;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+iron-pages {
+  position: relative;
+}
+
+@media (min-width: 1240px) {
+  .static-toolbar {
+    padding: 1% 260px;
+  }
+}
+</style>
+
+<firebase-document id="storefrontData" path$="[[_storefrontEndpoint]]" data="{{settings}}" hidden></firebase-document>
+<iron-ajax id="getBackup" handle-as="json" url$="https://bloombox-io.firebaseio.com[[_storefrontEndpoint]].json" last-response="{{backup}}"></iron-ajax>
+
+
+<div id="overlay" hidden></div>
+<main>
+  <header>
+    <paper-tabs selected="{{selectedTab}}" attr-for-selected="name">
+    <paper-tab name="general">General Settings</paper-tab>
+    <paper-tab name="hours">Store Hours</paper-tab>
+    <paper-tab name="theme">Appearance</paper-tab>
+  </paper-tabs>
+</header>
+
+<iron-pages selected="{{selectedTab}}" attr-for-selected="name">
+  <section name="general" id="general">
+    <!-- BUSINESS INFO -->
+
+    <div class="setting">
+
+      <div class="third no-left-margin">
+        <div class="appearance-switches card">
+          <h2><iron-icon icon="settings-applications"></iron-icon>Store Settings</h2>
+          <paper-toggle-button checked="{{persistedSettings.services.pickup}}">Pickup</paper-toggle-button>
+          <paper-toggle-button checked="{{persistedSettings.services.delivery}}">Delivery</paper-toggle-button>
+          <paper-toggle-button checked="{{persistedSettings.services.medical}}">Medical</paper-toggle-button>
+          <paper-toggle-button checked="{{persistedSettings.services.recreational}}">Recreational</paper-toggle-button>
+           <paper-toggle-button checked="{{persistedSettings.enrollment.on}}">Accepting Patients</paper-toggle-button>
+        </div>
+
+        <div class="appearance-switches card" hidden="[[!persistedSettings.enrollment.on]]">
+          <h2><iron-icon icon="credit-card"></iron-icon>ID Settings</h2>
+          <paper-toggle-button checked="{{persistedSettings.enrollment.acceptedIds.dl}}">Driver's License</paper-toggle-button>
+          <paper-toggle-button checked="{{persistedSettings.enrollment.acceptedIds.passport}}">Passport</paper-toggle-button>
+          <paper-toggle-button checked="{{persistedSettings.enrollment.acceptedIds.bloomboxcard}}">Bloombox Card</paper-toggle-button>
+        </div>
+
+        <div class="appearance-switches card">
+          <h2><iron-icon icon="redeem"></iron-icon>Promo Codes</h2>
+          <bloombox-storeconfig-list items="{{persistedSettings.promos}}" type="promo" button="Add Promo"></bloombox-storeconfig-list>
+        </div>
+      </div>
+
+      <div class="threight">
+        
+        <div class="card half-inputs">
+          <h2><iron-icon icon="icons:info"></iron-icon>Business Info</h2>
+          <paper-input value="{{persistedSettings.businessInfo.name}}" label="Name"></paper-input>
+          <paper-input value="{{persistedSettings.businessInfo.email}}" label="Email"></paper-input>
+          <paper-input value="{{persistedSettings.businessInfo.phone}}" label="Phone"></paper-input>
+          <paper-input value="{{persistedSettings.businessInfo.address.firstLine}}" label="Address"></paper-input>
+          <paper-input value="{{persistedSettings.businessInfo.address.secondLine}}" label="Suite #"></paper-input>
+          <paper-input value="{{persistedSettings.businessInfo.address.city}}" label="City"></paper-input>
+          <paper-input value="{{persistedSettings.businessInfo.address.state}}" label="State"></paper-input>
+          <paper-input value="{{persistedSettings.businessInfo.address.zip}}" label="Zip"></paper-input>
+        </div>
+        
+        <div class="card half-inputs">
+          <h2><iron-icon icon="social:share"></iron-icon>Website &amp; Social</h2>
+          <paper-input value="{{persistedSettings.businessInfo.website}}" label="Website"></paper-input>
+          <paper-input value="{{persistedSettings.businessInfo.socialMedia.facebook}}" label="Facebook"></paper-input>
+          <paper-input value="{{persistedSettings.businessInfo.socialMedia.instagram}}" label="Instagram"></paper-input>
+          <paper-input value="{{persistedSettings.businessInfo.socialMedia.twitter}}" label="Twitter"></paper-input>
+        </div>
+      </div>
+      
+      <div class="third">
+        <div class="card" hidden="[[!persistedSettings.services.delivery]]">
+          <h2><iron-icon icon="communication:location"></iron-icon>Zipcode Minimums</h2>
+          <paper-input value="{{persistedSettings.storefront.delivery.globalMinimum}}" label="Global Minimum"></paper-input>
+          <bloombox-storeconfig-list items="{{persistedSettings.storefront.delivery.zipcodes}}" type="zip" button="Add Zip"></bloombox-storeconfig-list>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- DELIVERY/PICKUP/HOURS/ZIP -->
+
+
+  </section>
+
+  <section name="hours" id="hours">
+    <div class="table-head">
+      <div>Status</div>
+      <div>Span</div>
+      <div>Begin</div>
+      <div>End</div>
+      <div>Enabled</div>
+    </div>
+
+    <div class="table-body" id="hourRules">
+      <template is="dom-repeat" items="{{persistedSettings.hours.regular}}" as="hours" id="hoursList"> 
+        <bloombox-storeconfig-rule draggable="true" index="[[index]]" hours="{{hours}}"></bloombox-storeconfig-rule>
+      </template>
+  </div>
+
+  <div class="tools">
+    <paper-button on-tap="_addRule"><iron-icon icon="add"></iron-icon>Add Rule</paper-button>
+  </div>
+  </section>
+
+  <section name="theme" class="theme">
+    <h1>Drag and drop to change your navigation order:</h1>
+    <div class="menuOrder" id="menuOrder">
+       <template is="dom-repeat" items="{{persistedSettings.menuOrder}}" as="category">
+        <bloombox-storeconfig-menu-order draggable="true" category="{{category}}" index="{{index}}"></bloombox-store-config-menu-order>
+      </template>
+    </div>
+   <div class="flex-row">
+     <div class="appearance-switches card">
+      <h2><iron-icon icon="sort"></iron-icon> Enable/Disable Filters</h2>
+      <paper-toggle-button checked="{{persistedSettings.filters.price}}">Price</paper-toggle-button>
+      <paper-toggle-button checked="{{persistedSettings.filters.THC}}">THC</paper-toggle-button>
+      <paper-toggle-button checked="{{persistedSettings.filters.CBD}}">CBD</paper-toggle-button>
+      <paper-toggle-button checked="{{persistedSettings.filters.dietary}}">Dietary</paper-toggle-button>
+      <paper-toggle-button checked="{{persistedSettings.filters.brands}}">Brands</paper-toggle-button>
+      <paper-toggle-button checked="{{persistedSettings.filters.species}}">Species</paper-toggle-button>
+      <paper-toggle-button checked="{{persistedSettings.filters.grow}}">Grow</paper-toggle-button>
+    </div>
+    
+    <div class="theme-form card">
+      <h2><iron-icon icon="code"></iron-icon>Custom Styles</h2>
+      <template is="dom-repeat" items="{{persistedSettings.theme}}" as="option">
+        <paper-input always-float-label value="{{option.value}}" label="{{option.name}}">
+        <iron-icon class="input-icon" icon="{{option.icon}}" prefix></iron-icon>
+      </paper-input>
+      </template>
+    </div>
+   </div>
+  </section>
+</iron-pages>
+
+<div class="static-toolbar" id="toolbar">
+ <paper-button on-tap="_revertToLastBackup"><iron-icon icon="undo"></iron-icon>Revert to Last Backup</paper-button>
+    <paper-button on-tap="_popSaveChanges"><iron-icon icon="save"></iron-icon>Save Changes</paper-button>
+
+</div>
+</main>
+
+<paper-dialog id="saveChangesModal"  on-iron-overlay-opened="_openSaveModal" on-iron-overlay-closed="_closeSaveModal">
+  <h2>Please confirm these changes.</h2>
+  <paper-dialog-scrollable>
+    Don't worry - we'll save a copy of your prior changes in case you need to revert.
+  </paper-dialog-scrollable>
+  <div class="buttons">
+    <paper-button dialog-dismiss>Cancel</paper-button>
+    <paper-button dialog-confirm autofocus>Accept</paper-button>
+  </div>
+</paper-dialog>
+
+</template>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+
+var BloomboxPageStorefront = Polymer.BloomboxPageStorefront = Polymer({
+  is: "bloombox-page-storefront",
+
+  behaviors: [
+  Polymer.BloomboxDashboardPageBehavior
+  ],
+
+  properties: {
+    _storefrontEndpoint: {
+      type: String,
+      notify: true,
+      computed: '_computeStorefrontEndpoint(endpoint, location)'
+    },
+    settings: {
+      type: Object,
+      observer: '_settingsReceived',
+      notify: true
+    },
+    selectedTab: {
+      value: "general"
+    },
+    sortable: {
+      type: Object
+    },
+    persistedSettings: {
+      type: Object,
+      notify: true
+    }
+  },
+
+  observers: [],
+
+  _computeStorefrontEndpoint: function(endpoint, location) {
+    return endpoint + "/locations/" + location + "/settings/shop";
+  },
+
+  _popSaveChanges: function() {
+    this.$.overlay.hidden = false;
+    this.$.saveChangesModal.open();
+  },
+
+  _saveChanges: function() {
+    let self = this;
+    let request = this.$.getBackup.generateRequest();
+    let newData = this.get("persistedSettings");
+    let settings = this.settings;
+
+    request.completes.then(function(req){
+      // Backup Complete, save data
+
+      newData.lastBackup = self.backup;
+      self.set("settings", {});
+      self.set("settings", newData);
+    }, function(rejected){
+      console.log(rejected);
+    });
+  },
+
+  _revertToLastBackup: function() {
+    let backup = this.persistedSettings.lastBackup;
+    if(backup) {
+      this.set("persistedSettings", backup);
+    }
+  },
+
+  ready: function() {
+    var self = this;
+
+    this.addEventListener('setRuleDragOver', function(e){
+      self.set("dragOver", e.detail.index);
+    });
+
+    this.addEventListener('setMenuDragOver', function(e){
+      self.set("menuDragOver", e.detail.index);
+    });
+
+    this.addEventListener('moveMenuOrder', function(e){
+      let menuOrder = self.get("persistedSettings.menuOrder");
+      menuOrder.splice(self.get("menuDragOver"), 0, menuOrder.splice(e.detail.index, 1)[0]);
+      self.set("persistedSettings.menuOrder", []);
+      self.set("persistedSettings.menuOrder", menuOrder);
+    });
+
+    this.addEventListener('moveHourItem', function(e){
+      let hours = self.get("persistedSettings.hours.regular");
+      hours.splice(self.get("dragOver"), 0, hours.splice(e.detail.index, 1)[0]);
+      self.set("persistedSettings.hours.regular", []);
+      self.set("persistedSettings.hours.regular", hours);
+    });
+
+    this.addEventListener('delete', function(e){
+       self.splice("persistedSettings.hours.regular", e.detail.item.index, 1);
+    });
+
+    this.addEventListener('deleteListItem', function(e) {
+      let name = e.detail.name;
+      let isPromo = e.detail.isPromo;
+      let pushPath = isPromo ? "persistedSettings.promos" : "persistedSettings.storefront.delivery.zipcodes";
+      let listItem = self.get(pushPath);
+
+      delete listItem[name];
+
+      self.set(pushPath, {});
+      self.set(pushPath, listItem);
+    });
+
+    this.addEventListener('addNewListItem', function(e){
+      let item = e.detail.item;
+      let pushPath =  e.detail.type ==="promo" ? "persistedSettings.promos" : "persistedSettings.storefront.delivery.zipcodes";
+      let listItem = self.get(pushPath);
+      let newPromo = {
+        discount: item.discount,
+        enabled: item.enabled
+      }
+      let newZip = {
+        deliveryMinimum: item.deliveryMinimum,
+        enabled: item.enabled
+      }
+
+      let toPush = e.detail.type ==="promo" ? newPromo : newZip;
+
+      if(listItem == null) {
+        self.set(pushPath, {});
+      }
+
+      listItem[item.name] = toPush;
+
+      self.set(pushPath, {});
+      self.set(pushPath, listItem);
+    });
+  },
+
+  _openSaveModal: function() {
+    this.$.overlay.hidden = false;
+  },
+
+  _closeSaveModal: function() {
+    this.$.overlay.hidden = true;
+
+    if(this.$.saveChangesModal.closingReason.confirmed)
+      this._saveChanges();
+  },
+
+  _addRule: function() {
+    this.push('persistedSettings.hours.regular', {
+      enabled: false,
+      bounds: {
+        begin: {
+          hour: 9
+        },
+        end: {
+          hour: 17
+        },
+        span: "EVERYDAY"
+      },
+      mode: "DELIVERY_ONLY"
+    });
+  },
+  _settingsReceived: function(settings) {
+    this.set("persistedSettings", settings);
+  },
+
+  _isEmptyObj: function(obj) {
+    for(var prop in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, prop)) {
+        return false;
+      }
+    }
+    return true;
+  },
+
+  attached: function() {
+    bloom.app.pageDidLoad("storefront");
+  }
+});
+</script>
+</dom-module>
