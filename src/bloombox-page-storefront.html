@@ -24,6 +24,7 @@
 <link rel="import" href="./behaviors/bloombox-dashboard-page-behavior.html">
 <link rel="import" href="../components/polymerfire/polymerfire.html">
 <link rel="import" href="../components/bloombox-storeconfig/bloombox-storeconfig-rule.html">
+<link rel="import" href="../components/bloombox-storeconfig/bloombox-storeconfig-special.html">
 <link rel="import" href="../components/bloombox-storeconfig/bloombox-storeconfig-list.html">
 <link rel="import" href="../components/bloombox-storeconfig/bloombox-storeconfig-menu-order.html">
 
@@ -200,10 +201,23 @@ section[name="hours"] .table-head > div {
 }
 
 section[name="hours"] .table-body {
-  width: 100%;
+  width: 49%;
  flex-wrap: wrap;
+ flex-direction: column;
 }
 
+.flex-wrap {
+  display: flex;
+  width: 100%;
+}
+
+.flex-wrap > div:nth-child(1) {
+  margin-right: 1%;
+}
+
+.flex-wrap > div:nth-child(2) {
+  margin-left: 1%;
+}
 
 .tools {
   margin-top: 1em;
@@ -299,6 +313,12 @@ section[name="hours"] .table-body {
   margin: 0 1%;
 }
 
+#hours h1 {
+  text-align: center;
+  width: 100%;
+  position: relative;
+}
+
 #overlay {
     position: fixed;
     background: rgba(0,0,0,0.7);
@@ -324,7 +344,14 @@ section[name="hours"] .table-body {
 iron-pages {
   position: relative;
 }
-
+paper-icon-button {
+  background: var(--app-primary-color);
+  border-radius: 24px;
+  color: white;
+  padding-top: 6px;
+  position: absolute;
+  right: 14px;
+}
 @media (min-width: 1240px) {
   .static-toolbar {
     padding: 1% 260px;
@@ -414,23 +441,24 @@ iron-pages {
   </section>
 
   <section name="hours" id="hours">
-    <div class="table-head">
-      <div>Status</div>
-      <div>Span</div>
-      <div>Begin</div>
-      <div>End</div>
-      <div>Enabled</div>
-    </div>
+    <div class="flex-wrap">
+      <div class="table-body" id="hourRules">
+        <h1>Regular Hours <paper-icon-button on-tap="_addRule" icon="add">Add Hours</paper-icon-button></h1>
+        <template is="dom-repeat" items="{{persistedSettings.hours.regular}}" as="hours" id="hoursList"> 
+          <bloombox-storeconfig-rule draggable="true" index="[[index]]" hours="{{hours}}"></bloombox-storeconfig-rule>
+        </template>
+      </div>
 
-    <div class="table-body" id="hourRules">
-      <template is="dom-repeat" items="{{persistedSettings.hours.regular}}" as="hours" id="hoursList"> 
-        <bloombox-storeconfig-rule draggable="true" index="[[index]]" hours="{{hours}}"></bloombox-storeconfig-rule>
-      </template>
-  </div>
-
-  <div class="tools">
-    <paper-button on-tap="_addRule"><iron-icon icon="add"></iron-icon>Add Rule</paper-button>
-  </div>
+      <div class="table-body" id="hourRules">
+        <h1>Special Hours <paper-icon-button on-tap="_addSpecialRule" icon="add">Add Special Hours</paper-icon-button></h1>
+        <template is="dom-repeat" items="{{specialHours}}" as="hours" id="specialHoursList"> 
+          <template is="dom-repeat" items="{{hours.value}}">
+            <bloombox-storeconfig-special draggable="true" index="[[index]]" value="{{hours.date}}" hours="{{item}}"></bloombox-storeconfig-special>
+          </template>
+        </template>
+      </div>
+    </div> 
+    
   </section>
 
   <section name="theme" class="theme">
@@ -513,10 +541,25 @@ var BloomboxPageStorefront = Polymer.BloomboxPageStorefront = Polymer({
     persistedSettings: {
       type: Object,
       notify: true
+    },
+    specialHours: {
+      type: Array,
+      computed: '_computedSpecialHours(persistedSettings.hours.special)'
     }
   },
 
   observers: [],
+
+  _computedSpecialHours: function(hours) {
+    let arr = [];
+    for(let hour in hours) {
+      arr.push({
+        "date" : hour,
+        "value" : hours[hour]
+      })
+    }
+    return arr;
+  },
 
   _computeStorefrontEndpoint: function(endpoint, location) {
     return endpoint + "/locations/" + location + "/settings/shop";
@@ -643,6 +686,41 @@ var BloomboxPageStorefront = Polymer.BloomboxPageStorefront = Polymer({
       },
       mode: "DELIVERY_ONLY"
     });
+  },
+  _addSpecialRule: function() {
+    let now = new Date().getTime(),
+        nowMYD = new Date(now - 2880000),
+        today = nowMYD.toJSON().slice(0,10).replace(/-/g,''),
+        todayPath = this.get('persistedSettings.hours.special.' + today),
+        objToPush = {
+          bounds: {
+            begin: {
+              hour: 9
+            },
+            end: {
+              hour: 17
+            }
+          },
+          mode: "DELIVERY_ONLY"
+        }
+
+    if(todayPath === undefined) {
+      this.set('persistedSettings.hours.special.' + today, []);
+
+      this.push('persistedSettings.hours.special.' + today, objToPush);
+    } else {
+      todayPath.push(objToPush);
+
+      this.set('persistedSettings.hours.special.' + today, [])
+      this.set('persistedSettings.hours.special.' + today, todayPath);
+    }
+
+    let oldRules = this.get('persistedSettings.hours.special');
+
+    this.set('persistedSettings.hours.special', {});
+    setTimeout(function(){
+      this.set('persistedSettings.hours.special', oldRules);
+    }.bind(this), 0);
   },
   _settingsReceived: function(settings) {
     this.set("persistedSettings", settings);
