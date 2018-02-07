@@ -451,9 +451,9 @@ paper-icon-button {
 
       <div class="table-body" id="hourRules">
         <h1>Special Hours <paper-icon-button on-tap="_addSpecialRule" icon="add">Add Special Hours</paper-icon-button></h1>
-        <template is="dom-repeat" items="{{specialHours}}" as="hours" id="specialHoursList"> 
-          <template is="dom-repeat" items="{{hours.value}}">
-            <bloombox-storeconfig-special draggable="true" index="[[index]]" value="{{hours.date}}" hours="{{item}}"></bloombox-storeconfig-special>
+        <template is="dom-repeat" items="{{specialHours}}" as="parent" id="specialHoursList"> 
+          <template is="dom-repeat" items="{{parent.value}}" as="child">
+            <bloombox-storeconfig-special draggable="true" index-parent="{{parent.index}}" index-child="{{index}}" value="{{parent.date}}" hours="{{child}}"></bloombox-storeconfig-special>
           </template>
         </template>
       </div>
@@ -552,11 +552,15 @@ var BloomboxPageStorefront = Polymer.BloomboxPageStorefront = Polymer({
 
   _computedSpecialHours: function(hours) {
     let arr = [];
+    let i = 0;
     for(let hour in hours) {
       arr.push({
         "date" : hour,
-        "value" : hours[hour]
-      })
+        "value" : hours[hour],
+        "index": i
+      });
+
+      i++;
     }
     return arr;
   },
@@ -617,6 +621,23 @@ var BloomboxPageStorefront = Polymer.BloomboxPageStorefront = Polymer({
       hours.splice(self.get("dragOver"), 0, hours.splice(e.detail.index, 1)[0]);
       self.set("persistedSettings.hours.regular", []);
       self.set("persistedSettings.hours.regular", hours);
+    });
+    this.addEventListener('deleteSpecial', function(e){
+      let selection = "persistedSettings.hours.special." + e.detail.date;
+      self.splice(selection, e.detail.index, 1);
+
+      let items = self.get("persistedSettings.hours.special");
+
+      if(self.get(selection).length === 0) {
+        delete items[e.detail.date];
+        self.set("persistedSettings.hours.special", {});
+        self.set("persistedSettings.hours.special", items);
+      } else {
+        self.set("persistedSettings.hours.special", {});
+        setTimeout(function(){
+          self.set("persistedSettings.hours.special", items);
+        }.bind(this), 0);
+      }
     });
 
     this.addEventListener('delete', function(e){
