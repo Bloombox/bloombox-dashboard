@@ -26,7 +26,6 @@
     "neon-elements": "PolymerElements/neon-elements#^1.0.0",
     "gold-elements": "PolymerElements/gold-elements#^1.0.1",
     "app-elements": "PolymerElements/app-elements#^0.9.0",
-    "molecules": "PolymerElements/molecules#^1.0.0",
     "google-apis": "GoogleWebComponents/google-apis#^1.1.5",
     "google-map": "GoogleWebComponents/google-map#^1.1.10",
     "iron-form": "PolymerElements/iron-form#^1.1.4",
