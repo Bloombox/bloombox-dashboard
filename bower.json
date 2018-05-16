@@ -69,9 +69,34 @@
     "paper-radio-group": "master"
   },
   "resolutions": {
-    "bloombox-styles": "0.0.4",
+    "bloombox-styles": "^0.0.6",
     "paper-radio-group": "master",
     "polymerfire": "^0.9.3",
-    "app-storage": "^0.9.0"
+    "app-storage": "^0.9.0",
+    "bloombox-analytics-chart": "master",
+    "paper-styles": "^1.0.0",
+    "bloombox-apothecary": "master",
+    "bloombox-cartridge": "master",
+    "bloombox-concentrate": "master",
+    "bloombox-device": "master",
+    "bloombox-edible": "master",
+    "bloombox-enroll": "master",
+    "bloombox-icons": "master",
+    "bloombox-logo": "master",
+    "bloombox-media": "master",
+    "bloombox-menutools": "master",
+    "bloombox-merch": "master",
+    "bloombox-orders": "master",
+    "bloombox-plant": "master",
+    "bloombox-preroll": "master",
+    "bloombox-pricelist": "master",
+    "bloombox-product": "master",
+    "bloombox-product-list": "master",
+    "bloombox-strain": "master",
+    "bloombox-testing": "master",
+    "bloombox-tv": "master",
+    "bloombox-user": "master",
+    "polymer": "^1.5.0",
+    "webcomponentsjs": "^0.7.24"
   }
 }
